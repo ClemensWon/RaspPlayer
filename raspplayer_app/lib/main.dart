@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:raspplayer_app/Screens/MainScreen.dart';
+import 'package:raspplayer_app/Screens/SettingsScreen.dart';
 
 import './Screens/ConnectScreen.dart';
 
@@ -16,7 +18,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ConnectScreen(),
+      home: MainScreen(),
+      routes: {
+        'SettingsScreen': (context) => SettingsScreen(),
+      },
     );
   }
 }
