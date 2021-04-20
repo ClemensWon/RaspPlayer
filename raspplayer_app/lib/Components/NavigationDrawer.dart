@@ -61,6 +61,13 @@ class NavigationDrawer extends StatelessWidget {
               },
             ),
             ListTile(
+              leading: Icon(Icons.connected_tv),
+              title: Text('Connecting Screen'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, 'Connect');
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.help),
               title: Text('Help'),
               onTap: () {
