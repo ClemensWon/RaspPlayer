@@ -20,7 +20,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'RaspPlayer',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: Color.fromRGBO(0, 1, 49, 1),
+        accentColor: Colors.blue,
+        sliderTheme: SliderThemeData(
+          activeTrackColor: Color.fromRGBO(0, 1, 49, 1),
+          thumbColor: Color.fromRGBO(0, 1, 49, 1)
+        ),
+        backgroundColor: Color.fromRGBO(218, 218, 218, 1),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MainScreen(),

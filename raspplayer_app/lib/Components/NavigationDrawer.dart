@@ -15,7 +15,7 @@ class NavigationDrawer extends StatelessWidget {
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Color.fromRGBO(0, 1, 49, 1),
               ),
               child: Text(
                 'RaspPlayer',
