@@ -1,3 +1,6 @@
+# Created by Martin, 20.04.2021
+# Code is from here: https://towardsdatascience.com/how-to-build-an-mp3-music-player-with-python-619e0c0dcee2
+
 import pygame  # used to create video games
 import tkinter as tkr  # used to develop GUI
 from tkinter.filedialog import Directory, askdirectory  # it permit to select dir
@@ -41,7 +44,6 @@ def pause():
 
 def unpause():
   pygame.mixer.music.unpause()
-
 
 Button1 = tkr.Button(music_player, width=5, height=3, font="Helvetica 12 bold", text="PLAY", command=play, bg="blue", fg="white")
 Button2 = tkr.Button(music_player, width=5, height=3, font="Helvetica 12 bold", text="STOP", command=stop, bg="red", fg="white")
