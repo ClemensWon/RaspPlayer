@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:raspplayer_app/Screens/AboutScreen.dart';
+import 'package:raspplayer_app/Screens/DeviceOptionsScreen.dart';
+import 'package:raspplayer_app/Screens/HelpScreen.dart';
+import 'package:raspplayer_app/Screens/LibaryScreen.dart';
+import 'package:raspplayer_app/Screens/MainScreen.dart';
+import 'package:raspplayer_app/Screens/StatisticsScreen.dart';
+import 'package:raspplayer_app/Screens/UserListScreen.dart';
 
 import './Screens/ConnectScreen.dart';
 
@@ -13,10 +20,26 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'RaspPlayer',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: Color.fromRGBO(0, 1, 49, 1),
+        accentColor: Colors.blue,
+        sliderTheme: SliderThemeData(
+          activeTrackColor: Color.fromRGBO(0, 1, 49, 1),
+          thumbColor: Color.fromRGBO(0, 1, 49, 1)
+        ),
+        backgroundColor: Color.fromRGBO(218, 218, 218, 1),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ConnectScreen(),
+      home: MainScreen(),
+      routes: {
+        'About': (context) => AboutScreen(),
+        'Connect': (context) => ConnectScreen(),
+        'DeviceOptions': (context) => DeviceOptionsScreen(),
+        'Help': (context) => HelpScreen(),
+        'Library': (context) => LibraryScreen(),
+        'Main': (context) => MainScreen(),
+        'Statistics': (context) => StatisticsScreen(),
+        'UserList': (context) => UserListScreen(),
+      },
     );
   }
 }
