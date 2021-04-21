@@ -17,9 +17,6 @@ def returnAllSongs():
         {'songs': songs}
         )
 
-#s
-#
-
 @app.route('/songs/<string:name>', methods = ["GET"]) 
 def returnOneSong(name):
     oneSong = [songs for songs in songs if songs['name'] == name]
