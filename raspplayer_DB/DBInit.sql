@@ -1,12 +1,12 @@
 DROP DATABASE RaspPlayer;
 
-DROP USER 'StandartUser';
+DROP USER 'johnlennon';
 
 CREATE DATABASE RaspPlayer;
 
-CREATE USER 'StandartUser' identified by '4XvwPp3RDPsr5E8s';
+CREATE USER 'johnlennon' identified by 'woodstock69';
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON RaspPlayer.* TO 'StandartUser';
+GRANT SELECT, INSERT, UPDATE, DELETE ON RaspPlayer.* TO 'johnlennon';
 
 FLUSH PRIVILEGES;
 
