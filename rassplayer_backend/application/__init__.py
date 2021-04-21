@@ -5,6 +5,8 @@ app = Flask(__name__, instance_relative_config=False)
 
 #Testvariables
 
+songs = [{'name' : 'Sockosophie','artist' : 'Kaeptn Peng', 'genre' : 'Rap', 'released' : '2013'},{'name' : 'Panikk in der Diskko','artist' : 'ODMGIDA feat Kex Kuhl', 'genre' : 'Rap', 'released' : '2020'},{'name' : 'Awkward', 'artist' : 'Duzoe', 'genre' : 'Rap', 'released' : '2020'}]
+
 @app.route('/')
 def index():
     return 'Hello World'
