@@ -101,7 +101,8 @@ class LibraryScreenSate extends State<LibraryScreen> {
                 },
               )
             ]
-        )
+        ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

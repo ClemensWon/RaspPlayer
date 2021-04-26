@@ -25,6 +25,15 @@ class MainScreenState extends State<MainScreen> {
           textAlign: TextAlign.center,
         ),
       ),
+      floatingActionButton: ElevatedButton(
+        child: Text(
+          "Show Playlist"
+        ),
+        onPressed: () {
+          Navigator.pushNamed(context, 'Playlist');
+        },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
