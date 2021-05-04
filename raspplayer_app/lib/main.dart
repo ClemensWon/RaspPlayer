@@ -4,6 +4,7 @@ import 'package:raspplayer_app/Screens/DeviceOptionsScreen.dart';
 import 'package:raspplayer_app/Screens/HelpScreen.dart';
 import 'package:raspplayer_app/Screens/LibaryScreen.dart';
 import 'package:raspplayer_app/Screens/MainScreen.dart';
+import 'package:raspplayer_app/Screens/PlaylistScreen.dart';
 import 'package:raspplayer_app/Screens/StatisticsScreen.dart';
 import 'package:raspplayer_app/Screens/UserListScreen.dart';
 
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
         'Main': (context) => MainScreen(),
         'Statistics': (context) => StatisticsScreen(),
         'UserList': (context) => UserListScreen(),
+        'Playlist': (context) => PlaylistScreen(),
       },
     );
   }
