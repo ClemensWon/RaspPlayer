@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Components/SongListItem.dart';
 import 'package:flutter/foundation.dart';
+import 'package:raspplayer_app/Services/RestService.dart';
+import 'package:tuple/tuple.dart';
+import 'dart:io';
+
 
 class LibraryScreen extends StatefulWidget {
   @override
@@ -10,32 +14,32 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class LibraryScreenSate extends State<LibraryScreen> {
-  final List<SongListItem> songList = <SongListItem>[
-    SongListItem(
-      key: Key('0 song'),
-      songTitle: '0 Song',
-      artist: 'Mozart',
-      username: 'Clemens',
-      child: Checkbox(
-        value: false,
-        onChanged: (bool check) {
+  final List<SongListItem> songList = [];
+  bool _stuff = true;
 
-        },
-      ),
-    ),
-    SongListItem(
-      key: Key('1 song'),
-      songTitle: '1 Song',
-      artist: 'Mozart',
-      username: 'Clemens',
-      child: Checkbox(
-        value: false,
-        onChanged: (bool check) {
-
-        },
-      ),
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    RestService restService = new RestService();
+    restService.getSongs().then((songs) => {
+      setState((){
+        songs.forEach((song) {
+          songList.add(SongListItem.fromSong(key: Key(song.id.toString()), song: song, child: StatefulBuilder( builder:  (BuildContext context, StateSetter setState) {
+            return Checkbox(
+                key: Key(song.id.toString() + "_checkbox"),
+                value: _stuff,
+                onChanged: (changeValue) {
+                  setState(() {
+                    _stuff = changeValue;
+                  });
+                });
+          }),
+          ));
+          //stderr.writeln(song.id);
+        });
+      })
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +101,16 @@ class LibraryScreenSate extends State<LibraryScreen> {
                     )
                 ),
                 onPressed: () {
+
+                },
+              ),
+              Checkbox(
+                value: _stuff,
+                onChanged: (changeValue){
+                  setState(() {
+                    _stuff = changeValue;
+                    stderr.writeln(_stuff);
+                  });
 
                 },
               )
