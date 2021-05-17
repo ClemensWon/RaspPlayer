@@ -40,6 +40,13 @@ class NavigationDrawer extends StatelessWidget {
               },
             ),
             ListTile(
+              leading: Icon(Icons.playlist_play),
+              title: Text('Playlists'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, 'Playlists');
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.supervised_user_circle_rounded),
               title: Text('User List'),
               onTap: () {

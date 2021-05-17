@@ -1,6 +1,8 @@
 DROP DATABASE RaspPlayer;
 
-DROP USER 'StandardUser';
+
+DROP USER 'johnlennon';
+
 
 CREATE DATABASE RaspPlayer;
 
