@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Components/SongListItem.dart';
 import 'package:flutter/foundation.dart';
+import 'package:raspplayer_app/Services/RestService.dart';
+import 'dart:io';
+
 
 class LibraryScreen extends StatefulWidget {
   @override
@@ -10,32 +13,34 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class LibraryScreenSate extends State<LibraryScreen> {
-  final List<SongListItem> songList = <SongListItem>[
-    SongListItem(
-      key: Key('0 song'),
-      songTitle: '0 Song',
-      artist: 'Mozart',
-      username: 'Clemens',
-      child: Checkbox(
-        value: false,
-        onChanged: (bool check) {
+  final List<SongListItem> songList = [];
+  List<SongListItem> displayList = [];
+  Map checked = {};
 
-        },
-      ),
-    ),
-    SongListItem(
-      key: Key('1 song'),
-      songTitle: '1 Song',
-      artist: 'Mozart',
-      username: 'Clemens',
-      child: Checkbox(
-        value: false,
-        onChanged: (bool check) {
-
-        },
-      ),
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    RestService restService = new RestService();
+    restService.getSongs().then((songs) => {
+      setState((){
+        songs.forEach((song) {
+          checked[song.id] = false;
+          songList.add(SongListItem.fromSong(key: Key(song.id.toString()), song: song, child: StatefulBuilder( builder:  (BuildContext context, StateSetter setState) {
+            return Checkbox(
+                key: Key(song.id.toString() + "_checkbox"),
+                value: checked[song.id],
+                onChanged: (changeValue) {
+                  setState(() {
+                    checked[song.id] = changeValue;
+                  });
+                });
+            }),
+          ));
+          displayList = songList;
+        });
+      })
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +55,16 @@ class LibraryScreenSate extends State<LibraryScreen> {
         margin:EdgeInsets.all(10),
         child: ReorderableListView(
           header: TextFormField(
+            onChanged: (String searchText){
+              setState(() {
+                displayList = songList.where((element) {
+                  return element.username.toUpperCase().contains(searchText.toUpperCase())
+                      || element.artist.toUpperCase().contains(searchText.toUpperCase())
+                      || element.songTitle.toUpperCase().contains(searchText.toUpperCase());
+                }).toList();
+              });
+
+            },
             textAlign: TextAlign.start,
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
@@ -69,7 +84,7 @@ class LibraryScreenSate extends State<LibraryScreen> {
               songList.insert(newIndex, item);
             });
           },
-          children: songList,
+          children: displayList,
         ),
       ),
         floatingActionButton: Row(
@@ -84,7 +99,9 @@ class LibraryScreenSate extends State<LibraryScreen> {
                   )
                 ),
                 onPressed: () {
-                  //...
+                  checked.forEach((key, value) {
+                    stderr.writeln(key.toString() + " " + value.toString());
+                  });
                 },
                 
               ),
@@ -99,7 +116,7 @@ class LibraryScreenSate extends State<LibraryScreen> {
                 onPressed: () {
 
                 },
-              )
+              ),
             ]
         ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
