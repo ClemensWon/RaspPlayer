@@ -2,9 +2,7 @@ from datetime import datetime
 from flask import Flask,jsonify, request
 from functools import wraps
 from flask_sqlalchemy import SQLAlchemy
-from Classes.db import *
 import jwt
-import pprint
 import datetime
 
 app = Flask(__name__)
@@ -60,9 +58,10 @@ def index():
 
 @app.route('/login', methods = ["POST"])
 def login():
-    if(request.form['sessionPin'] == sessionPin):
+    requestData = request_data = request.get_json()
+    if(requestData['sessionPin'] == sessionPin):
         token = jwt.encode({
-            'username': request.form['username'],
+            'username': requestData['username'],
             'sessionPin': sessionPin,
             'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
         },
@@ -77,9 +76,10 @@ def login():
 
 @app.route('/login/master', methods = ["POST"])
 def loginMaster():
-    if request.form['password'] == password:
+    requestData = request_data = request.get_json()
+    if requestData['password'] == password:
         token = jwt.encode({
-            'username': request.form['username'],
+            'username': requestData['username'],
             'admin': 'yes',
             'sessionPin': sessionPin,
             'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
@@ -110,7 +110,8 @@ def returnOneSong(name):
 @app.route('/settings/sessionPin', methods = ["POST"])
 @checkForAdmin
 def changeSessionPin():
-    sessionPin = request.form['newPin']
+    requestData = request_data = request.get_json()
+    sessionPin = requestData['newPin']
     return jsonify(
         {'sessionPin': sessionPin}
     )
@@ -183,7 +184,7 @@ def getStatistics():
         {'statistics': 'yes'}
     )
 
-@app.route('/session/queue/add/<songName>', methods = ['PUT'])
+@app.route('/session/queue/add/<songId>', methods = ['PUT'])
 @checkForUser
 def addSongToQueue(songName):
     #addSongHere
@@ -223,10 +224,8 @@ def muteUser(username):
         {'muted': username}
     )
 
-
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
     
 #@app.route("/login/master", methods = ["POST"])
 #def returnMasterJWT():
