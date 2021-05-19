@@ -1,6 +1,9 @@
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:raspplayer_app/Services/RestService.dart';
 
 class ConnectScreen extends StatefulWidget {
   @override
@@ -8,6 +11,9 @@ class ConnectScreen extends StatefulWidget {
 }
 
 class ConnectScreenState extends State<ConnectScreen> {
+
+  TextEditingController _nickname = TextEditingController();
+  TextEditingController _sessionPin = TextEditingController();
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -50,6 +56,7 @@ class ConnectScreenState extends State<ConnectScreen> {
                 ),
               ),
               TextField(
+                controller: _nickname,
                 decoration: InputDecoration(
                   hintText: 'Enter your Nickname',
                 ),
@@ -60,6 +67,7 @@ class ConnectScreenState extends State<ConnectScreen> {
                 textAlign: TextAlign.center,
               ),
               TextField(
+                controller: _sessionPin,
                 decoration: InputDecoration(
                   hintText: 'Enter the password',
                 ),
@@ -69,10 +77,7 @@ class ConnectScreenState extends State<ConnectScreen> {
                 width: 150.0,
                 height: 50,
                 child: ElevatedButton.icon(
-                  onPressed: () {
-                    // TODO: Check Password and save nickname
-                    Navigator.pushReplacementNamed(context, 'Main');
-                  },
+                  onPressed: OnConnect,
                   icon: Icon(Icons.connected_tv),
                   label: Text(
                     'Connect',
@@ -85,5 +90,32 @@ class ConnectScreenState extends State<ConnectScreen> {
         ),
       ),
     );
+  }
+
+  OnConnect() {
+    stderr.writeln({
+      'username': _nickname.text,
+      'sessionPin': _sessionPin.text
+    });
+    RestService restService = new RestService();
+    restService.login(_nickname.text, _sessionPin.text).then((recievedToken) {
+      if (recievedToken) {
+        Navigator.pushReplacementNamed(context, 'Main');
+      }
+      else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('session pin is wrong'),
+            action: SnackBarAction(
+              label: 'ok',
+              onPressed: () {
+                // Code to execute.
+              },
+            ),
+          ),
+        );
+
+      }
+    });
   }
 }

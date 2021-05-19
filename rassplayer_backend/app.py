@@ -1,8 +1,10 @@
 from datetime import datetime
 from flask import Flask,jsonify, request
 from functools import wraps
+
+from flask.helpers import make_response
 from flask_sqlalchemy import SQLAlchemy
-from Classes.db import *
+#from Classes.db import *
 import jwt
 import pprint
 import datetime
@@ -10,7 +12,7 @@ import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'SECRETKEY'
 
-songs = [{'name' : 'Sockosophie','artist' : 'Kaeptn Peng', 'genre' : 'Rap', 'released' : '2013'},{'name' : 'Panikk in der Diskko','artist' : 'ODMGIDA feat Kex Kuhl', 'genre' : 'Rap', 'released' : '2020'},{'name' : 'Awkward', 'artist' : 'Duzoe', 'genre' : 'Rap', 'released' : '2020'}]
+songs = [{"id":0, "name" : "Sockosophie","artist" : "Kaeptn Peng", "genre" : "Rap", "released" : "2013", "album": "test-album", "addedBy": "Alex"},{"id":1,"name" : "Panikk in der Diskko","artist" : "ODMGIDA feat Kex Kuhl", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Bob"},{"id":2,"name" : "Awkward", "artist" : "Duzoe", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Clemens"}]
 admin = 'master'
 password = "1234"
 global currentSong
@@ -60,9 +62,11 @@ def index():
 
 @app.route('/login', methods = ["POST"])
 def login():
-    if(request.form['sessionPin'] == sessionPin):
+    print(request.data)
+    requestData = request_data = request.get_json()
+    if(requestData['sessionPin'] == sessionPin):
         token = jwt.encode({
-            'username': request.form['username'],
+            'username': requestData['username'],
             'sessionPin': sessionPin,
             'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
         },
@@ -71,9 +75,9 @@ def login():
             {'token': token}
         )
     else:
-        return jsonify(
-            {'message': 'SessionPin was not correct'}, 403
-        )        
+        return make_response(jsonify(
+            {'message': 'SessionPin was not correct'}
+        ), 403)        
 
 @app.route('/login/master', methods = ["POST"])
 def loginMaster():
@@ -226,7 +230,7 @@ def muteUser(username):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
     
 #@app.route("/login/master", methods = ["POST"])
 #def returnMasterJWT():
