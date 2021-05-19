@@ -25,6 +25,29 @@ class RestService {
     if (response.statusCode == 200) {
       stderr.writeln(response.body);
       UserData.token = json.decode(response.body)['token'] as String;
+      UserData.nickname = nickname;
+      UserData.role = 'User';
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> masterLogin(String nickname, String password) async {
+    final response = await http.post(Uri.parse("http://10.0.0.2:5000/login/master"), headers: {
+      "content-type": "application/json",
+      "accept": "application/json",
+    },
+    body: json.encode({
+      'username': nickname,
+      'password': password
+    }));
+    stderr.writeln("abc");
+    if (response.statusCode == 200) {
+      stderr.writeln(response.body);
+      Map jsonObject = json.decode(response.body);
+      UserData.token = jsonObject['token'] as String;
+      UserData.nickname = nickname;
+      UserData.role = 'Owner';
       return true;
     }
     return false;

@@ -81,9 +81,11 @@ def login():
 
 @app.route('/login/master', methods = ["POST"])
 def loginMaster():
-    if request.form['password'] == password:
+    requestData = request_data = request.get_json()
+    print(requestData)
+    if requestData['password'] == password:
         token = jwt.encode({
-            'username': request.form['username'],
+            'username': requestData['username'],
             'admin': 'yes',
             'sessionPin': sessionPin,
             'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
