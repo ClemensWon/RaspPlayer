@@ -77,9 +77,6 @@ def login():
 @app.route('/login/master', methods = ["POST"])
 def loginMaster():
     requestData = request_data = request.get_json()
-    print(requestData)
-    if requestData['password'] == password:
-    requestData = request_data = request.get_json()
     if requestData['password'] == password:
         token = jwt.encode({
             'username': requestData['username'],
