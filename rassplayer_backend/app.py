@@ -1,12 +1,8 @@
 from datetime import datetime
 from flask import Flask,jsonify, request
 from functools import wraps
-
-from flask.helpers import make_response
 from flask_sqlalchemy import SQLAlchemy
-#from Classes.db import *
 import jwt
-import pprint
 import datetime
 
 app = Flask(__name__)
@@ -62,7 +58,6 @@ def index():
 
 @app.route('/login', methods = ["POST"])
 def login():
-    print(request.data)
     requestData = request_data = request.get_json()
     if(requestData['sessionPin'] == sessionPin):
         token = jwt.encode({
@@ -77,12 +72,14 @@ def login():
     else:
         return make_response(jsonify(
             {'message': 'SessionPin was not correct'}
-        ), 403)        
+        ), 403)
 
 @app.route('/login/master', methods = ["POST"])
 def loginMaster():
     requestData = request_data = request.get_json()
     print(requestData)
+    if requestData['password'] == password:
+    requestData = request_data = request.get_json()
     if requestData['password'] == password:
         token = jwt.encode({
             'username': requestData['username'],
@@ -116,7 +113,8 @@ def returnOneSong(name):
 @app.route('/settings/sessionPin', methods = ["POST"])
 @checkForAdmin
 def changeSessionPin():
-    sessionPin = request.form['newPin']
+    requestData = request_data = request.get_json()
+    sessionPin = requestData['newPin']
     return jsonify(
         {'sessionPin': sessionPin}
     )
@@ -189,7 +187,7 @@ def getStatistics():
         {'statistics': 'yes'}
     )
 
-@app.route('/session/queue/add/<songName>', methods = ['PUT'])
+@app.route('/session/queue/add/<songId>', methods = ['PUT'])
 @checkForUser
 def addSongToQueue(songName):
     #addSongHere
@@ -228,8 +226,6 @@ def muteUser(username):
     return jsonify(
         {'muted': username}
     )
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
