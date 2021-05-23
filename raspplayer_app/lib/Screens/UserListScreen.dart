@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Components/UserListItem.dart';
+import 'package:raspplayer_app/Services/UserData.dart';
 
 class UserListScreen extends StatefulWidget {
   @override
@@ -9,7 +10,7 @@ class UserListScreen extends StatefulWidget {
 }
 
 class UserListScreenState extends State<UserListScreen> {
-  final bool _adminView = true;
+  final bool _adminView = UserData.role == "Owner";
   final bool _allowMute = true;
 
   @override

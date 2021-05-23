@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
+import 'package:raspplayer_app/Services/UserData.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -108,7 +109,7 @@ class MainScreenState extends State<MainScreen> {
                   onPressed: () {},
                   icon: Image.asset('assets/img/icon_Pause.png', color: Colors.black54),
                 ),
-                IconButton(
+                if (UserData.role == 'Owner')IconButton(
                   onPressed: () {},
                   icon: Image.asset('assets/img/icon_Power.png', color: Colors.black54),
                 ),
