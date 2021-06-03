@@ -7,14 +7,15 @@ import 'dart:convert';
 import 'package:raspplayer_app/model/Song.dart';
 
 class RestService {
+  final String hostname = "http://10.0.0.2:5000";
   void testFetch() async{
-    http.get(Uri.parse("http://10.0.0.2:5000"), headers: {
-      "Accept": "application/json"
+    http.get(Uri.parse(hostname), headers: {
+      "Accept": "application/json",
     }).then((value) => stderr.writeln(value.body));
   }
 
   Future<bool> login(String nickname, String sessionPin) async {
-    final response = await http.post(Uri.parse('http://10.0.0.2:5000/login'), headers: {
+    final response = await http.post(Uri.parse(hostname+'/login'), headers: {
       "content-type" : "application/json",
       "accept" : "application/json",
     },
@@ -33,7 +34,7 @@ class RestService {
   }
 
   Future<bool> masterLogin(String nickname, String password) async {
-    final response = await http.post(Uri.parse("http://10.0.0.2:5000/login/master"), headers: {
+    final response = await http.post(Uri.parse(hostname+"/login/master"), headers: {
       "content-type": "application/json",
       "accept": "application/json",
     },
@@ -55,8 +56,9 @@ class RestService {
 
   Future<List<Song>> getSongs() async{
     List<Song> result = [];
-    final response = await http.get(Uri.parse('http://10.0.0.2:5000/songs?token='+UserData.token), headers: {
+    final response = await http.get(Uri.parse(hostname + '/songs'), headers: {
       'Accept': 'application/json',
+      'token': UserData.token
     });
     if (response.statusCode == 200) {
       //stderr.writeln(jsonDecode(response.body)["songs"]);
