@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
+import 'package:raspplayer_app/Services/RestService.dart';
 import 'package:raspplayer_app/Services/UserData.dart';
 
 class MainScreen extends StatefulWidget {
@@ -10,7 +11,10 @@ class MainScreen extends StatefulWidget {
 
 class MainScreenState extends State<MainScreen> {
 
-  final bool admin = true;
+  RestService _restService = new RestService();
+  bool _isLikedSong = false;
+  bool _isSkipped = false;
+  bool _isReplay = false;
   final String songTitle = 'Song1';
   final String artist = 'Artist1';
   final String album = 'Album1';
@@ -90,20 +94,38 @@ class MainScreenState extends State<MainScreen> {
 
                 ),
                 IconButton(
-                  onPressed: () {},
-                  icon: Image.asset('assets/img/icon_Like.png', color: Colors.black54),
+                  onPressed: () {
+                    _restService.likeCurrentSong().then((success) {
+                      setState(() {
+                        _isLikedSong = true;
+                      });
+                    });
+                  },
+                  icon: Image.asset('assets/img/icon_Like.png', color: (_isLikedSong)? Colors.blue : Colors.black54),
                 ),
                 IconButton(
-                  onPressed: () {},
-                  icon: Image.asset('assets/img/icon_Again.png', color: Colors.black54),
+                  onPressed: () {
+                    _restService.replayCurrentSong().then((success) {
+                      setState(() {
+                        _isReplay = true;
+                      });
+                    });
+                  },
+                  icon: Image.asset('assets/img/icon_Again.png', color: (_isReplay)? Colors.blue : Colors.black54),
                 ),
                 IconButton(
                   onPressed: () {},
                   icon: Image.asset('assets/img/icon_Info.png', color: Colors.black54),
                 ),
                 IconButton(
-                  onPressed: () {},
-                  icon: Image.asset('assets/img/icon_PlayNext.png', color: Colors.black54),
+                  onPressed: () {
+                    _restService.skipCurrentSong().then((success) {
+                      setState(() {
+                        _isSkipped = true;
+                      });
+                    });
+                  },
+                  icon: Image.asset('assets/img/icon_PlayNext.png', color: (_isSkipped)? Colors.blue : Colors.black54),
                 ),
                 IconButton(
                   onPressed: () {},

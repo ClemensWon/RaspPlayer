@@ -68,4 +68,28 @@ class RestService {
        return result;
     }
   }
+
+  Future<bool> likeCurrentSong() async {
+    final response = await http.put(Uri.parse(hostname + '/session/currentSong/like'), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
+  }
+
+  Future<bool> skipCurrentSong() async {
+    final response = await http.get(Uri.parse(hostname + '/session/currentSong/replay'), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
+  }
+
+  Future<bool> replayCurrentSong() async {
+    final response = await http.get(Uri.parse(hostname + '/session/currentSong/skip'), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
+  }
 }
