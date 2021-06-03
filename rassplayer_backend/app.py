@@ -1,52 +1,52 @@
 from datetime import datetime
 from flask import Flask,jsonify, request
 from functools import wraps
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import sqlalchemy
+from CLasses import User, Session, Admin
 import jwt
 import datetime
+
+
+#FIX ADMIN TOKEN? OTHER WAY TO AUTH ADMIN THEN IN TOKEN THAT CAN BE SEEN
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'SECRETKEY'
 
 songs = [{'name' : 'Sockosophie','artist' : 'Kaeptn Peng', 'genre' : 'Rap', 'released' : '2013'},{'name' : 'Panikk in der Diskko','artist' : 'ODMGIDA feat Kex Kuhl', 'genre' : 'Rap', 'released' : '2020'},{'name' : 'Awkward', 'artist' : 'Duzoe', 'genre' : 'Rap', 'released' : '2020'}]
-admin = 'master'
-password = "1234"
-global currentSong
-global sessionPin
-global thisSession
 
-currentSong = 'default'
-sessionPin= 'default'
+
+session = Session.Session('default')
+admin   = Admin.Admin()
 
 def checkForAdmin(func):
     @wraps(func)
     def wrapped(*args, **kwargs):
-        token = request.args.get('token')
+        token = request.headers.get('Token')
         if not token:
             return jsonify({'message': 'Missing token'}), 403
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             if not data.get('admin'):
-                return jsonify({'message': 'User is not admin'}), 403
+                return jsonify({'message': 'User is not admin'}), 401
         except:
-            return jsonify({'message': 'Invalid Token'}), 403
+            return jsonify({'message': 'Invalid Token'}), 401
         return func(*args, **kwargs)
     return wrapped
 
 def checkForUser(func):
     @wraps(func)
     def wrapped(*args, **kwargs):
-        token = request.args.get('token')
+        token = request.headers.get('Token')
         if not token:
             return jsonify({'message': 'Missing token'}), 403
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             if data.get('admin'):
                 return func(*args, **kwargs)
-            elif not data.get('sessionPin') == sessionPin:
-                return jsonify({'message': 'SessionPin not registered'}), 403
+            elif not data.get('sessionPin') == session.sessionPin:
+                return jsonify({'message': 'SessionPin not registered'}), 401
         except:
-            return jsonify({'message': 'Invalid Token'}), 403
+            return jsonify({'message': 'Invalid Token'}), 401
         return func(*args, **kwargs)
     return wrapped
 
@@ -58,11 +58,13 @@ def index():
 
 @app.route('/login', methods = ["POST"])
 def login():
-    requestData = request_data = request.get_json()
-    if(requestData['sessionPin'] == sessionPin):
+    requestData = request.get_json()
+    if(requestData['sessionPin'] == session.sessionPin):
+        newUser = User.User(requestData['username'])
+        session.users.append(newUser)
         token = jwt.encode({
             'username': requestData['username'],
-            'sessionPin': sessionPin,
+            'sessionPin': session.sessionPin,
             'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
         },
         app.config['SECRET_KEY'], algorithm="HS256")
@@ -71,17 +73,17 @@ def login():
         )
     else:
         return jsonify(
-            {'message': 'SessionPin was not correct'}, 403
-        )        
+            {'message': 'SessionPin was not correct'}
+        ), 401        
 
 @app.route('/login/master', methods = ["POST"])
 def loginMaster():
-    requestData = request_data = request.get_json()
-    if requestData['password'] == password:
+    requestData = request.get_json()
+    if requestData['password'] == admin.password and requestData['username'] == admin.username:
         token = jwt.encode({
             'username': requestData['username'],
             'admin': 'yes',
-            'sessionPin': sessionPin,
+            'sessionPin': session.sessionPin,
             'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
         },
         app.config['SECRET_KEY'], algorithm="HS256")
@@ -90,8 +92,8 @@ def loginMaster():
         )
     else:
         return jsonify(
-            {'message': 'Login as Master was not sucessfull'}, 403
-        )
+            {'message': 'Login as Master was not sucessfull'}
+        ), 401
 
 @app.route('/songs', methods = ["GET"])
 @checkForUser
@@ -110,10 +112,10 @@ def returnOneSong(name):
 @app.route('/settings/sessionPin', methods = ["POST"])
 @checkForAdmin
 def changeSessionPin():
-    requestData = request_data = request.get_json()
-    sessionPin = requestData['newPin']
+    requestData = request.get_json()
+    session.sessionPin = requestData['newPin']
     return jsonify(
-        {'sessionPin': sessionPin}
+        {'sessionPin': session.sessionPin}
     )
 
 @app.route('/session/currentSong/like', methods = ["PUT"])
@@ -127,53 +129,55 @@ def likeSong():
 @app.route('/session/setCurrentSong/<songId>', methods = ["PUT"])
 @checkForAdmin
 def setCurrentSong(songId):
-    currentSong = songId
+    session.currentSong = songId
     return jsonify(
-        {'currentSong': currentSong}
+        {'currentSong': session.currentSong}
     )
 
 @app.route('/session/currentSong/skip', methods = ['GET'])
 @checkForUser
 def skipCurrentSong():
-    currentSong = 'nextSong'
+    session.currentSong = 'nextSong'
     return jsonify(
-        {'currentSong': currentSong}
+        {'currentSong': session.currentSong}
     )
 
 @app.route('/session/currentSong/play', methods = ['GET'])
 @checkForUser
 def playCurrentSong():
-    currentSong = 'play'
+    session.currentSong = 'play'
     #currentSong = nextSong
     return jsonify(
-        {'currentSong': currentSong}
+        {'currentSong': session.currentSong}
     )
 
 @app.route('/session/currentSong/replay', methods = ['GET'])
 @checkForUser
 def replayCurrentSong():
-    currentSong = 'replay'
+    session.currentSong = 'replay'
     #currentSong = nextSong
     return jsonify(
-        {'currentSong': currentSong}
+        {'currentSong': session.currentSong}
     )
 
+'''
+BRAUCHEN  WIR DAS NOCH?
 @app.route('/session/end', methods = ['GET'])
 @checkForAdmin
 def endSession():
-    thisSession = 'end'
     #currentSong = nextSong
     return jsonify(
         {'session': thisSession}
     )
+'''
 
 @app.route('/session/start', methods = ['GET'])
 @checkForAdmin
 def startSession():
-    thisSession = 'start'
+    session = Session.Session("default")
     #currentSong = nextSong
     return jsonify(
-        {'session': thisSession}
+        {'session': "Created New"}
     )
 
 @app.route('/statistics', methods = ["GET"])
@@ -223,6 +227,15 @@ def muteUser(username):
     return jsonify(
         {'muted': username}
     )
+
+@app.route('/Session/Users/return', methods = ['GET'])
+@checkForUser
+def returnUsers():
+    users = session.returnUsers()
+    return jsonify(
+        users
+    )
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
