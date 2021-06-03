@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:raspplayer_app/Services/DeviceInfoService.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 
 class ConnectScreen extends StatefulWidget {
@@ -148,6 +149,10 @@ class ConnectScreenState extends State<ConnectScreen> {
     stderr.writeln({
       'username': _nickname.text,
       'sessionPin': _sessionPin.text
+    });
+    DeviceInfoService deviceInfoService = new DeviceInfoService();
+    deviceInfoService.getDeviceId().then((value) {
+      print(value);
     });
     RestService restService = new RestService();
     if (dropdownValue == "User") {
