@@ -6,8 +6,7 @@ from CLasses import User, Session, Admin
 import jwt
 import datetime
 
-
-#FIX ADMIN TOKEN? OTHER WAY TO AUTH ADMIN THEN IN TOKEN THAT CAN BE SEEN
+#Parameter check incoming
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'SECRETKEY'
