@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Services/UserData.dart';
 
@@ -11,6 +12,7 @@ class MainScreen extends StatefulWidget {
 class MainScreenState extends State<MainScreen> {
 
   final bool admin = true;
+  final String currentSong = 'current Song';
   final String songTitle = 'Song1';
   final String artist = 'Artist1';
   final String album = 'Album1';
@@ -98,7 +100,46 @@ class MainScreenState extends State<MainScreen> {
                   icon: Image.asset('assets/img/icon_Again.png', color: Colors.black54),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (builder) {
+                          return Dialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                            elevation: 16,
+                            child: Container(
+                              height: 300,
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(15, 0, 15, 20),
+                                child: ListView(
+                                  children: <Widget>[
+                                    SizedBox(height:20),
+                                    Center(
+                                      child: Text("Information", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Songname" + ": " + currentSong),
+                                          SizedBox(height: 30),
+                                          Text("Interpret" + ": " + artist),
+                                          SizedBox(height: 30),
+                                          Text("Album" + ": " + album),
+                                          SizedBox(height: 30),
+                                          Text("Added by" + ": " + user),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                    );
+                  },
                   icon: Image.asset('assets/img/icon_Info.png', color: Colors.black54),
                 ),
                 IconButton(
