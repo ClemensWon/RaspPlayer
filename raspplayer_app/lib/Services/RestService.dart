@@ -7,15 +7,15 @@ import 'dart:convert';
 import 'package:raspplayer_app/model/Song.dart';
 
 class RestService {
-  final String hostname = "http://10.0.0.2:5000";
+  final String hostname = "http://10.0.0.15:5000";
   void testFetch() async{
     http.get(Uri.parse(hostname), headers: {
-      "Accept": "application/json",
+      "Accept": "application/json"
     }).then((value) => stderr.writeln(value.body));
   }
 
   Future<bool> login(String nickname, String sessionPin) async {
-    final response = await http.post(Uri.parse(hostname+'/login'), headers: {
+    final response = await http.post(Uri.parse(hostname + '/login'), headers: {
       "content-type" : "application/json",
       "accept" : "application/json",
     },
@@ -34,7 +34,7 @@ class RestService {
   }
 
   Future<bool> masterLogin(String nickname, String password) async {
-    final response = await http.post(Uri.parse(hostname+"/login/master"), headers: {
+    final response = await http.post(Uri.parse(hostname + "/login/master"), headers: {
       "content-type": "application/json",
       "accept": "application/json",
     },
