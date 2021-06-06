@@ -76,7 +76,6 @@ class RestService {
       'token': UserData.token,
     });
     if (response.statusCode == 200) {
-      stderr.writeln(response.body);
       int idCounter = 0;
       jsonDecode(response.body).forEach((element) {
         result.add(new User(id: idCounter.toString(),username: element,role: "User",isMuted: false));
@@ -116,6 +115,19 @@ class RestService {
       'token': UserData.token
     });
     return response.statusCode == 200;
+  }
+
+  Future<Map> getStatistic() async{
+    Map result;
+    final response = await http.get(Uri.parse(hostname + '/statistics'), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token,
+    });
+    if (response.statusCode == 200) {
+      result = jsonDecode(response.body);
+      stderr.writeln(result["bestDj"]);
+      return result;
+    }
   }
 }
 

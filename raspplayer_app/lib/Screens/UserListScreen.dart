@@ -20,7 +20,6 @@ class UserListScreenState extends State<UserListScreen> {
   void initState() {
     super.initState();
     RestService rs = new RestService();
-    stderr.writeln("Hallo");
     rs.getUsers().then((result) {
       int keyValue = 0;
       setState(() {

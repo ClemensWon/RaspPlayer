@@ -184,7 +184,33 @@ def startSession():
 def getStatistics():
     #get statistics
     return jsonify(
-        {'statistics': 'yes'}
+        {
+            'statistics': 'yes',
+            'bestDj': {
+                'username': 'DJ Ötzi',
+                'likes': 2,
+            },
+            'bestSong': {
+                'songname': 'Song1',
+                'likes': 69,
+            },
+            'favArtist': {
+                'artistname': 'Mozart',
+                'likes': 123,
+            },
+            'playlistJunkie': {
+                'username': 'MoneyBoy',
+                'songsAdded': 123,
+            },
+            'mostReplays': {
+                'songname': 'Song24',
+                'replays': 5,
+            },
+            'mostSkipped': {
+                'songname': 'Song99',
+                'skipped': 19,
+            },
+        }
     )
 
 @app.route('/session/queue/add/<songId>', methods = ['PUT'])
