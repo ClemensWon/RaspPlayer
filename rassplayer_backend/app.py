@@ -3,6 +3,7 @@ from flask import Flask,jsonify, request
 from functools import wraps
 from flask_sqlalchemy import sqlalchemy
 from CLasses import User, Session, Admin
+import json
 import jwt
 import datetime
 
@@ -49,6 +50,20 @@ def checkForUser(func):
         return func(*args, **kwargs)
     return wrapped
 
+def checkJsonValid(func):
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        if request.is_json:
+            data = request.get_json()
+            try:
+                test = json.loads(data)
+                return func(*args, **kwargs)
+            except ValueError as e:
+                return jsonify({'message': 'invalid json'}), 400
+        else:
+            return jsonify({'message': 'data is not json'}), 400
+
+
 #Testvariables
 
 @app.route('/')
@@ -56,6 +71,7 @@ def index():
     return 'Hello World'
 
 @app.route('/login', methods = ["POST"])
+@checkJsonValid
 def login():
     requestData = request.get_json()
     if(requestData['sessionPin'] == session.sessionPin):
@@ -76,6 +92,7 @@ def login():
         ), 401        
 
 @app.route('/login/master', methods = ["POST"])
+@checkJsonValid
 def loginMaster():
     requestData = request.get_json()
     if requestData['password'] == admin.password and requestData['username'] == admin.username:
@@ -101,7 +118,8 @@ def returnAllSongs():
         {'songs': songs}
     )
 
-@app.route('/songs/<string:name>', methods = ["GET"]) 
+@app.route('/songs/<string:name>', methods = ["GET"])
+@checkForUser
 def returnOneSong(name):
     oneSong = [songs for songs in songs if songs['name'] == name]
     return jsonify(
@@ -110,6 +128,7 @@ def returnOneSong(name):
 
 @app.route('/settings/sessionPin', methods = ["POST"])
 @checkForAdmin
+@checkJsonValid
 def changeSessionPin():
     requestData = request.get_json()
     session.sessionPin = requestData['newPin']
@@ -119,14 +138,15 @@ def changeSessionPin():
 
 @app.route('/session/currentSong/like', methods = ["PUT"])
 @checkForUser
+@checkJsonValid
 def likeSong():
-    #like in DB
     return jsonify(
         {'message': 'song Liked'}
     )
 
 @app.route('/session/setCurrentSong/<songId>', methods = ["PUT"])
 @checkForAdmin
+@checkJsonValid
 def setCurrentSong(songId):
     session.currentSong = songId
     return jsonify(
@@ -145,7 +165,14 @@ def skipCurrentSong():
 @checkForUser
 def playCurrentSong():
     session.currentSong = 'play'
-    #currentSong = nextSong
+    return jsonify(
+        {'currentSong': session.currentSong}
+    )
+
+@app.route('/session/currentSong/stop', methods = ['GET'])
+@checkForUser
+def stopCurrentSong():
+    session.currentSong = 'stop'
     return jsonify(
         {'currentSong': session.currentSong}
     )
@@ -154,7 +181,6 @@ def playCurrentSong():
 @checkForUser
 def replayCurrentSong():
     session.currentSong = 'replay'
-    #currentSong = nextSong
     return jsonify(
         {'currentSong': session.currentSong}
     )
@@ -171,10 +197,9 @@ def endSession():
 '''
 
 @app.route('/session/start', methods = ['GET'])
-@checkForAdmin
+@checkForUser
 def startSession():
     session = Session.Session("default")
-    #currentSong = nextSong
     return jsonify(
         {'session': "Created New"}
     )
@@ -182,15 +207,14 @@ def startSession():
 @app.route('/statistics', methods = ["GET"])
 @checkForUser
 def getStatistics():
-    #get statistics
     return jsonify(
         {'statistics': 'yes'}
     )
 
 @app.route('/session/queue/add/<songId>', methods = ['PUT'])
 @checkForUser
+@checkJsonValid
 def addSongToQueue(songName):
-    #addSongHere
     return jsonify(
         {'queue': songName}
     )
@@ -198,7 +222,6 @@ def addSongToQueue(songName):
 @app.route('/Library/upload', methods = ['POST'])
 @checkForUser
 def uploadSong():
-    #uploadSong
     return jsonify(
         {'upload': 'yes'}
     )
@@ -206,7 +229,6 @@ def uploadSong():
 @app.route('/Session/Volume/<amount>', methods = ['GET'])
 @checkForUser
 def setVolume(amount):
-    #setSessionVolume
     return jsonify(
         {'volume': amount}
     )
@@ -214,15 +236,14 @@ def setVolume(amount):
 @app.route('/Session/Volume/mute', methods = ['GET'])
 @checkForUser
 def muteVolume():
-    #muteVolume
     return jsonify(
         {'volume': 'muted'}
     )
 
 @app.route('/Session/Mute/<username>', methods = ['PUT'])
 @checkForUser
+@checkJsonValid
 def muteUser(username):
-    #muteUser
     return jsonify(
         {'muted': username}
     )
@@ -235,6 +256,13 @@ def returnUsers():
         users
     )
 
+@app.route('/Session/Queue/return', methods = ['GET'])
+@checkForUser
+def returnQueue():
+    songs = session.returnQueue()
+    return jsonify(
+        songs
+    )
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
