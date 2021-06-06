@@ -74,6 +74,7 @@ class RestService {
       'Accept': 'application/json',
       'token': UserData.token
     });
+    stderr.writeln(response.statusCode== 200);
     return response.statusCode == 200;
   }
 

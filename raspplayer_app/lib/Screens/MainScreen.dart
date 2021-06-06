@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
@@ -15,10 +17,25 @@ class MainScreenState extends State<MainScreen> {
   bool _isLikedSong = false;
   bool _isSkipped = false;
   bool _isReplay = false;
+  bool _isPlaying = true;
   final String songTitle = 'Song1';
   final String artist = 'Artist1';
   final String album = 'Album1';
   final String user = 'User1';
+
+  displayErrorMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('error with connection to the server'),
+          action: SnackBarAction(
+            label: 'Ok',
+            onPressed: () {
+              // Code to execute.
+            },
+          ),
+        )
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +114,11 @@ class MainScreenState extends State<MainScreen> {
                   onPressed: () {
                     _restService.likeCurrentSong().then((success) {
                       setState(() {
-                        _isLikedSong = true;
+                        if (success) {
+                          _isLikedSong = true;
+                        } else {
+                          displayErrorMessage();
+                        }
                       });
                     });
                   },
@@ -107,7 +128,11 @@ class MainScreenState extends State<MainScreen> {
                   onPressed: () {
                     _restService.replayCurrentSong().then((success) {
                       setState(() {
-                        _isReplay = true;
+                        if (success) {
+                          _isReplay = true;
+                        } else {
+                          displayErrorMessage();
+                        }
                       });
                     });
                   },
@@ -121,16 +146,31 @@ class MainScreenState extends State<MainScreen> {
                   onPressed: () {
                     _restService.skipCurrentSong().then((success) {
                       setState(() {
-                        _isSkipped = true;
+                        if (success) {
+                          _isSkipped = true;
+                        } else {
+                          displayErrorMessage();
+                        }
                       });
                     });
                   },
                   icon: Image.asset('assets/img/icon_PlayNext.png', color: (_isSkipped)? Colors.blue : Colors.black54),
                 ),
-                IconButton(
-                  onPressed: () {},
+                if (_isPlaying)IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _isPlaying = false;
+                    });
+                  },
                   icon: Image.asset('assets/img/icon_Pause.png', color: Colors.black54),
                 ),
+                if (!_isPlaying)IconButton(
+                    icon: Image.asset('assets/img/icon_Play.png', color: Colors.black54),
+                    onPressed: () {
+                      setState(() {
+                        _isPlaying = true;
+                      });
+                    }),
                 if (UserData.role == 'Owner')IconButton(
                   onPressed: () {},
                   icon: Image.asset('assets/img/icon_Power.png', color: Colors.black54),
