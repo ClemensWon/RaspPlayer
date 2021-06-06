@@ -8,9 +8,9 @@ class Session:
         this.currentSong = ''
 
     def returnUsers(this):
-        users = {}
+        users = []
         i = -1
         for user in this.users:
             i=i+1
-            users['user'+ str(i)] = user.username
+            users.append(user.username)
         return users

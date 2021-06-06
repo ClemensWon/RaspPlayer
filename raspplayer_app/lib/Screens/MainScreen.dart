@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
+import 'package:raspplayer_app/Services/RestService.dart';
+import 'package:raspplayer_app/Services/UserData.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -10,10 +15,30 @@ class MainScreen extends StatefulWidget {
 class MainScreenState extends State<MainScreen> {
 
   final bool admin = true;
+  final String currentSong = 'current Song';
+  RestService _restService = new RestService();
+  bool _isLikedSong = false;
+  bool _isSkipped = false;
+  bool _isReplay = false;
+  bool _isPlaying = true;
   final String songTitle = 'Song1';
   final String artist = 'Artist1';
   final String album = 'Album1';
   final String user = 'User1';
+
+  displayErrorMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('error with connection to the server'),
+          action: SnackBarAction(
+            label: 'Ok',
+            onPressed: () {
+              // Code to execute.
+            },
+          ),
+        )
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,26 +114,114 @@ class MainScreenState extends State<MainScreen> {
 
                 ),
                 IconButton(
-                  onPressed: () {},
-                  icon: Image.asset('assets/img/icon_Like.png', color: Colors.black54),
+                  onPressed: () {
+                    _restService.likeCurrentSong().then((success) {
+                      setState(() {
+                        if (success) {
+                          _isLikedSong = true;
+                        } else {
+                          displayErrorMessage();
+                        }
+                      });
+                    });
+                  },
+                  icon: Image.asset('assets/img/icon_Like.png', color: (_isLikedSong)? Colors.blue : Colors.black54),
                 ),
                 IconButton(
-                  onPressed: () {},
-                  icon: Image.asset('assets/img/icon_Again.png', color: Colors.black54),
+                  onPressed: () {
+                    _restService.replayCurrentSong().then((success) {
+                      setState(() {
+                        if (success) {
+                          _isReplay = true;
+                        } else {
+                          displayErrorMessage();
+                        }
+                      });
+                    });
+                  },
+                  icon: Image.asset('assets/img/icon_Again.png', color: (_isReplay)? Colors.blue : Colors.black54),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (builder) {
+                          return Dialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                            elevation: 16,
+                            child: Container(
+                              height: 300,
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(15, 0, 15, 20),
+                                child: ListView(
+                                  children: <Widget>[
+                                    SizedBox(height:20),
+                                    Center(
+                                      child: Text("Information", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Songname" + ": " + currentSong),
+                                          SizedBox(height: 10),
+                                          Text("Interpret" + ": " + artist),
+                                          SizedBox(height: 10),
+                                          Text("Album" + ": " + album),
+                                          SizedBox(height: 10),
+                                          Text("Added by" + ": " + user),
+                                          SizedBox(height: 10),
+                                          Text("Duration" + ": " + user),
+                                          SizedBox(height: 10),
+                                          Text("Genre" + ": " + user),
+                                          SizedBox(height: 10),
+                                          Text("Likes" + ": " + user),
+                                          SizedBox(height: 10),
+                                          Text("Skips" + ": " + user),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                    );
+                  },
                   icon: Image.asset('assets/img/icon_Info.png', color: Colors.black54),
                 ),
                 IconButton(
-                  onPressed: () {},
-                  icon: Image.asset('assets/img/icon_PlayNext.png', color: Colors.black54),
+                  onPressed: () {
+                    _restService.skipCurrentSong().then((success) {
+                      setState(() {
+                        if (success) {
+                          _isSkipped = true;
+                        } else {
+                          displayErrorMessage();
+                        }
+                      });
+                    });
+                  },
+                  icon: Image.asset('assets/img/icon_PlayNext.png', color: (_isSkipped)? Colors.blue : Colors.black54),
                 ),
-                IconButton(
-                  onPressed: () {},
+                if (_isPlaying)IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _isPlaying = false;
+                    });
+                  },
                   icon: Image.asset('assets/img/icon_Pause.png', color: Colors.black54),
                 ),
-                IconButton(
+                if (!_isPlaying)IconButton(
+                    icon: Image.asset('assets/img/icon_Play.png', color: Colors.black54),
+                    onPressed: () {
+                      setState(() {
+                        _isPlaying = true;
+                      });
+                    }),
+                if (UserData.role == 'Owner')IconButton(
                   onPressed: () {},
                   icon: Image.asset('assets/img/icon_Power.png', color: Colors.black54),
                 ),

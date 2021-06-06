@@ -11,7 +11,7 @@ import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'SECRETKEY'
 
-songs = [{'name' : 'Sockosophie','artist' : 'Kaeptn Peng', 'genre' : 'Rap', 'released' : '2013'},{'name' : 'Panikk in der Diskko','artist' : 'ODMGIDA feat Kex Kuhl', 'genre' : 'Rap', 'released' : '2020'},{'name' : 'Awkward', 'artist' : 'Duzoe', 'genre' : 'Rap', 'released' : '2020'}]
+songs = [{"id":0, "name" : "Sockosophie","artist" : "Kaeptn Peng", "genre" : "Rap", "released" : "2013", "album": "test-album", "addedBy": "Alex"},{"id":1,"name" : "Panikk in der Diskko","artist" : "ODMGIDA feat Kex Kuhl", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Bob"},{"id":2,"name" : "Awkward", "artist" : "Duzoe", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Clemens"}]
 
 
 session = Session.Session('default')
@@ -73,7 +73,7 @@ def login():
     else:
         return jsonify(
             {'message': 'SessionPin was not correct'}
-        ), 401        
+        ), 401
 
 @app.route('/login/master', methods = ["POST"])
 def loginMaster():
@@ -184,7 +184,33 @@ def startSession():
 def getStatistics():
     #get statistics
     return jsonify(
-        {'statistics': 'yes'}
+        {
+            'statistics': 'yes',
+            'bestDj': {
+                'username': 'DJ Ötzi',
+                'likes': 2,
+            },
+            'bestSong': {
+                'songname': 'Song1',
+                'likes': 69,
+            },
+            'favArtist': {
+                'artistname': 'Mozart',
+                'likes': 123,
+            },
+            'playlistJunkie': {
+                'username': 'MoneyBoy',
+                'songsAdded': 123,
+            },
+            'mostReplays': {
+                'songname': 'Song24',
+                'replays': 5,
+            },
+            'mostSkipped': {
+                'songname': 'Song99',
+                'skipped': 19,
+            },
+        }
     )
 
 @app.route('/session/queue/add/<songId>', methods = ['PUT'])

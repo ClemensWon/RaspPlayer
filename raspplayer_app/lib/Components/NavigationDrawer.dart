@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:raspplayer_app/Services/UserData.dart';
 
 class NavigationDrawer extends StatelessWidget {
 
@@ -60,7 +61,7 @@ class NavigationDrawer extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, 'Statistics');
               },
             ),
-            ListTile(
+            if (UserData.role == 'Owner')ListTile(
               leading: Icon(Icons.settings),
               title: Text('Device Options'),
               onTap: () {
@@ -68,9 +69,11 @@ class NavigationDrawer extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.connected_tv),
-              title: Text('Connecting Screen'),
+              leading: Icon(Icons.cancel_presentation),
+              title: Text('Disconnect'),
               onTap: () {
+                UserData.role = '';
+                UserData.nickname = '';
                 Navigator.pushReplacementNamed(context, 'Connect');
               },
             ),
