@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:raspplayer_app/Services/UserData.dart';
 import 'dart:convert';
-
+import 'package:raspplayer_app/model/User.dart';
 import 'package:raspplayer_app/model/Song.dart';
 
 class RestService {
@@ -69,6 +69,22 @@ class RestService {
     }
   }
 
+  Future<List<User>> getUsers() async{
+    List<User> result = [];
+    final response = await http.get(Uri.parse(hostname + '/Session/Users/return'), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token,
+    });
+    if (response.statusCode == 200) {
+      stderr.writeln(response.body);
+      int idCounter = 0;
+      jsonDecode(response.body).forEach((element) {
+        result.add(new User(id: idCounter.toString(),username: element,role: "User",isMuted: false));
+      });
+      return result;
+    }
+  }
+
   Future<bool> likeCurrentSong() async {
     final response = await http.put(Uri.parse(hostname + '/session/currentSong/like'), headers: {
       'Accept': 'application/json',
@@ -92,4 +108,13 @@ class RestService {
     });
     return response.statusCode == 200;
   }
+
+  Future<bool> muteUser(String username) async {
+    final response = await http.put(Uri.parse(hostname + '/Session/Mute/' + username), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
+  }
 }
+
