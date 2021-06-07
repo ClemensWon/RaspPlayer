@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Flask,jsonify, request
 from functools import wraps
 from flask_sqlalchemy import sqlalchemy
-from CLasses import User, Session, Admin
+from CLasses import User, Session, Admin, MopidyConnection
 import jwt
 import datetime
 
@@ -16,6 +16,7 @@ songs = [{'name' : 'Sockosophie','artist' : 'Kaeptn Peng', 'genre' : 'Rap', 'rel
 
 session = Session.Session('default')
 admin   = Admin.Admin()
+mopidy = MopidyConnection.MopidyConnection()
 
 def checkForAdmin(func):
     @wraps(func)
