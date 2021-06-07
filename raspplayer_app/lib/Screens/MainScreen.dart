@@ -1,8 +1,8 @@
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:provider/provider.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 import 'package:raspplayer_app/Services/UserData.dart';
@@ -16,11 +16,9 @@ class MainScreenState extends State<MainScreen> {
 
   final bool admin = true;
   final String currentSong = 'current Song';
+
   RestService _restService = new RestService();
-  bool _isLikedSong = false;
-  bool _isSkipped = false;
-  bool _isReplay = false;
-  bool _isPlaying = true;
+
   final String songTitle = 'Song1';
   final String artist = 'Artist1';
   final String album = 'Album1';
@@ -43,6 +41,7 @@ class MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    MainScreenProvider mainScreenProvider = Provider.of<MainScreenProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Playing Now'),
@@ -118,28 +117,28 @@ class MainScreenState extends State<MainScreen> {
                     _restService.likeCurrentSong().then((success) {
                       setState(() {
                         if (success) {
-                          _isLikedSong = true;
+                          mainScreenProvider.setIsLikedSong(true);
                         } else {
                           displayErrorMessage();
                         }
                       });
                     });
                   },
-                  icon: Image.asset('assets/img/icon_Like.png', color: (_isLikedSong)? Colors.blue : Colors.black54),
+                  icon: Image.asset('assets/img/icon_Like.png', color: (mainScreenProvider.getIsLikedSong())? Colors.blue : Colors.black54),
                 ),
                 IconButton(
                   onPressed: () {
                     _restService.replayCurrentSong().then((success) {
                       setState(() {
                         if (success) {
-                          _isReplay = true;
+                          mainScreenProvider.setIsReplay(true);
                         } else {
                           displayErrorMessage();
                         }
                       });
                     });
                   },
-                  icon: Image.asset('assets/img/icon_Again.png', color: (_isReplay)? Colors.blue : Colors.black54),
+                  icon: Image.asset('assets/img/icon_Again.png', color: (mainScreenProvider.getIsReplay())? Colors.blue : Colors.black54),
                 ),
                 IconButton(
                   onPressed: () {
@@ -197,28 +196,28 @@ class MainScreenState extends State<MainScreen> {
                     _restService.skipCurrentSong().then((success) {
                       setState(() {
                         if (success) {
-                          _isSkipped = true;
+                          mainScreenProvider.setIsSkipped(true);
                         } else {
                           displayErrorMessage();
                         }
                       });
                     });
                   },
-                  icon: Image.asset('assets/img/icon_PlayNext.png', color: (_isSkipped)? Colors.blue : Colors.black54),
+                  icon: Image.asset('assets/img/icon_PlayNext.png', color: (mainScreenProvider.getIsSkipped())? Colors.blue : Colors.black54),
                 ),
-                if (_isPlaying)IconButton(
+                if (mainScreenProvider.getIsPlaying())IconButton(
                   onPressed: () {
                     setState(() {
-                      _isPlaying = false;
+                      mainScreenProvider.setIsPlaying(false);
                     });
                   },
                   icon: Image.asset('assets/img/icon_Pause.png', color: Colors.black54),
                 ),
-                if (!_isPlaying)IconButton(
+                if (!mainScreenProvider.getIsPlaying())IconButton(
                     icon: Image.asset('assets/img/icon_Play.png', color: Colors.black54),
                     onPressed: () {
                       setState(() {
-                        _isPlaying = true;
+                        mainScreenProvider.setIsPlaying(true);
                       });
                     }),
                 if (UserData.role == 'Owner')IconButton(
@@ -306,5 +305,48 @@ class MainScreenState extends State<MainScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
+  }
+}
+
+class MainScreenProvider with ChangeNotifier {
+  bool _isLikedSong = false;
+  bool _isSkipped = false;
+  bool _isReplay = false;
+  bool _isPlaying = true;
+
+  bool getIsLikedSong() {
+    return this._isLikedSong;
+  }
+
+  void setIsLikedSong(isLikedSong) {
+    this._isLikedSong = isLikedSong;
+    notifyListeners();
+  }
+
+  bool getIsSkipped() {
+    return this._isSkipped;
+  }
+
+  void setIsSkipped(isSkipped) {
+    this._isSkipped = _isSkipped;
+    notifyListeners();
+  }
+
+  bool getIsReplay() {
+    return this._isReplay;
+  }
+
+  void setIsReplay(bool isReplay) {
+    this._isReplay = isReplay;
+    notifyListeners();
+  }
+
+  bool getIsPlaying() {
+    return this._isPlaying;
+  }
+
+  void setIsPlaying(bool isPlaying) {
+    this._isPlaying = isPlaying;
+    notifyListeners();
   }
 }
