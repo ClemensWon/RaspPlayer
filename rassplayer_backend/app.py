@@ -224,6 +224,7 @@ def addSongToQueue(songName):
 @app.route('/Library/upload', methods = ['POST'])
 @checkForUser
 def uploadSong():
+    file = request.files['file']
     #uploadSong
     return jsonify(
         {'upload': 'yes'}

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Components/SongListItem.dart';
 import 'package:flutter/foundation.dart';
+import 'package:raspplayer_app/Services/FilePickerService.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 import 'dart:io';
 
@@ -13,6 +14,7 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class LibraryScreenSate extends State<LibraryScreen> {
+  final FilePickerService filePickerService = new FilePickerService();
   final List<SongListItem> songList = [];
   List<SongListItem> displayList = [];
   Map checked = {};
@@ -114,7 +116,12 @@ class LibraryScreenSate extends State<LibraryScreen> {
                     )
                 ),
                 onPressed: () {
-
+                  filePickerService.getFile().then((file) {
+                    RestService restService = new RestService();
+                    restService.uploadSong(file).then((value) => null);
+                    stderr.writeln(file);
+                  });
+                  stderr.writeln();
                 },
               ),
             ]

@@ -1,13 +1,14 @@
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:raspplayer_app/Services/UserData.dart';
 import 'dart:convert';
 import 'package:raspplayer_app/model/User.dart';
 import 'package:raspplayer_app/model/Song.dart';
 
 class RestService {
-  final String hostname = "http://10.0.0.15:5000";
+  final String hostname = "http://10.0.0.2:5000";
   void testFetch() async{
     http.get(Uri.parse(hostname), headers: {
       "Accept": "application/json"
@@ -67,6 +68,7 @@ class RestService {
         });
        return result;
     }
+    return null;
   }
 
   Future<List<User>> getUsers() async{
@@ -82,6 +84,7 @@ class RestService {
       });
       return result;
     }
+    return null;
   }
 
   Future<bool> likeCurrentSong() async {
@@ -128,6 +131,19 @@ class RestService {
       stderr.writeln(result["bestDj"]);
       return result;
     }
+    return null;
+  }
+
+  Future<Song> uploadSong(File file) async {
+    var request = http.MultipartRequest('POST',Uri.parse(hostname + '/Library/upload'))
+      ..files.add(await http.MultipartFile.fromPath('file', file.path, filename: file.path.split("/").last, contentType: MediaType('audio', 'mpeg')));
+    request.headers.addAll({
+      'Accept': 'application/json',
+      'token': UserData.token,
+    });
+    final response = await request.send();
+    stderr.writeln(response);
+    return null;
   }
 }
 
