@@ -215,10 +215,10 @@ def getStatistics():
 
 @app.route('/session/queue/add/<songId>', methods = ['PUT'])
 @checkForUser
-def addSongToQueue(songName):
+def addSongToQueue(songId):
     #addSongHere
     return jsonify(
-        {'queue': songName}
+        {'queue': songId}
     )
 
 @app.route('/Library/upload', methods = ['POST'])

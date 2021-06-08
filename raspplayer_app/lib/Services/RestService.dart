@@ -43,7 +43,6 @@ class RestService {
       'username': nickname,
       'password': password
     }));
-    stderr.writeln("abc");
     if (response.statusCode == 200) {
       stderr.writeln(response.body);
       Map jsonObject = json.decode(response.body);
@@ -87,12 +86,19 @@ class RestService {
     return null;
   }
 
+  Future<bool> playCurrentSong() async {
+    final response = await http.get(Uri.parse(hostname + '/session/currentSong/play'), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
+  }
+
   Future<bool> likeCurrentSong() async {
     final response = await http.put(Uri.parse(hostname + '/session/currentSong/like'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
-    stderr.writeln(response.statusCode== 200);
     return response.statusCode == 200;
   }
 
@@ -132,6 +138,14 @@ class RestService {
       return result;
     }
     return null;
+  }
+
+  Future<bool> addSongToQueue(Song song) async{
+    final response = await http.put(Uri.parse(hostname + '/session/queue/add/' + song.id.toString()), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
   }
 
   Future<Song> uploadSong(File file) async {

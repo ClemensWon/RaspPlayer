@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:provider/provider.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
+import 'package:raspplayer_app/Components/SongListItem.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 import 'package:raspplayer_app/Services/UserData.dart';
+import 'package:raspplayer_app/model/Song.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -108,7 +110,9 @@ class MainScreenState extends State<MainScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, 'Library');
+                  },
                   icon: Image.asset('assets/img/icon_Plus.png', color: Colors.black54),
 
                 ),
@@ -216,9 +220,16 @@ class MainScreenState extends State<MainScreen> {
                 if (!mainScreenProvider.getIsPlaying())IconButton(
                     icon: Image.asset('assets/img/icon_Play.png', color: Colors.black54),
                     onPressed: () {
-                      setState(() {
-                        mainScreenProvider.setIsPlaying(true);
+                      _restService.playCurrentSong().then((success) {
+                        if (success) {
+                          setState(() {
+                            mainScreenProvider.setIsPlaying(true);
+                          });
+                        } else {
+                          displayErrorMessage();
+                        }
                       });
+
                     }),
                 if (UserData.role == 'Owner')IconButton(
                   onPressed: () {},
@@ -236,56 +247,7 @@ class MainScreenState extends State<MainScreen> {
                 margin: EdgeInsets.fromLTRB(10, 15, 25, 15),
                 child: ListView(
                   scrollDirection: Axis.vertical,
-                  children: [
-                    ListTile(
-                      title: Text(
-                          'Song1 - Artist1'
-                      ),
-                      subtitle: Text(
-                          'added by User1'
-                      ),
-                    ),
-                    ListTile(
-                      title: Text(
-                          'Song2 - Artist2'
-                      ),
-                      subtitle: Text(
-                          'added by User2'
-                      ),
-                    ),
-                    ListTile(
-                      title: Text(
-                          'Song3 - Artist3'
-                      ),
-                      subtitle: Text(
-                          'added by User3'
-                      ),
-                    ),
-                    ListTile(
-                      title: Text(
-                          'Song4 - Artist4'
-                      ),
-                      subtitle: Text(
-                          'added by User4'
-                      ),
-                    ),
-                    ListTile(
-                      title: Text(
-                          'Song5 - Artist5'
-                      ),
-                      subtitle: Text(
-                          'added by User5'
-                      ),
-                    ),
-                    ListTile(
-                      title: Text(
-                          'Song6 - Artist6'
-                      ),
-                      subtitle: Text(
-                          'added by User6'
-                      ),
-                    ),
-                  ],
+                  children: mainScreenProvider.getQueue()
                 ),
               ),
             ),
@@ -309,10 +271,12 @@ class MainScreenState extends State<MainScreen> {
 }
 
 class MainScreenProvider with ChangeNotifier {
+  List<SongListItem> _queue = [];
   bool _isLikedSong = false;
   bool _isSkipped = false;
   bool _isReplay = false;
   bool _isPlaying = true;
+  int keyCounter = 0;
 
   bool getIsLikedSong() {
     return this._isLikedSong;
@@ -348,5 +312,16 @@ class MainScreenProvider with ChangeNotifier {
   void setIsPlaying(bool isPlaying) {
     this._isPlaying = isPlaying;
     notifyListeners();
+  }
+
+  void addToQueue(Song newSong) {
+    this._queue.add(SongListItem.fromSong(song: newSong));
+    List<SongListItem> tmp = _queue;
+    this._queue = tmp;
+    notifyListeners();
+  }
+
+  List<SongListItem> getQueue() {
+    return this._queue;
   }
 }
