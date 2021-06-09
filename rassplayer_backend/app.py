@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Flask,jsonify, request
 from functools import wraps
 from flask_sqlalchemy import sqlalchemy
-from CLasses import User, Session, Admin, MopidyConnection
+from CLasses import User, Session, Admin
 import jwt
 import datetime
 
@@ -16,7 +16,6 @@ songs = [{'name' : 'Sockosophie','artist' : 'Kaeptn Peng', 'genre' : 'Rap', 'rel
 
 session = Session.Session('default')
 admin   = Admin.Admin()
-mopidy = MopidyConnection.MopidyConnection()
 
 def checkForAdmin(func):
     @wraps(func)
@@ -55,6 +54,11 @@ def checkForUser(func):
 @app.route('/')
 def index():
     return 'Hello World'
+
+@app.route('/pause')
+def testpause():
+    session.pause()
+    return 'pause/resume'
 
 @app.route('/login', methods = ["POST"])
 def login():
@@ -137,7 +141,7 @@ def setCurrentSong(songId):
 @app.route('/session/currentSong/skip', methods = ['GET'])
 @checkForUser
 def skipCurrentSong():
-    session.currentSong = 'nextSong'
+    session.skip()
     return jsonify(
         {'currentSong': session.currentSong}
     )
@@ -145,8 +149,7 @@ def skipCurrentSong():
 @app.route('/session/currentSong/play', methods = ['GET'])
 @checkForUser
 def playCurrentSong():
-    session.currentSong = 'play'
-    #currentSong = nextSong
+    session.play()
     return jsonify(
         {'currentSong': session.currentSong}
     )
@@ -154,8 +157,7 @@ def playCurrentSong():
 @app.route('/session/currentSong/replay', methods = ['GET'])
 @checkForUser
 def replayCurrentSong():
-    session.currentSong = 'replay'
-    #currentSong = nextSong
+    session.replay()
     return jsonify(
         {'currentSong': session.currentSong}
     )
@@ -190,10 +192,10 @@ def getStatistics():
 
 @app.route('/session/queue/add/<songId>', methods = ['PUT'])
 @checkForUser
-def addSongToQueue(songName):
-    #addSongHere
+def addSongToQueue(songId):
+    session.songToQueue(songId)
     return jsonify(
-        {'queue': songName}
+        {'queue': songId}
     )
 
 @app.route('/Library/upload', methods = ['POST'])
@@ -207,7 +209,7 @@ def uploadSong():
 @app.route('/Session/Volume/<amount>', methods = ['GET'])
 @checkForUser
 def setVolume(amount):
-    #setSessionVolume
+    session.setvolume(int(amount))
     return jsonify(
         {'volume': amount}
     )
@@ -215,7 +217,7 @@ def setVolume(amount):
 @app.route('/Session/Volume/mute', methods = ['GET'])
 @checkForUser
 def muteVolume():
-    #muteVolume
+    session.mute()
     return jsonify(
         {'volume': 'muted'}
     )
