@@ -71,6 +71,11 @@ def checkJsonValid(func):
 def index():
     return 'Hello World'
 
+@app.route('/pause')
+def testpause():
+    session.pause()
+    return 'pause/resume'
+
 @app.route('/login', methods = ["POST"])
 @checkJsonValid
 def login():
@@ -168,7 +173,7 @@ def setCurrentSong(songId):
 @app.route('/session/currentSong/skip', methods = ['GET'])
 @checkForUser
 def skipCurrentSong():
-    session.currentSong = 'nextSong'
+    session.skip()
     return jsonify(
         {'currentSong': session.currentSong}
     )
@@ -176,15 +181,15 @@ def skipCurrentSong():
 @app.route('/session/currentSong/play', methods = ['GET'])
 @checkForUser
 def playCurrentSong():
-    session.currentSong = 'play'
+    session.play()
     return jsonify(
         {'currentSong': session.currentSong}
     )
 
 @app.route('/session/currentSong/stop', methods = ['GET'])
 @checkForUser
-def stopCurrentSong():
-    session.currentSong = 'stop'
+def replayCurrentSong():
+    session.replay()
     return jsonify(
         {'currentSong': session.currentSong}
     )
@@ -214,10 +219,10 @@ def getStatistics():
 
 @app.route('/session/queue/add/<songId>', methods = ['PUT'])
 @checkForUser
-@checkJsonValid
-def addSongToQueue(songName):
+def addSongToQueue(songId):
+    session.songToQueue(songId)
     return jsonify(
-        {'queue': songName}
+        {'queue': songId}
     )
 
 @app.route('/Library/upload', methods = ['POST'])
@@ -230,6 +235,7 @@ def uploadSong():
 @app.route('/Session/Volume/<amount>', methods = ['GET'])
 @checkForUser
 def setVolume(amount):
+    session.setvolume(int(amount))
     return jsonify(
         {'volume': amount}
     )
@@ -237,6 +243,7 @@ def setVolume(amount):
 @app.route('/Session/Volume/mute', methods = ['GET'])
 @checkForUser
 def muteVolume():
+    session.mute()
     return jsonify(
         {'volume': 'muted'}
     )
