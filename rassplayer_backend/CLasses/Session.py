@@ -5,7 +5,8 @@ class Session:
         this.sessionPin = sessionPin
         this.users = []
         this.queue = [1,3,4,2,5]
-        this.currentSong = ''
+        this.playlist = 0           #playlistId
+        this.usersMuted = []
 
     def returnUsers(this):
         users = {}

@@ -40,6 +40,7 @@ def checkForUser(func):
         if not token:
             return jsonify({'message': 'Missing token'}), 403
         try:
+            #check if device Id is banned
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             if data.get('admin'):
                 return func(*args, **kwargs)
@@ -75,6 +76,8 @@ def index():
 def login():
     requestData = request.get_json()
     if(requestData['sessionPin'] == session.sessionPin):
+        #create User in database
+        #log deviceId to Database
         newUser = User.User(requestData['username'])
         session.users.append(newUser)
         token = jwt.encode({
@@ -144,6 +147,15 @@ def likeSong():
         {'message': 'song Liked'}
     )
 
+@app.route('/session/currentSong/get', methods = ["PUT"])
+@checkForUser
+@checkJsonValid
+def getCurrentSong():
+    return jsonify(
+        {'message': 'song Liked'}
+    )
+
+
 @app.route('/session/setCurrentSong/<songId>', methods = ["PUT"])
 @checkForAdmin
 @checkJsonValid
@@ -184,17 +196,6 @@ def replayCurrentSong():
     return jsonify(
         {'currentSong': session.currentSong}
     )
-
-'''
-BRAUCHEN  WIR DAS NOCH?
-@app.route('/session/end', methods = ['GET'])
-@checkForAdmin
-def endSession():
-    #currentSong = nextSong
-    return jsonify(
-        {'session': thisSession}
-    )
-'''
 
 @app.route('/session/start', methods = ['GET'])
 @checkForUser
@@ -262,6 +263,29 @@ def returnQueue():
     songs = session.returnQueue()
     return jsonify(
         songs
+    )
+
+@app.route('/Session/Queue/delete/<songId>', methods = ['GET'])
+@checkForUser
+def deleteSongFromQueue():
+    return jsonify(
+        songs
+    )
+
+@app.route('/Session/playlist/get/', methods = ['GET'])
+@checkForUser
+def getPlaylist():
+    #getPlaylistData
+    return jsonify(
+        {'message': 'getPlaylist'}
+    )
+
+@app.route('/Session/playlist/delete/<songId>', methods = ['GET'])
+@checkForUser
+def deleteSongFromPlaylist():
+    #deleteSongFromPlaylist
+    return jsonify(
+        {'message': 'delete Playlist'}
     )
 
 if __name__ == '__main__':
