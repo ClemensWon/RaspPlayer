@@ -57,13 +57,13 @@ def checkJsonValid(func):
         if request.is_json:
             data = request.get_json()
             try:
-                test = json.loads(data)
+                test=json.dumps(data)
                 return func(*args, **kwargs)
             except ValueError as e:
                 return jsonify({'message': 'invalid json'}), 400
         else:
             return jsonify({'message': 'data is not json'}), 400
-
+    return wrapped
 
 #Testvariables
 
