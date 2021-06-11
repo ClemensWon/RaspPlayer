@@ -39,7 +39,7 @@ CREATE TABLE Song (
     likes int NOT NULL,
     skips int NOT NULL,
     album varchar NOT NULL,
-    replay int NOT NULL,
+    replays int NOT NULL,
     foreign key (deviceID) references User(deviceID) on delete cascade
 );
 
@@ -64,6 +64,7 @@ CREATE TABLE InterpretToSong (
 CREATE TABLE SongToPlaylist (
     playlistID int,
     songID int,
+    songPos int NOT NULL,
     primary key (playlistID, songID),
     foreign key (playlistID) references Playlist(playlistID) on delete cascade,
     foreign key (songID) references Song(songID) on delete cascade
