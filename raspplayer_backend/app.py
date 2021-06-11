@@ -150,7 +150,7 @@ def likeSong():
 @checkForUser
 @checkJsonValid
 #ban User
-def likeSong():
+def banUser():
     return jsonify(
         {'message': 'song Liked'}
     )
@@ -170,22 +170,22 @@ def currentSongPause():
     return 'pause/resume'
 
 @app.route('/settings')
-def currentSongPause():
+def settings():
     #get Settings
     return 'settings'
 
 @app.route('/users/muteAll')
-def currentSongPause():
+def mutAll():
     #mute All users
     return 'mute'
 
 @app.route('/users/kickAll')
-def currentSongPause():
+def kickAll():
     #kick All users
     return 'kick'
 
 @app.route('/session/setPlaylist')
-def currentSongPause():
+def setPlaylist():
     #setPlaylistId
     return 'setPlaylist'
 

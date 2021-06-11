@@ -1,5 +1,5 @@
 import json
-from CLasses import MopidyConnection
+from CLasses import MopidyConnection, DB
 
 class Session:
     def __init__(this,sessionPin):
@@ -11,13 +11,14 @@ class Session:
         this.currentPlaylist = ''
         this.volume = 0
         this.mopidy = MopidyConnection.MopidyConnection()
+        this.db = DB.DB()
 
     def returnUsers(this):
-        users = []
-        i = -1
-        for user in this.users:
-            users.append(user.username)
-        return users
+        users = this.db.getUsers()
+
+        for user in users:
+            this.users.append(user[1])
+        return this.users
     
     def returnQueue (this):
         queue = {}
