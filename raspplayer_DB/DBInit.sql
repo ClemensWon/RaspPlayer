@@ -6,9 +6,9 @@ DROP USER 'johnlennon';
 
 CREATE DATABASE RaspPlayer;
 
-CREATE USER 'johnlennon' identified by 'woodstock69';
+CREATE USER 'johnlennon'@'localhost' identified by 'woodstock69';
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON RaspPlayer.* TO 'johnlennon';
+GRANT SELECT, INSERT, UPDATE, DELETE ON RaspPlayer.* TO 'johnlennon'@'localhost';
 
 FLUSH PRIVILEGES;
 
