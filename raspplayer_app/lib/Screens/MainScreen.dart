@@ -16,6 +16,7 @@ class MainScreen extends StatefulWidget {
 
 class MainScreenState extends State<MainScreen> {
 
+
   final bool admin = true;
   final String currentSong = 'current Song';
 
@@ -25,6 +26,7 @@ class MainScreenState extends State<MainScreen> {
   final String artist = 'Artist1';
   final String album = 'Album1';
   final String user = 'User1';
+  List<SongListItem> queue = [];
 
   displayErrorMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -38,6 +40,23 @@ class MainScreenState extends State<MainScreen> {
           ),
         )
     );
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    _restService.getQueue().then((response) {
+      if (response != []) {
+        setState(() {
+          response.forEach((element) {
+           queue.add(SongListItem.fromSong(song: element));
+          });
+        });
+      }
+
+    });
+    //MainScreenProvider mainScreenProvider = Provider.of<MainScreenProvider>(context);
+
   }
 
   @override
@@ -209,30 +228,28 @@ class MainScreenState extends State<MainScreen> {
                   },
                   icon: Image.asset('assets/img/icon_PlayNext.png', color: (mainScreenProvider.getIsSkipped())? Colors.blue : Colors.black54),
                 ),
-                if (mainScreenProvider.getIsPlaying())IconButton(
+                IconButton(
                   onPressed: () {
-                    setState(() {
-                      mainScreenProvider.setIsPlaying(false);
+                    _restService.pauseResumeCurrentSong().then((success) {
+                      if (success) {
+                        setState(() {
+                          mainScreenProvider.setIsPlaying(!mainScreenProvider.getIsPlaying());
+                        });
+                      } else {
+                        displayErrorMessage();
+                      }
                     });
                   },
-                  icon: Image.asset('assets/img/icon_Pause.png', color: Colors.black54),
+                  icon: (mainScreenProvider.getIsPlaying()) ?  Image.asset('assets/img/icon_Pause.png', color: Colors.black54) : Image.asset('assets/img/icon_Play.png', color: Colors.black54),
                 ),
-                if (!mainScreenProvider.getIsPlaying())IconButton(
-                    icon: Image.asset('assets/img/icon_Play.png', color: Colors.black54),
-                    onPressed: () {
-                      _restService.playCurrentSong().then((success) {
-                        if (success) {
-                          setState(() {
-                            mainScreenProvider.setIsPlaying(true);
-                          });
-                        } else {
-                          displayErrorMessage();
-                        }
-                      });
-
-                    }),
                 if (UserData.role == 'Owner')IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _restService.playCurrentSong().then((success) {
+                      if (!success) {
+                        displayErrorMessage();
+                      }
+                    });
+                  },
                   icon: Image.asset('assets/img/icon_Power.png', color: Colors.black54),
                 ),
               ],
@@ -247,7 +264,7 @@ class MainScreenState extends State<MainScreen> {
                 margin: EdgeInsets.fromLTRB(10, 15, 25, 15),
                 child: ListView(
                   scrollDirection: Axis.vertical,
-                  children: mainScreenProvider.getQueue()
+                  children:queue
                 ),
               ),
             ),

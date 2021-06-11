@@ -8,7 +8,7 @@ import 'package:raspplayer_app/model/User.dart';
 import 'package:raspplayer_app/model/Song.dart';
 
 class RestService {
-  final String hostname = "http://10.0.0.2:5000";
+  final String hostname = "http://10.0.0.37:5000";
   void testFetch() async{
     http.get(Uri.parse(hostname), headers: {
       "Accept": "application/json"
@@ -70,6 +70,22 @@ class RestService {
     return null;
   }
 
+  Future<List<Song>> getQueue() async {
+    List<Song> result = [];
+    final response = await http.get(Uri.parse(hostname+ '/Session/Queue/return'), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    if (response.statusCode == 200) {
+      stderr.writeln(jsonDecode(response.body));
+      jsonDecode(response.body).forEach((element) {
+        result.add(Song.fromJson(element));
+      });
+      return result;
+    }
+    return null;
+  }
+
   Future<List<User>> getUsers() async{
     List<User> result = [];
     final response = await http.get(Uri.parse(hostname + '/Session/Users/return'), headers: {
@@ -88,6 +104,14 @@ class RestService {
 
   Future<bool> playCurrentSong() async {
     final response = await http.get(Uri.parse(hostname + '/session/currentSong/play'), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
+  }
+
+  Future<bool> pauseResumeCurrentSong() async {
+    final response = await http.post(Uri.parse(hostname + '/session/currentSong/pause'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
