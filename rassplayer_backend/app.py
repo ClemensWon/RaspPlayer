@@ -55,7 +55,7 @@ def checkJsonValid(func):
     @wraps(func)
     def wrapped(*args, **kwargs):
         if request.is_json:
-            data = request.get_json()
+            data = request.data
             try:
                 test = json.loads(data)
                 return func(*args, **kwargs)
@@ -63,7 +63,7 @@ def checkJsonValid(func):
                 return jsonify({'message': 'invalid json'}), 400
         else:
             return jsonify({'message': 'data is not json'}), 400
-
+    return wrapped
 
 #Testvariables
 
@@ -71,7 +71,7 @@ def checkJsonValid(func):
 def index():
     return 'Hello World'
 
-@app.route('/pause')
+@app.route('/session/currentSong/pause', methods = ["POST"])
 def testpause():
     session.pause()
     return 'pause/resume'
@@ -188,8 +188,8 @@ def playCurrentSong():
 
 @app.route('/session/currentSong/stop', methods = ['GET'])
 @checkForUser
-def replayCurrentSong():
-    session.replay()
+def stopCurrentSong():
+    session.stop()
     return jsonify(
         {'currentSong': session.currentSong}
     )
