@@ -66,16 +66,6 @@ def checkJsonValid(func):
     return wrapped
 
 #Testvariables
-
-@app.route('/')
-def index():
-    return 'Hello World'
-
-@app.route('/pause')
-def testpause():
-    session.pause()
-    return 'pause/resume'
-
 @app.route('/login', methods = ["POST"])
 @checkJsonValid
 def login():
@@ -126,6 +116,10 @@ def returnAllSongs():
         {'songs': songs}
     )
 
+@app.route('/')
+def index():
+    return 'Hello World'
+
 @app.route('/songs/<string:name>', methods = ["GET"])
 @checkForUser
 def returnOneSong(name):
@@ -152,14 +146,48 @@ def likeSong():
         {'message': 'song Liked'}
     )
 
-@app.route('/session/currentSong/get', methods = ["PUT"])
+@app.route('/users/ban/<userId>', methods = ["PUT"])
 @checkForUser
 @checkJsonValid
-def getCurrentSong():
+#ban User
+def likeSong():
     return jsonify(
         {'message': 'song Liked'}
     )
 
+@app.route('/session/currentSong/get', methods = ["PUT"])
+@checkForUser
+@checkJsonValid
+#Get song from DB
+def getCurrentSong():
+    return jsonify(
+        {'message': 'get Song'}
+    )
+
+@app.route('/session/currentSong/pause')
+def currentSongPause():
+    session.pause()
+    return 'pause/resume'
+
+@app.route('/settings')
+def currentSongPause():
+    #get Settings
+    return 'settings'
+
+@app.route('/users/muteAll')
+def currentSongPause():
+    #mute All users
+    return 'mute'
+
+@app.route('/users/kickAll')
+def currentSongPause():
+    #kick All users
+    return 'kick'
+
+@app.route('/session/setPlaylist')
+def currentSongPause():
+    #setPlaylistId
+    return 'setPlaylist'
 
 @app.route('/session/setCurrentSong/<songId>', methods = ["PUT"])
 @checkForAdmin
