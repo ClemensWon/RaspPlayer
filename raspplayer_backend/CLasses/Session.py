@@ -52,7 +52,7 @@ class Session:
         self.currentSong += 1
 
     def play(self):
-        self.mopidy.loadPlaylist("Kalimba")
+        self.mopidy.loadPlaylist("all")
         self.mopidy.play()
 
     def pause(self):

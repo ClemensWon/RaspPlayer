@@ -194,14 +194,6 @@ def replayCurrentSong():
         {'currentSong': session.currentSong}
     )
 
-@app.route('/session/currentSong/replay', methods = ['GET'])
-@checkForUser
-def replayCurrentSong():
-    session.currentSong = 'replay'
-    return jsonify(
-        {'currentSong': session.currentSong}
-    )
-
 @app.route('/session/start', methods = ['GET'])
 @checkForUser
 def startSession():

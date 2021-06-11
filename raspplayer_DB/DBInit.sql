@@ -27,7 +27,7 @@ CREATE TABLE User (
     deviceID int primary key,
     username varchar(20) not null,
     banned boolean not null,
-    token varchar
+    token varchar(500)
 );
 
 CREATE TABLE Song (
@@ -38,7 +38,7 @@ CREATE TABLE Song (
     duration int NOT NULL,
     likes int NOT NULL,
     skips int NOT NULL,
-    album varchar NOT NULL,
+    album varchar(50) NOT NULL,
     replays int NOT NULL,
     foreign key (deviceID) references User(deviceID) on delete cascade
 );
