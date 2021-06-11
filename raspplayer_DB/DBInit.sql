@@ -17,22 +17,30 @@ USE RaspPlayer;
 CREATE TABLE SoundBoxSettings (
     soundBoxID int primary key,
     masterPassword varchar(256) not null,
-    partyPin int not null
+    sessionPin int not null
 );
 
-INSERT INTO SoundBoxSettings (soundBoxID, masterPassword, partyPin)
+INSERT INTO SoundBoxSettings (soundBoxID, masterPassword, sessionPin)
 VALUES (0, 'masterPasswordHash', 0000);
 
 CREATE TABLE User (
     deviceID int primary key,
     username varchar(20) not null,
-    banned boolean not null
+    banned boolean not null,
+    token varchar
 );
 
 CREATE TABLE Song (
     songID int primary key auto_increment,
+    deviceID int NOT NULL,
     songName varchar(50) not null,
-    genre varchar(30)
+    genre varchar(30),
+    duration int NOT NULL,
+    likes int NOT NULL,
+    skips int NOT NULL,
+    album varchar NOT NULL,
+    replay int NOT NULL,
+    foreign key (deviceID) references User(deviceID) on delete cascade
 );
 
 CREATE TABLE Interpret (
@@ -56,20 +64,9 @@ CREATE TABLE InterpretToSong (
 CREATE TABLE SongToPlaylist (
     playlistID int,
     songID int,
-    deviceID int not null,
     primary key (playlistID, songID),
     foreign key (playlistID) references Playlist(playlistID) on delete cascade,
-    foreign key (songID) references Song(songID) on delete cascade,
-    foreign key (deviceID) references User(deviceID) on delete cascade
-);
-
-CREATE TABLE History (
-    songID int,
-    date datetime,
-    deviceID int not null,
-    primary key (songID, date),
-    foreign key (songID) references Song(songID) on delete cascade,
-    foreign key (deviceID) references User(deviceID) on delete cascade
+    foreign key (songID) references Song(songID) on delete cascade
 );
 
 commit;
