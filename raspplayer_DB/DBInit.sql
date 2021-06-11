@@ -54,16 +54,16 @@ CREATE TABLE Playlist (
 );
 
 CREATE TABLE InterpretToSong (
-    songID int,
-    interpretID int,
+    songID int NOT NULL,
+    interpretID int NOT NULL,
     primary key (songID, interpretID),
     foreign key (songID) references Song(songID) on delete cascade,
     foreign key (interpretID) references Interpret(interpretID) on delete cascade
 );
 
 CREATE TABLE SongToPlaylist (
-    playlistID int,
-    songID int,
+    playlistID int NOT NULL,
+    songID int NOT NULL,
     songPos int NOT NULL,
     primary key (playlistID, songID),
     foreign key (playlistID) references Playlist(playlistID) on delete cascade,
