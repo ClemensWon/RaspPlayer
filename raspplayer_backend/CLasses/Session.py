@@ -6,18 +6,17 @@ class Session:
         self.sessionPin = sessionPin
         self.users = []
         self.queue = []
-        self.currentSong = 0
+        self.currentSong = 1
         self.nextInsertPos = 0
         self.currentPlaylist = ''
         self.volume = 0
         self.mopidy = MopidyConnection.MopidyConnection()
+        self.db = DB.DB()
 
     def insertUser(self, user):
-        self.db = DB.DB()
         self.db.insertUser(user.deviceId, user.username, 0, user.token)
 
     def returnUsers(self):
-        self.db = DB.DB()
         users = self.db.getUsers()
         self.users = []
         for user in users:
@@ -25,7 +24,6 @@ class Session:
         return self.users
 
     def getSongs(self):
-        self.db = DB.DB()
         songs = self.db.getSongs()
         songsAll = {}
         for song in songs:
@@ -33,22 +31,22 @@ class Session:
         return songsAll
 
     def getSpecSong(self,id):
-        self.db = DB.DB()
         song = self.db.getSpecSong(id)
         return song.fetchall()
     
     def getBanned(self, deviceId):
-        self.db = DB.DB()
         banned = self.db.getBanned(deviceId)
         return banned.fetchall()[0][0]
 
+    def likeCurr(self):
+        self.db.likeSong(self.currentSong)
+        return
+
     def getToken(self, deviceId):
-        self.db = DB.DB()
         token = self.db.getToken(deviceId)
         return token.fetchall()[0][0]
 
-    def returnQueue (self):
-        self.db = DB.DB()
+    def returnQueue (self): 
         queue = {}
         i = -1
         for song in self.queue:

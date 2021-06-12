@@ -141,8 +141,8 @@ def changeSessionPin():
 
 @app.route('/session/currentSong/like', methods = ["PUT"])
 @checkForUser
-@checkJsonValid
 def likeSong():
+    session.likeCurr()
     return jsonify(
         {'message': 'song Liked'}
     )
