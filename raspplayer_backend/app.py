@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Flask,jsonify, request
 from functools import wraps
 from flask_sqlalchemy import sqlalchemy
-from CLasses import User, Session, Admin
+from CLasses import User, Session, Admin, User
 import json
 import jwt
 import datetime
@@ -13,7 +13,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'SECRETKEY'
 
 songs = [{"id":0, "name" : "Sockosophie","artist" : "Kaeptn Peng", "genre" : "Rap", "released" : "2013", "album": "test-album", "addedBy": "Alex"},{"id":1,"name" : "Panikk in der Diskko","artist" : "ODMGIDA feat Kex Kuhl", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Bob"},{"id":2,"name" : "Awkward", "artist" : "Duzoe", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Clemens"}]
-
 
 session = Session.Session('default')
 admin   = Admin.Admin()
@@ -39,11 +38,18 @@ def checkForUser(func):
         token = request.headers.get('Token')
         if not token:
             return jsonify({'message': 'Missing token'}), 403
+
         try:
-            #check if device Id is banned
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             if data.get('admin'):
                 return func(*args, **kwargs)
+            
+            elif not token == session.getToken(request.headers.get("deviceId")):
+                return jsonify({'message': 'Wrong Token'}), 401
+                #braucht TESTING
+            elif session.getBanned(request.headers.get("deviceId")):
+                return jsonify({'message': 'DeviceId banned'}), 401
+                #braucht TESTING
             elif not data.get('sessionPin') == session.sessionPin:
                 return jsonify({'message': 'SessionPin not registered'}), 401
         except:
@@ -71,16 +77,15 @@ def checkJsonValid(func):
 def login():
     requestData = request.get_json()
     if(requestData['sessionPin'] == session.sessionPin):
-        #create User in database
-        #log deviceId to Database
-        newUser = User.User(requestData['username'])
-        session.users.append(newUser)
         token = jwt.encode({
             'username': requestData['username'],
             'sessionPin': session.sessionPin,
             'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
         },
         app.config['SECRET_KEY'], algorithm="HS256")
+        newUser = User.User(requestData['username'], requestData['deviceId'], token)
+        #session.users.append(newUser)  ??HIER ODER IN DER SESSION
+        session.insertUser(newUser)
         return jsonify(
             {'token': token}
         )
@@ -305,6 +310,7 @@ def muteUser(username):
 @app.route('/Session/Users/return', methods = ['GET'])
 @checkForUser
 def returnUsers():
+    # WILL DIE APP ID ODER USERNAMES??
     users = session.returnUsers()
     return jsonify(
         users
