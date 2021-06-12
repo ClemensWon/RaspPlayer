@@ -161,13 +161,12 @@ def unbanUser(deviceId):
         {'message': 'User unbanned'}
     )
 
-@app.route('/session/currentSong/get', methods = ["PUT"])
+@app.route('/session/currentSong/get', methods = ["GET"])
 @checkForUser
-@checkJsonValid
-#Get song from DB
 def getCurrentSong():
+    song = session.getCurrentSong()
     return jsonify(
-        {'message': 'get Song'}
+        song
     )
 
 @app.route('/session/currentSong/pause')

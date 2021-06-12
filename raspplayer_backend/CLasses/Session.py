@@ -33,6 +33,10 @@ class Session:
     def getSpecSong(self,id):
         song = self.db.getSpecSong(id)
         return song.fetchall()
+
+    def getCurrentSong(self):
+        song = self.db.getSpecSong(self.currentSong)
+        return song.fetchall()
     
     def getBanned(self, deviceId):
         banned = self.db.getBanned(deviceId)
@@ -45,7 +49,6 @@ class Session:
     def unbanUser(self, deviceId):
         self.db.unbanUser(deviceId)
         return
-
 
     def likeCurr(self):
         self.db.likeSong(self.currentSong)
