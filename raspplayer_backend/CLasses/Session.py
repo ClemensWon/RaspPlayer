@@ -23,6 +23,14 @@ class Session:
         for user in users:
             self.users.append(user[1])
         return self.users
+
+    def getSongs(self):
+        self.db = DB.DB()
+        songs = self.db.getSongs()
+        songsAll = {}
+        for song in songs:
+            songsAll[song[0]]=song[2]
+        return songsAll
     
     def getBanned(self, deviceId):
         self.db = DB.DB()

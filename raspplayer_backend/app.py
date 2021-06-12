@@ -43,13 +43,10 @@ def checkForUser(func):
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             if data.get('admin'):
                 return func(*args, **kwargs)
-            
             elif not token == session.getToken(request.headers.get("deviceId")):
                 return jsonify({'message': 'Wrong Token'}), 401
-                #braucht TESTING
             elif session.getBanned(request.headers.get("deviceId")):
                 return jsonify({'message': 'DeviceId banned'}), 401
-                #braucht TESTING
             elif not data.get('sessionPin') == session.sessionPin:
                 return jsonify({'message': 'SessionPin not registered'}), 401
         except:
@@ -71,7 +68,6 @@ def checkJsonValid(func):
             return jsonify({'message': 'data is not json'}), 400
     return wrapped
 
-#Testvariables
 @app.route('/login', methods = ["POST"])
 @checkJsonValid
 def login():
@@ -84,7 +80,6 @@ def login():
         },
         app.config['SECRET_KEY'], algorithm="HS256")
         newUser = User.User(requestData['username'], requestData['deviceId'], token)
-        #session.users.append(newUser)  ??HIER ODER IN DER SESSION
         session.insertUser(newUser)
         return jsonify(
             {'token': token}
@@ -117,8 +112,9 @@ def loginMaster():
 @app.route('/songs', methods = ["GET"])
 @checkForUser
 def returnAllSongs():
+    songs = session.getSongs()
     return jsonify(
-        {'songs': songs}
+        songs
     )
 
 @app.route('/')
@@ -156,6 +152,15 @@ def likeSong():
 @checkJsonValid
 #ban User
 def banUser():
+    return jsonify(
+        {'message': 'song Liked'}
+    )
+
+@app.route('/users/unban/<userId>', methods = ["PUT"])
+@checkForUser
+@checkJsonValid
+#ban User
+def unbanUser():
     return jsonify(
         {'message': 'song Liked'}
     )
@@ -327,6 +332,7 @@ def returnQueue():
 @app.route('/Session/Queue/delete/<songId>', methods = ['GET'])
 @checkForUser
 def deleteSongFromQueue():
+    #mopdidy & Session
     return jsonify(
         songs
     )
