@@ -4,6 +4,7 @@ from CLasses import MopidyConnection, DB
 class Session:
     def __init__(self,sessionPin):
         self.sessionPin = sessionPin
+        self.usersAll = []
         self.users = []
         self.queue = []
         self.currentSong = 1
@@ -15,13 +16,14 @@ class Session:
 
     def insertUser(self, user):
         self.db.insertUser(user.deviceId, user.username, 0, user.token)
+        self.users.append(user)
 
     def returnUsers(self):
         users = self.db.getUsers()
-        self.users = []
+        self.usersAll = []
         for user in users:
-            self.users.append(user)
-        return self.users
+            self.usersAll.append(user)
+        return self.usersAll
 
     def getSongs(self):
         songs = self.db.getSongs()
@@ -96,3 +98,6 @@ class Session:
 
     def pause(self):
         self.mopidy.pause_resume()
+
+    def kickAll(self):
+        self.users = []

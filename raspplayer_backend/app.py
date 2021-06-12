@@ -51,7 +51,18 @@ def checkForUser(func):
                 return jsonify({'message': 'SessionPin not registered'}), 401
         except:
             return jsonify({'message': 'Invalid Token'}), 401
-        return func(*args, **kwargs)
+        
+        print(session.users)
+        for user in session.users:
+            print(user.deviceId)
+            print(request.headers.get("deviceId"))
+            if int(user.deviceId) == int(request.headers.get("deviceId")):
+                print("AAAAAAAA")
+                return func(*args, **kwargs)
+            else:
+                continue
+
+        return jsonify({'message': 'This Device is nor a user in the current Session'}), 401
     return wrapped
 
 def checkJsonValid(func):
@@ -186,8 +197,13 @@ def mutAll():
 
 @app.route('/users/kickAll')
 def kickAll():
+    #check Users list in session
+    #evtl wrapped in Session um zu überprüfen ob die User überhaupt in der Session sind?
     #kick All users
-    return 'kick'
+    session.kickAll()
+    return jsonify(
+        {'message': 'All kicked'}
+    )
 
 @app.route('/session/setPlaylist')
 def setPlaylist():
@@ -310,7 +326,6 @@ def muteUser(username):
 @app.route('/Session/Users/return', methods = ['GET'])
 @checkForUser
 def returnUsers():
-    # WILL DIE APP ID ODER USERNAMES??
     users = session.returnUsers()
     return jsonify(
         users
