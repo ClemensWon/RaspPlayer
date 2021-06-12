@@ -109,6 +109,10 @@ def loginMaster():
             {'message': 'Login as Master was not sucessfull'}
         ), 401
 
+@app.route('/')
+def index():
+    return 'Hello World'
+
 @app.route('/songs', methods = ["GET"])
 @checkForUser
 def returnAllSongs():
@@ -117,16 +121,12 @@ def returnAllSongs():
         songs
     )
 
-@app.route('/')
-def index():
-    return 'Hello World'
-
-@app.route('/songs/<string:name>', methods = ["GET"])
+@app.route('/songs/<id>', methods = ["GET"])
 @checkForUser
-def returnOneSong(name):
-    oneSong = [songs for songs in songs if songs['name'] == name]
+def returnOneSong(id):
+    song = session.getSpecSong(id)
     return jsonify(
-        {'song': oneSong}
+        song
     )
 
 @app.route('/settings/sessionPin', methods = ["POST"])

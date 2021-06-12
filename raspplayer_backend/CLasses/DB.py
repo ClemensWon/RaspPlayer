@@ -44,6 +44,12 @@ class DB:
 
         return self.cur
 
+    def getSpecSong(self,id):
+        self.cur.execute("SELECT * FROM Song WHERE songID = ?",
+        (id,))
+
+        return self.cur
+
     def getBanned(self, deviceId):
         self.cur.execute("SELECT banned FROM User WHERE deviceID = ?",
         (deviceId,))

@@ -31,6 +31,11 @@ class Session:
         for song in songs:
             songsAll[song[0]]=song[2]
         return songsAll
+
+    def getSpecSong(self,id):
+        self.db = DB.DB()
+        song = self.db.getSpecSong(id)
+        return song.fetchall()
     
     def getBanned(self, deviceId):
         self.db = DB.DB()
