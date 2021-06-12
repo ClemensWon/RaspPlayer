@@ -2,28 +2,43 @@ import json
 from CLasses import MopidyConnection, DB
 
 class Session:
-    def __init__(this,sessionPin):
-        this.sessionPin = sessionPin
-        this.users = []
-        this.queue = []
-        this.currentSong = 0
-        this.nextInsertPos = 0
-        this.currentPlaylist = ''
-        this.volume = 0
-        this.mopidy = MopidyConnection.MopidyConnection()
-        this.db = DB.DB()
+    def __init__(self,sessionPin):
+        self.sessionPin = sessionPin
+        self.users = []
+        self.queue = []
+        self.currentSong = 0
+        self.nextInsertPos = 0
+        self.currentPlaylist = ''
+        self.volume = 0
+        self.mopidy = MopidyConnection.MopidyConnection()
 
-    def returnUsers(this):
-        users = this.db.getUsers()
+    def insertUser(self, user):
+        self.db = DB.DB()
+        self.db.insertUser(user.deviceId, user.username, 0, user.token)
 
+    def returnUsers(self):
+        self.db = DB.DB()
+        users = self.db.getUsers()
+        self.users = []
         for user in users:
-            this.users.append(user[1])
-        return this.users
+            self.users.append(user[1])
+        return self.users
     
-    def returnQueue (this):
+    def getBanned(self, deviceId):
+        self.db = DB.DB()
+        banned = self.db.getBanned(deviceId)
+        return banned.fetchall()[0][0]
+
+    def getToken(self, deviceId):
+        self.db = DB.DB()
+        token = self.db.getToken(deviceId)
+        return token.fetchall()[0][0]
+
+    def returnQueue (self):
+        self.db = DB.DB()
         queue = {}
         i = -1
-        for song in this.queue:
+        for song in self.queue:
             i=i+1
             queue['song@'+ str(i)] = song #ID
         return queue

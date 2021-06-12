@@ -1,10 +1,9 @@
 class User:
     
-    def __init__(this,username):
+    def __init__(this,username,deviceId, token):
         this.username=username
-        this.deviceId= ''
+        this.deviceId=deviceId
+        this.token=token
         this.muted= ''
         this.counterPosMuted= ''
         this.counterNegMuted= ''
-
-#User Device Id

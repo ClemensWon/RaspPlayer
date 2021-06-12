@@ -17,14 +17,36 @@ class DB:
         
         self.cur = self.conn.cursor()
 
-    def insertUser(self,deviceID, username, banned, token):
-        self.cur.execute(
-            "INSERT INTO User (deviceID, username, banned, token) VALUES (?, ?, ?, ?)", 
-            (deviceID, username, banned, token))
+    def insertUser(self,deviceId, username, banned, token):
+        try:
+            self.cur.execute(
+                "INSERT INTO User (deviceID, username, banned, token) VALUES (?,?,?,?)", 
+                (deviceId, username, banned, token)) 
+            self.conn.commit()
 
-        self.conn.commit()
+        except:
+            print("Already there")
+            try:
+                self.cur.execute(
+                "UPDATE User SET username = ?, banned = ?, token = ? WHERE deviceID = ?",
+                (username, banned, token, deviceId))     
+                self.conn.commit()
+            except:
+                print("Did not work")
 
     def getUsers(self):
         self.cur.execute("SELECT * FROM User")
+
+        return self.cur
+
+    def getBanned(self, deviceId):
+        self.cur.execute("SELECT banned FROM User WHERE deviceID = ?",
+        (deviceId,))
+
+        return self.cur
+
+    def getToken(self, deviceId):
+        self.cur.execute("SELECT token FROM User WHERE deviceID = ?",
+        (deviceId,))
 
         return self.cur
