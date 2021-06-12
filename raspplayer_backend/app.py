@@ -76,7 +76,6 @@ def login():
         token = jwt.encode({
             'username': requestData['username'],
             'sessionPin': session.sessionPin,
-            'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
         },
         app.config['SECRET_KEY'], algorithm="HS256")
         newUser = User.User(requestData['username'], requestData['deviceId'], token)
@@ -98,7 +97,6 @@ def loginMaster():
             'username': requestData['username'],
             'admin': 'yes',
             'sessionPin': session.sessionPin,
-            'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
         },
         app.config['SECRET_KEY'], algorithm="HS256")
         return jsonify(
@@ -147,22 +145,20 @@ def likeSong():
         {'message': 'song Liked'}
     )
 
-@app.route('/users/ban/<userId>', methods = ["PUT"])
-@checkForUser
-@checkJsonValid
-#ban User
-def banUser():
+@app.route('/users/ban/<deviceId>', methods = ["PUT"])
+@checkForAdmin
+def banUser(deviceId):
+    session.banUser(deviceId)
     return jsonify(
-        {'message': 'song Liked'}
+        {'message': 'User banned'}
     )
 
-@app.route('/users/unban/<userId>', methods = ["PUT"])
-@checkForUser
-@checkJsonValid
-#ban User
-def unbanUser():
+@app.route('/users/unban/<deviceId>', methods = ["PUT"])
+@checkForAdmin
+def unbanUser(deviceId):
+    session.unbanUser(deviceId)
     return jsonify(
-        {'message': 'song Liked'}
+        {'message': 'User unbanned'}
     )
 
 @app.route('/session/currentSong/get', methods = ["PUT"])

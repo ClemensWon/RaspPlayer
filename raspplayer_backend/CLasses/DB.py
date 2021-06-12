@@ -53,6 +53,17 @@ class DB:
     def likeSong(self,id):
         self.cur.execute("UPDATE Song SET likes = likes+1 WHERE songID = ?",
         (id,))
+        return
+
+    def banUser(self,deviceId):
+        self.cur.execute("UPDATE User SET banned = 1 WHERE deviceId = ?",
+        (deviceId,))
+        return
+
+    def unbanUser(self,deviceId):
+        self.cur.execute("UPDATE User SET banned = 0 WHERE deviceId = ?",
+        (deviceId,))
+        return
 
     def getBanned(self, deviceId):
         self.cur.execute("SELECT banned FROM User WHERE deviceID = ?",

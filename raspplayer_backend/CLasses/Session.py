@@ -20,7 +20,7 @@ class Session:
         users = self.db.getUsers()
         self.users = []
         for user in users:
-            self.users.append(user[1])
+            self.users.append(user)
         return self.users
 
     def getSongs(self):
@@ -37,6 +37,15 @@ class Session:
     def getBanned(self, deviceId):
         banned = self.db.getBanned(deviceId)
         return banned.fetchall()[0][0]
+
+    def banUser(self, deviceId):
+        self.db.banUser(deviceId)
+        return
+
+    def unbanUser(self, deviceId):
+        self.db.unbanUser(deviceId)
+        return
+
 
     def likeCurr(self):
         self.db.likeSong(self.currentSong)
