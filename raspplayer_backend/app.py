@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Flask,jsonify, request
 from functools import wraps
 from flask_sqlalchemy import sqlalchemy
-from CLasses import User, Session, Admin
+from CLasses import User, Session, Admin, User
 import json
 import jwt
 import datetime
@@ -13,7 +13,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'SECRETKEY'
 
 songs = [{"id":0, "name" : "Sockosophie","artist" : "Kaeptn Peng", "genre" : "Rap", "released" : "2013", "album": "test-album", "addedBy": "Alex"},{"id":1,"name" : "Panikk in der Diskko","artist" : "ODMGIDA feat Kex Kuhl", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Bob"},{"id":2,"name" : "Awkward", "artist" : "Duzoe", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Clemens"}]
-
 
 session = Session.Session('default')
 admin   = Admin.Admin()
@@ -39,16 +38,31 @@ def checkForUser(func):
         token = request.headers.get('Token')
         if not token:
             return jsonify({'message': 'Missing token'}), 403
+
         try:
-            #check if device Id is banned
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             if data.get('admin'):
                 return func(*args, **kwargs)
+            elif not token == session.getToken(request.headers.get("deviceId")):
+                return jsonify({'message': 'Wrong Token'}), 401
+            elif session.getBanned(request.headers.get("deviceId")):
+                return jsonify({'message': 'DeviceId banned'}), 401
             elif not data.get('sessionPin') == session.sessionPin:
                 return jsonify({'message': 'SessionPin not registered'}), 401
         except:
             return jsonify({'message': 'Invalid Token'}), 401
-        return func(*args, **kwargs)
+        
+        print(session.users)
+        for user in session.users:
+            print(user.deviceId)
+            print(request.headers.get("deviceId"))
+            if int(user.deviceId) == int(request.headers.get("deviceId")):
+                print("AAAAAAAA")
+                return func(*args, **kwargs)
+            else:
+                continue
+
+        return jsonify({'message': 'This Device is nor a user in the current Session'}), 401
     return wrapped
 
 def checkJsonValid(func):
@@ -57,7 +71,7 @@ def checkJsonValid(func):
         if request.is_json:
             data = request.data
             try:
-                test = json.loads(data)
+                test=json.dumps(data)
                 return func(*args, **kwargs)
             except ValueError as e:
                 return jsonify({'message': 'invalid json'}), 400
@@ -65,32 +79,18 @@ def checkJsonValid(func):
             return jsonify({'message': 'data is not json'}), 400
     return wrapped
 
-#Testvariables
-
-@app.route('/')
-def index():
-    return 'Hello World'
-
-@app.route('/session/currentSong/pause', methods = ["POST"])
-def testpause():
-    session.pause()
-    return 'pause/resume'
-
 @app.route('/login', methods = ["POST"])
 @checkJsonValid
 def login():
     requestData = request.get_json()
     if(requestData['sessionPin'] == session.sessionPin):
-        #create User in database
-        #log deviceId to Database
-        newUser = User.User(requestData['username'])
-        session.users.append(newUser)
         token = jwt.encode({
             'username': requestData['username'],
             'sessionPin': session.sessionPin,
-            'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
         },
         app.config['SECRET_KEY'], algorithm="HS256")
+        newUser = User.User(requestData['username'], requestData['deviceId'], token)
+        session.insertUser(newUser)
         return jsonify(
             {'token': token}
         )
@@ -108,7 +108,6 @@ def loginMaster():
             'username': requestData['username'],
             'admin': 'yes',
             'sessionPin': session.sessionPin,
-            'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=30)
         },
         app.config['SECRET_KEY'], algorithm="HS256")
         return jsonify(
@@ -119,19 +118,24 @@ def loginMaster():
             {'message': 'Login as Master was not sucessfull'}
         ), 401
 
+@app.route('/')
+def index():
+    return 'Hello World'
+
 @app.route('/songs', methods = ["GET"])
 @checkForUser
 def returnAllSongs():
+    songs = session.getSongs()
     return jsonify(
-        {'songs': songs}
+        songs
     )
 
-@app.route('/songs/<string:name>', methods = ["GET"])
+@app.route('/songs/<id>', methods = ["GET"])
 @checkForUser
-def returnOneSong(name):
-    oneSong = [songs for songs in songs if songs['name'] == name]
+def returnOneSong(id):
+    song = session.getSpecSong(id)
     return jsonify(
-        {'song': oneSong}
+        song
     )
 
 @app.route('/settings/sessionPin', methods = ["POST"])
@@ -146,20 +150,65 @@ def changeSessionPin():
 
 @app.route('/session/currentSong/like', methods = ["PUT"])
 @checkForUser
-@checkJsonValid
 def likeSong():
+    session.likeCurr()
     return jsonify(
         {'message': 'song Liked'}
     )
 
-@app.route('/session/currentSong/get', methods = ["PUT"])
+@app.route('/users/ban/<deviceId>', methods = ["PUT"])
+@checkForAdmin
+def banUser(deviceId):
+    session.banUser(deviceId)
+    return jsonify(
+        {'message': 'User banned'}
+    )
+
+@app.route('/users/unban/<deviceId>', methods = ["PUT"])
+@checkForAdmin
+def unbanUser(deviceId):
+    session.unbanUser(deviceId)
+    return jsonify(
+        {'message': 'User unbanned'}
+    )
+
+@app.route('/session/currentSong/get', methods = ["GET"])
 @checkForUser
-@checkJsonValid
 def getCurrentSong():
+    song = session.getCurrentSong()
     return jsonify(
-        {'message': 'song Liked'}
+        song
     )
 
+@app.route('/session/currentSong/pause')
+def currentSongPause():
+    session.pause()
+    return 'pause/resume'
+
+@app.route('/settings')
+def settings():
+    #get Settings
+    return 'settings'
+
+@app.route('/users/muteAll')
+def mutAll():
+    #mute All users
+    return 'mute'
+
+@app.route('/users/kickAll')
+def kickAll():
+    #check Users list in session
+    #evtl wrapped in Session um zu überprüfen ob die User überhaupt in der Session sind?
+    #kick All users
+    session.kickAll()
+    return jsonify(
+        {'message': 'All kicked'}
+    )
+
+@app.route('/session/setPlaylist')
+def setPlaylist():
+    #setPlaylistId
+    return 'setPlaylist'
 
 @app.route('/session/setCurrentSong/<songId>', methods = ["PUT"])
 @checkForAdmin
@@ -190,14 +239,6 @@ def playCurrentSong():
 @checkForUser
 def stopCurrentSong():
     session.stop()
-    return jsonify(
-        {'currentSong': session.currentSong}
-    )
-
-@app.route('/session/currentSong/replay', methods = ['GET'])
-@checkForUser
-def replayCurrentSong():
-    session.currentSong = 'replay'
     return jsonify(
         {'currentSong': session.currentSong}
     )
@@ -303,6 +344,7 @@ def returnQueue():
 @app.route('/Session/Queue/delete/<songId>', methods = ['GET'])
 @checkForUser
 def deleteSongFromQueue():
+    #mopdidy & Session
     return jsonify(
         songs
     )

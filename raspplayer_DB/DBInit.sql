@@ -6,9 +6,9 @@ DROP USER 'johnlennon';
 
 CREATE DATABASE RaspPlayer;
 
-CREATE USER 'johnlennon' identified by 'woodstock69';
+CREATE USER 'johnlennon'@'localhost' identified by 'woodstock69';
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON RaspPlayer.* TO 'johnlennon';
+GRANT SELECT, INSERT, UPDATE, DELETE ON RaspPlayer.* TO 'johnlennon'@'localhost';
 
 FLUSH PRIVILEGES;
 
@@ -27,7 +27,7 @@ CREATE TABLE User (
     deviceID int primary key,
     username varchar(20) not null,
     banned boolean not null,
-    token varchar
+    token varchar(500)
 );
 
 CREATE TABLE Song (
@@ -38,8 +38,8 @@ CREATE TABLE Song (
     duration int NOT NULL,
     likes int NOT NULL,
     skips int NOT NULL,
-    album varchar NOT NULL,
-    replay int NOT NULL,
+    album varchar(50) NOT NULL,
+    replays int NOT NULL,
     foreign key (deviceID) references User(deviceID) on delete cascade
 );
 
@@ -54,16 +54,17 @@ CREATE TABLE Playlist (
 );
 
 CREATE TABLE InterpretToSong (
-    songID int,
-    interpretID int,
+    songID int NOT NULL,
+    interpretID int NOT NULL,
     primary key (songID, interpretID),
     foreign key (songID) references Song(songID) on delete cascade,
     foreign key (interpretID) references Interpret(interpretID) on delete cascade
 );
 
 CREATE TABLE SongToPlaylist (
-    playlistID int,
-    songID int,
+    playlistID int NOT NULL,
+    songID int NOT NULL,
+    songPos int NOT NULL,
     primary key (playlistID, songID),
     foreign key (playlistID) references Playlist(playlistID) on delete cascade,
     foreign key (songID) references Song(songID) on delete cascade
