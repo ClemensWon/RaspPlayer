@@ -14,6 +14,7 @@ app.config['SECRET_KEY'] = 'SECRETKEY'
 
 songs = [{"id":0, "name" : "Sockosophie","artist" : "Kaeptn Peng", "genre" : "Rap", "released" : "2013", "album": "test-album", "addedBy": "Alex"},{"id":1,"name" : "Panikk in der Diskko","artist" : "ODMGIDA feat Kex Kuhl", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Bob"},{"id":2,"name" : "Awkward", "artist" : "Duzoe", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Clemens"}]
 
+
 session = Session.Session('default')
 admin   = Admin.Admin()
 
@@ -51,7 +52,7 @@ def checkForUser(func):
                 return jsonify({'message': 'SessionPin not registered'}), 401
         except:
             return jsonify({'message': 'Invalid Token'}), 401
-        
+
         print(session.users)
         for user in session.users:
             print(user.deviceId)
@@ -237,8 +238,8 @@ def playCurrentSong():
 
 @app.route('/session/currentSong/stop', methods = ['GET'])
 @checkForUser
-def stopCurrentSong():
-    session.stop()
+def replayCurrentSong():
+    session.replay()
     return jsonify(
         {'currentSong': session.currentSong}
     )
