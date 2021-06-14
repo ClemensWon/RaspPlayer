@@ -1,7 +1,6 @@
 from datetime import datetime
 from flask import Flask,jsonify, request
 from functools import wraps
-from flask_sqlalchemy import sqlalchemy
 from CLasses import User, Session, Admin, User
 import json
 import jwt
@@ -44,21 +43,16 @@ def checkForUser(func):
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
             if data.get('admin'):
                 return func(*args, **kwargs)
-            elif not token == session.getToken(request.headers.get("deviceId")):
-                return jsonify({'message': 'Wrong Token'}), 401
-            elif session.getBanned(request.headers.get("deviceId")):
+            elif session.getBanned(data.get('deviceId')):
                 return jsonify({'message': 'DeviceId banned'}), 401
             elif not data.get('sessionPin') == session.sessionPin:
                 return jsonify({'message': 'SessionPin not registered'}), 401
         except:
             return jsonify({'message': 'Invalid Token'}), 401
-
-        print(session.users)
+        
         for user in session.users:
             print(user.deviceId)
-            print(request.headers.get("deviceId"))
-            if int(user.deviceId) == int(request.headers.get("deviceId")):
-                print("AAAAAAAA")
+            if int(user.deviceId) == int(data.get('deviceId')):
                 return func(*args, **kwargs)
             else:
                 continue
@@ -88,9 +82,10 @@ def login():
         token = jwt.encode({
             'username': requestData['username'],
             'sessionPin': session.sessionPin,
+            'deviceId' : requestData['deviceId']
         },
         app.config['SECRET_KEY'], algorithm="HS256")
-        newUser = User.User(requestData['username'], requestData['deviceId'], token)
+        newUser = User.User(requestData['deviceId'], requestData['username'], 0, token)
         session.insertUser(newUser)
         return jsonify(
             {'token': token}
@@ -334,7 +329,7 @@ def returnUsers():
         users
     )
 
-@app.route('/Session/Queue/return', methods = ['GET'])
+@app.route('/Session/queue/return', methods = ['GET'])
 @checkForUser
 def returnQueue():
     songs = session.returnQueue()
@@ -342,7 +337,7 @@ def returnQueue():
         songs
     )
 
-@app.route('/Session/Queue/delete/<songId>', methods = ['GET'])
+@app.route('/Session/queue/delete/<songId>', methods = ['GET'])
 @checkForUser
 def deleteSongFromQueue():
     #mopdidy & Session
