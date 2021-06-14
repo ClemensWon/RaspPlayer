@@ -15,17 +15,17 @@ class RestService {
     }).then((value) => stderr.writeln(value.body));
   }
 
-  Future<bool> login(String nickname, String sessionPin) async {
+  Future<bool> login(String nickname, String sessionPin, String deviceID) async {
     final response = await http.post(Uri.parse(hostname + '/login'), headers: {
       "content-type" : "application/json",
       "accept" : "application/json",
     },
     body: json.encode({
       'username': nickname,
-      'sessionPin': sessionPin
+      'sessionPin': sessionPin,
+      'deviceId': deviceID
     }));
     if (response.statusCode == 200) {
-      stderr.writeln(response.body);
       UserData.token = json.decode(response.body)['token'] as String;
       UserData.nickname = nickname;
       UserData.role = 'User';
@@ -60,9 +60,9 @@ class RestService {
       'Accept': 'application/json',
       'token': UserData.token
     });
+    //stderr.writeln(response.body);
     if (response.statusCode == 200) {
-      //stderr.writeln(jsonDecode(response.body)["songs"]);
-        jsonDecode(response.body)["songs"].forEach((element) {
+        jsonDecode(response.body).forEach((element) {
           result.add(Song.fromJson(element));
         });
        return result;
@@ -72,7 +72,7 @@ class RestService {
 
   Future<List<Song>> getQueue() async {
     List<Song> result = [];
-    final response = await http.get(Uri.parse(hostname+ '/Session/Queue/return'), headers: {
+    final response = await http.get(Uri.parse(hostname+ '/Session/queue/return'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
@@ -92,10 +92,11 @@ class RestService {
       'Accept': 'application/json',
       'token': UserData.token,
     });
+    stderr.writeln(jsonDecode(response.body));
     if (response.statusCode == 200) {
       int idCounter = 0;
       jsonDecode(response.body).forEach((element) {
-        result.add(new User(id: idCounter.toString(),username: element,role: "User",isMuted: false));
+        result.add(new User(id: idCounter.toString(),username: element['username'],role: "User",isMuted: false));
       });
       return result;
     }
