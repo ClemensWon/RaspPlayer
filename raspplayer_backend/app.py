@@ -52,7 +52,7 @@ def checkForUser(func):
         
         for user in session.users:
             print(user.deviceId)
-            if int(user.deviceId) == int(data.get('deviceId')):
+            if user.deviceId == data.get('deviceId'):
                 return func(*args, **kwargs)
             else:
                 continue
@@ -64,7 +64,7 @@ def checkJsonValid(func):
     @wraps(func)
     def wrapped(*args, **kwargs):
         if request.is_json:
-            data = request.data
+            data = request.get_json()
             try:
                 test=json.dumps(data)
                 return func(*args, **kwargs)

@@ -22,14 +22,22 @@ class Session:
         users = self.db.getUsers()
         self.usersAll = []
         for user in users:
-            self.usersAll.append(((User.User(user[0], user[1], user[2], user[3]).__dict__)))
+            self.usersAll.append({
+                'username': user[1],
+                'banned': user[2]
+            })
         return self.usersAll
 
     def getSongs(self):
         songs = self.db.getSongs()
         songsAll = []
         for song in songs:
-            songsAll.append(Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__)
+            addedby = self.db.getUser(song[1])
+            interpretToSong = self.db.getInterpretToSong(song[0])
+            interpret = self.db.getInterpret(interpretToSong[0][1])
+            responseDic = Song.Song(song[0], addedby[0][1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
+            responseDic['artist'] = interpret[0][1]
+            songsAll.append(responseDic)
         return songsAll
 
     def getSpecSong(self,id):
