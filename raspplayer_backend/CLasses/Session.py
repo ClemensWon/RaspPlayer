@@ -32,11 +32,7 @@ class Session:
         songs = self.db.getSongs()
         songsAll = []
         for song in songs:
-            addedby = self.db.getUser(song[1])
-            interpretToSong = self.db.getInterpretToSong(song[0])
-            interpret = self.db.getInterpret(interpretToSong[0][1])
-            responseDic = Song.Song(song[0], addedby[0][1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
-            responseDic['artist'] = interpret[0][1]
+            responseDic = self.buildSong(song,)
             songsAll.append(responseDic)
         return songsAll
 
@@ -77,7 +73,7 @@ class Session:
         for son in self.queue:
             so = self.db.getSpecSong(son)
             for song in so:
-                s = Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__ 
+                s = self.buildSong(song,)
                 queue.append(s)           
         return queue
 
@@ -114,3 +110,11 @@ class Session:
 
     def kickAll(self):
         self.users = []
+
+    def buildSong(self, song):
+        addedby = self.db.getUser(song[1])
+        interpretToSong = self.db.getInterpretToSong(song[0])
+        interpret = self.db.getInterpret(interpretToSong[0][1])
+        responseDic = Song.Song(song[0], addedby[0][1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
+        responseDic['artist'] = interpret[0][1]
+        return responseDic
