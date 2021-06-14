@@ -24,7 +24,7 @@ INSERT INTO SoundBoxSettings (soundBoxID, masterPassword, sessionPin)
 VALUES (0, 'masterPasswordHash', 0000);
 
 CREATE TABLE User (
-    deviceID int primary key,
+    deviceID varchar(50) primary key,
     username varchar(20) not null,
     banned boolean not null,
     token varchar(500)
@@ -32,7 +32,7 @@ CREATE TABLE User (
 
 CREATE TABLE Song (
     songID int primary key auto_increment,
-    deviceID int NOT NULL,
+    deviceID varchar(50) NOT NULL,
     songName varchar(50) not null,
     genre varchar(30),
     duration int NOT NULL,
@@ -69,5 +69,15 @@ CREATE TABLE SongToPlaylist (
     foreign key (playlistID) references Playlist(playlistID) on delete cascade,
     foreign key (songID) references Song(songID) on delete cascade
 );
+
+INSERT INTO User (deviceID, username, banned, token) VALUES ("999", "Alex", 0, "abc");
+
+INSERT INTO Song (songID, deviceID, songName, genre, duration, likes, skips, album, replays) VALUES (1, "999", "Found God in a Tomato", "rock", 30, 2, 1, "High Viscera", 1);
+INSERT INTO Song (songID, deviceID, songName, genre, duration, likes, skips, album, replays) VALUES (2, "999", "Cornflake", "rock", 35, 0, 0, "High Viscera", 0);
+
+INSERT INTO Interpret (interpretID, interpretName) VALUES(1, "PPC");
+
+INSERT INTO InterpretToSong(songID, interpretID) VALUES (1, 1);
+INSERT INTO InterpretToSong(songID, interpretID) VALUES (2, 1);
 
 commit;
