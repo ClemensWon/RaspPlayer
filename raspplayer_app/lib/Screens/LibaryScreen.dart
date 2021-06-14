@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Components/SongListItem.dart';
 import 'package:flutter/foundation.dart';
+import 'package:raspplayer_app/Screens/MainScreen.dart';
+import 'package:raspplayer_app/Services/FilePickerService.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 import 'dart:io';
 
@@ -13,6 +16,7 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class LibraryScreenSate extends State<LibraryScreen> {
+  final FilePickerService filePickerService = new FilePickerService();
   final List<SongListItem> songList = [];
   List<SongListItem> displayList = [];
   Map checked = {};
@@ -24,14 +28,14 @@ class LibraryScreenSate extends State<LibraryScreen> {
     restService.getSongs().then((songs) => {
       setState((){
         songs.forEach((song) {
-          checked[song.id] = false;
+          checked[song] = false;
           songList.add(SongListItem.fromSong(key: Key(song.id.toString()), song: song, child: StatefulBuilder( builder:  (BuildContext context, StateSetter setState) {
             return Checkbox(
                 key: Key(song.id.toString() + "_checkbox"),
-                value: checked[song.id],
+                value: checked[song],
                 onChanged: (changeValue) {
                   setState(() {
-                    checked[song.id] = changeValue;
+                    checked[song] = changeValue;
                   });
                 });
             }),
@@ -45,7 +49,8 @@ class LibraryScreenSate extends State<LibraryScreen> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-
+    MainScreenProvider mainScreenProvider = Provider.of<MainScreenProvider>(context);
+    RestService restService = new RestService();
     return Scaffold(
       appBar: AppBar(
         title: Text('Music Library'),
@@ -100,8 +105,18 @@ class LibraryScreenSate extends State<LibraryScreen> {
                 ),
                 onPressed: () {
                   checked.forEach((key, value) {
-                    stderr.writeln(key.toString() + " " + value.toString());
+                    if (value) {
+                      restService.addSongToQueue(key).then((success) {
+                        if (success) {
+                          mainScreenProvider.addToQueue(key);
+                        } else {
+
+                        }
+                      });
+
+                    }
                   });
+                  Navigator.pushReplacementNamed(context, 'Main');
                 },
                 
               ),
@@ -114,7 +129,11 @@ class LibraryScreenSate extends State<LibraryScreen> {
                     )
                 ),
                 onPressed: () {
-
+                  filePickerService.getFile().then((file) {
+                    restService.uploadSong(file).then((value) => null);
+                    stderr.writeln(file);
+                  });
+                  stderr.writeln();
                 },
               ),
             ]

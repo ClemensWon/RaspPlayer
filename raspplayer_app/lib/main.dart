@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:raspplayer_app/Screens/AboutScreen.dart';
 import 'package:raspplayer_app/Screens/DeviceOptionsScreen.dart';
 import 'package:raspplayer_app/Screens/HelpScreen.dart';
@@ -12,7 +13,13 @@ import 'package:raspplayer_app/Screens/UserListScreen.dart';
 import './Screens/ConnectScreen.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+      MultiProvider(
+        providers: [
+         ChangeNotifierProvider(create: (_) => MainScreenProvider())
+        ],
+        child: MyApp(),
+      ));
 }
 
 class MyApp extends StatelessWidget {

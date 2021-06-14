@@ -38,11 +38,15 @@ class DB:
         self.cur.execute("SELECT * FROM User")
 
         return self.cur
+    
+    def getUser(self,deviceId):
+        self.cur.execute("SELECT * FROM User WHERE deviceID = ?", (deviceId,))
+        return self.cur.fetchall()
 
     def getSongs(self):
         self.cur.execute("SELECT * FROM Song")
 
-        return self.cur
+        return self.cur.fetchall()
 
     def getSpecSong(self,id):
         self.cur.execute("SELECT * FROM Song WHERE songID = ?",
@@ -76,3 +80,11 @@ class DB:
         (deviceId,))
 
         return self.cur
+
+    def getInterpretToSong(self, songID):
+        self.cur.execute("SELECT * FROM InterpretToSong WHERE songID = ?", (songID,))
+        return self.cur.fetchall()
+
+    def getInterpret(self, interpretID):
+        self.cur.execute("SELECT * FROM Interpret WHERE interpretID = ?",(interpretID,))
+        return self.cur.fetchall()
