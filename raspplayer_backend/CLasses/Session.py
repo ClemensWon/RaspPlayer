@@ -1,12 +1,12 @@
 import json
-from CLasses import MopidyConnection, DB
+from CLasses import MopidyConnection, DB, User, Song
 
 class Session:
     def __init__(self,sessionPin):
         self.sessionPin = sessionPin
         self.usersAll = []
         self.users = []
-        self.queue = []
+        self.queue = [1,2]
         self.currentSong = 1
         self.nextInsertPos = 0
         self.currentPlaylist = ''
@@ -22,23 +22,27 @@ class Session:
         users = self.db.getUsers()
         self.usersAll = []
         for user in users:
-            self.usersAll.append(user)
+            self.usersAll.append(((User.User(user[0], user[1], user[2], user[3]).__dict__)))
         return self.usersAll
 
     def getSongs(self):
         songs = self.db.getSongs()
-        songsAll = {}
+        songsAll = []
         for song in songs:
-            songsAll[song[0]]=song[2]
+            songsAll.append(Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__)
         return songsAll
 
     def getSpecSong(self,id):
-        song = self.db.getSpecSong(id)
-        return song.fetchall()
+        so = self.db.getSpecSong(id)
+        for song in so:
+            s = Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
+        return s
 
     def getCurrentSong(self):
-        song = self.db.getSpecSong(self.currentSong)
-        return song.fetchall()
+        so = self.db.getSpecSong(self.currentSong)
+        for song in so:
+            s = Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
+        return s
     
     def getBanned(self, deviceId):
         banned = self.db.getBanned(deviceId)
@@ -61,11 +65,12 @@ class Session:
         return token.fetchall()[0][0]
 
     def returnQueue (self): 
-        queue = {}
-        i = -1
-        for song in self.queue:
-            i=i+1
-            queue['song@'+ str(i)] = song #ID
+        queue = []
+        for son in self.queue:
+            so = self.db.getSpecSong(son)
+            for song in so:
+                s = Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__ 
+                queue.append(s)           
         return queue
 
     def setvolume(self, volume):
