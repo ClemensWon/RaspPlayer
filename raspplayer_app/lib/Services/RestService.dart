@@ -34,14 +34,15 @@ class RestService {
     return false;
   }
 
-  Future<bool> masterLogin(String nickname, String password) async {
+  Future<bool> masterLogin(String nickname, String password, String deviceID) async {
     final response = await http.post(Uri.parse(hostname + "/login/master"), headers: {
       "content-type": "application/json",
       "accept": "application/json",
     },
     body: json.encode({
       'username': nickname,
-      'password': password
+      'password': password,
+      'deviceId': deviceID
     }));
     if (response.statusCode == 200) {
       stderr.writeln(response.body);
@@ -183,6 +184,34 @@ class RestService {
     final response = await request.send();
     stderr.writeln(response);
     return null;
+  }
+
+  Future<int> setVolume(int volume) async {
+    final response = await http.post(Uri.parse(hostname+'/Session/Volume/'+volume.toString()), headers:  {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    if (response.statusCode == 200) {
+      stderr.writeln(jsonDecode(response.body)['volume']);
+      return  int.parse(jsonDecode(response.body)['volume']);
+    }
+    return -1;
+  }
+
+  Future<String> setSessionPin(String sessionPin) async {
+    stderr.writeln(sessionPin);
+    final response = await http.post(Uri.parse(hostname + "/settings/sessionPin"), headers: {
+      "content-type": "application/json",
+      "accept": "application/json",
+      'token': UserData.token
+    },
+        body: json.encode({
+          'newPin': sessionPin,
+        }));
+    if (response.statusCode==200) {
+      return jsonDecode(response.body)['sessionPin'] as String;
+    }
+    return "";
   }
 }
 

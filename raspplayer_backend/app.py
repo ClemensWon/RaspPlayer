@@ -297,7 +297,7 @@ def uploadSong():
         {'upload': 'yes'}
     )
 
-@app.route('/Session/Volume/<amount>', methods = ['GET'])
+@app.route('/Session/Volume/<amount>', methods = ['POST'])
 @checkForUser
 def setVolume(amount):
     session.setvolume(int(amount))

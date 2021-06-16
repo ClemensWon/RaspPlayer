@@ -47,10 +47,12 @@ class MainScreenState extends State<MainScreen> {
     super.initState();
     _restService.getQueue().then((response) {
       if (response != []) {
+        List<SongListItem> tmp = [];
         setState(() {
           response.forEach((element) {
-           queue.add(SongListItem.fromSong(song: element));
+           tmp.add(SongListItem.fromSong(song: element));
           });
+          queue = tmp;
         });
       }
 

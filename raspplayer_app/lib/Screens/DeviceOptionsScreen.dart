@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
+import 'package:raspplayer_app/Services/RestService.dart';
 
 class DeviceOptionsScreen extends StatefulWidget {
 @override
@@ -20,6 +21,8 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
   double _skipPercentage = 20;
   double _mutingPercentage = 50;
   double _volumePercentage = 50;
+
+  RestService _restService = new RestService();
 
   @override
   void initState() {
@@ -61,8 +64,11 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                     size: Size(75,30),
                     child: TextFormField(
                       initialValue: _pin,
+                      onFieldSubmitted: (newValue) {
+                        _pin = newValue;
+                      },
                       textAlign: TextAlign.center,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         focusColor: Color.fromRGBO(0, 1, 49, 1),
                         border: OutlineInputBorder(
@@ -92,8 +98,8 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                 min: 0,
                 max: 100,
                 divisions: 20,
-                label: _volumePercentage.round().toString() + "%",
-                value: _volumePercentage,
+                label: _volumePercentage.toString() + "%",
+                value: _volumePercentage.toDouble(),
                 onChanged: (double value) {
                   setState(() {
                     _volumePercentage = value;
@@ -178,7 +184,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                 max: 100,
                 divisions: 20,
                 label: _skipPercentage.round().toString() + "%",
-                value: _skipPercentage,
+                value: _skipPercentage.toDouble(),
                 onChanged: (double value) {
                   setState(() {
                     _skipPercentage = value;
@@ -222,7 +228,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                 alignment: Alignment.centerLeft,
               ),
               if (_allowMuting) Slider(
-                  value: _mutingPercentage,
+                  value: _mutingPercentage.toDouble(),
                   min:0,
                   max:100,
                   divisions: 20,
@@ -260,22 +266,32 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
           Icons.save
         ),
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Saved to Server'),
-              action: SnackBarAction(
-                label: 'Ok',
-                onPressed: () {
-                  if (_pin != _serverPin) {
+          if (_pin != _serverPin) {
+            _restService.setSessionPin(_pin).then((newPin) {
+              if (newPin != "") {
+                _serverPin = newPin;
+              }
+            });
+          }
+          if (_volumePercentage != _serverVolume) {
+            _restService.setVolume(_volumePercentage.floor()).then((newVolume) {
 
-                  }
-                  if (_volumePercentage != _serverVolume) {
+              if (newVolume != -1) {
+                _serverVolume = newVolume.toDouble();
+                /*ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Saved to Server'),
+                    action: SnackBarAction(
+                      label: 'Ok',
+                      onPressed: () {
+                      },
+                    ),
+                  ),
+                );*/
+              }
+            });
+          }
 
-                  }
-                },
-              ),
-            ),
-          );
         },
       ),
     );

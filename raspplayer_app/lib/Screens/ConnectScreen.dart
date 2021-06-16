@@ -173,7 +173,7 @@ class ConnectScreenState extends State<ConnectScreen> {
           }
         });
       } else {
-        restService.masterLogin(_nickname.text, _masterPassword.text).then((recievedToken) {
+        restService.masterLogin(_nickname.text, _masterPassword.text, deviceId).then((recievedToken) {
           if (recievedToken) {
             Navigator.pushReplacementNamed(context, 'Main');
           }
