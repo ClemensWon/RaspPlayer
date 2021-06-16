@@ -129,7 +129,7 @@ class RestService {
   }
 
   Future<bool> skipCurrentSong() async {
-    final response = await http.get(Uri.parse(hostname + '/session/currentSong/replay'), headers: {
+    final response = await http.get(Uri.parse(hostname + '/session/currentSong/skip'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
@@ -137,7 +137,7 @@ class RestService {
   }
 
   Future<bool> replayCurrentSong() async {
-    final response = await http.get(Uri.parse(hostname + '/session/currentSong/skip'), headers: {
+    final response = await http.get(Uri.parse(hostname + '/session/currentSong/replay'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
