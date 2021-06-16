@@ -31,6 +31,7 @@ class MainScreenState extends State<MainScreen> {
   String _skips = '';
   String _likes = '';
   List<SongListItem> queue = [];
+  List<Song> songs = [];
 
   displayErrorMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -52,6 +53,7 @@ class MainScreenState extends State<MainScreen> {
     _restService.getQueue().then((response) {
       if (response != []) {
         List<SongListItem> tmp = [];
+        songs = response;
         setState(() {
           _songTitle = response.first.songTitle;
           _artist = response.first.artist;
@@ -292,7 +294,7 @@ class MainScreenState extends State<MainScreen> {
             "Show Playlist"
           ),
           onPressed: () {
-            Navigator.pushNamed(context, 'Playlist');
+            Navigator.pushNamed(context, 'Playlist', arguments: {'playlist': songs});
           },
         ),
       ),
