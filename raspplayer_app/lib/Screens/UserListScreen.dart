@@ -24,7 +24,12 @@ class UserListScreenState extends State<UserListScreen> {
       int keyValue = 0;
       setState(() {
         result.forEach((element) {
-          userListItem = [...userListItem, new UserListItem(key: Key(keyValue.toString() + "userListItem"), username: element.username, adminView: _adminView, allowMute: _allowMute, isMuted: element.isMuted,)];
+          if(element.username == 'master') {
+            userListItem = [...userListItem, new UserListItem(key: Key(keyValue.toString() + "userListItem"), username: element.username, adminView: false, allowMute: false, isMuted: element.isMuted, isBanned: element.isBanned)];
+          }
+          else {
+            userListItem = [...userListItem, new UserListItem(key: Key(keyValue.toString() + "userListItem"), username: element.username, adminView: _adminView, allowMute: _allowMute, isMuted: element.isMuted, isBanned: element.isBanned,)];
+          }
           keyValue++;
         });
       });
@@ -59,9 +64,19 @@ class UserListScreenState extends State<UserListScreen> {
                   )
               ),
               onPressed: () {
-                //...
+                RestService rs = new RestService();
+                rs.muteAll().then((success) {
+                  if(success) {
+                    setState(() {
+                      List<UserListItem> tmp = [];
+                      userListItem.forEach((element) {
+                        tmp.add(new UserListItem(username: element.username, adminView: element.adminView, allowMute: element.allowMute, isMuted: true, isBanned: element.isBanned,));
+                      });
+                      userListItem = tmp;
+                    });
+                  }
+                });
               },
-
             ),
             if (_adminView) ElevatedButton(
               child: SizedBox(
@@ -73,7 +88,19 @@ class UserListScreenState extends State<UserListScreen> {
                   )
               ),
               onPressed: () {
-
+                RestService rs = new RestService();
+                rs.kickAll().then((success) {
+                  if(success) {
+                    stderr.writeln('test');
+                    setState(() {
+                      List<UserListItem> tmp = [];
+                      userListItem.forEach((element) {
+                        tmp.add(new UserListItem(username: element.username, adminView: element.adminView, allowMute: element.allowMute, isMuted: element.isMuted, isBanned: true));
+                      });
+                      userListItem = tmp;
+                    });
+                  }
+                });
               },
             )
           ]

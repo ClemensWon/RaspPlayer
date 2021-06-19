@@ -8,7 +8,7 @@ import 'package:raspplayer_app/model/User.dart';
 import 'package:raspplayer_app/model/Song.dart';
 
 class RestService {
-  final String hostname = "http://10.0.0.37:5000";
+  final String hostname = "http://10.0.0.14:5000";
   void testFetch() async{
     http.get(Uri.parse(hostname), headers: {
       "Accept": "application/json"
@@ -33,7 +33,7 @@ class RestService {
     }
     return false;
   }
-
+ 
   Future<bool> masterLogin(String nickname, String password, String deviceID) async {
     final response = await http.post(Uri.parse(hostname + "/login/master"), headers: {
       "content-type": "application/json",
@@ -97,7 +97,7 @@ class RestService {
     if (response.statusCode == 200) {
       int idCounter = 0;
       jsonDecode(response.body).forEach((element) {
-        result.add(new User(id: idCounter.toString(),username: element['username'],role: "User",isMuted: false));
+        result.add(new User(id: idCounter.toString(),username: element['username'],role: "User",isMuted: false, isBanned: false));
       });
       return result;
     }
@@ -146,6 +146,38 @@ class RestService {
 
   Future<bool> muteUser(String username) async {
     final response = await http.put(Uri.parse(hostname + '/Session/Mute/' + username), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
+  }
+
+  Future<bool> banUser(String deviceId) async {
+    final response = await http.put(Uri.parse(hostname + '/users/ban/' + deviceId), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
+  }
+
+  Future<bool> unbanUser(String deviceId) async {
+    final response = await http.put(Uri.parse(hostname + '/users/unban/' + deviceId), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
+  }
+
+  Future<bool> muteAll() async {
+    final response = await http.put(Uri.parse(hostname + '/users/muteAll'), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
+  }
+
+  Future<bool> kickAll() async {
+    final response = await http.put(Uri.parse(hostname + '/users/kickAll'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
