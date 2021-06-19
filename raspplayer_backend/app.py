@@ -186,12 +186,12 @@ def settings():
     #get Settings
     return 'settings'
 
-@app.route('/users/muteAll')
+@app.route('/users/muteAll', methods = ["PUT"])
 def mutAll():
     #mute All users
     return 'mute'
 
-@app.route('/users/kickAll')
+@app.route('/users/kickAll', methods = ["PUT"])
 def kickAll():
     #check Users list in session
     #evtl wrapped in Session um zu überprüfen ob die User überhaupt in der Session sind?
