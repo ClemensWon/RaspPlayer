@@ -79,39 +79,43 @@ class AboutScreen extends StatelessWidget {
                       style: TextStyle(color: Colors.black),
                       children: <TextSpan> [
                         TextSpan(
-                          text: 'Terms of Use\n\n',
+                          text: 'Privacy Policy\n\n',
                           style: TextStyle(fontSize: 16),
                         ),
                         TextSpan(
-                          text: 'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                                'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                                'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music.\n\n',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
-                        TextSpan(
-                          text: 'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                                'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                                'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                                'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                                'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. \n\n',
+                          text: 'This SERVICE is provided by and is intended for use as is. This page is used to inform visitors regarding our policies with the collection, use, and disclosure of Personal Information if anyone decided to use our Service. If you choose to use our Service, then you agree to the collection and use of information in relation to this policy. The Personal Information that we collect is used for providing and improving the Service. We will not use or share your information with anyone except as described in this Privacy Policy. The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at RaspPlayer unless otherwise defined in this Privacy Policy.\n\n',
                           style: TextStyle(fontSize: 12),
                         ),
                         TextSpan(
-                          text: 'General Use and Data Privacy\n\n',
+                          text: 'Personal Data\n\n',
                           style: TextStyle(fontSize: 16),
                         ),
                         TextSpan(
-                          text: 'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                              'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                              'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music.\n\n',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                          text: 'We do not store personal data. There is no registration required nor will the application ever give the option to submit personal data. The only data that we receive, are game relevant information that is used to improve the player experience. This data, like how long a category was played, or how many tools have been used, cannot be assigned to a person, since all the data is being sent without user information (like User IP, etc.) and will be held anonymously at any time.\n\n',
+                          style: TextStyle(fontSize: 12),
                         ),
                         TextSpan(
-                          text: 'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                              'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                              'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                              'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. '
-                              'RaspPlayer is a special Application which can build up a connection to a RaspBox to play music. \n\n\n',
+                          text: 'Security\n\n',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        TextSpan(
+                          text: 'We value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and we cannot guarantee its absolute security.\n\n',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        TextSpan(
+                          text: 'Children\'s Privacy\n\n',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        TextSpan(
+                          text: 'These Services do not address anyone under the age of 13. We do not knowingly collect personally identifiable information from children under 13. In the case we discover that a child under 13 has provided us with personal information, we immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact us so that we will be able to do necessary actions.\n\n',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        TextSpan(
+                          text: 'Changes to This Privacy Policy\n\n',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        TextSpan(
+                          text: 'We may update our Privacy Policy from time to time. Thus, you are advised to review this page periodically for any changes. We will notify you of any changes by posting the new Privacy Policy on this page. These changes are effective immediately after they are posted on this page.\n\n',
                           style: TextStyle(fontSize: 12),
                         ),
                       ],
