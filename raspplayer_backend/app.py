@@ -224,7 +224,7 @@ def skipCurrentSong():
     )
 
 @app.route('/session/currentSong/play', methods = ['GET'])
-@checkForUser
+#@checkForUser
 def playCurrentSong():
     session.play()
     return jsonify(
@@ -353,13 +353,67 @@ def getPlaylist():
         {'message': 'getPlaylist'}
     )
 
-@app.route('/Session/playlist/delete/<songId>', methods = ['GET'])
-@checkForUser
+
+#################### PLAYLIST ####################
+
+@app.route('/session/playlist/create', methods = ['PUT'])
+#@checkForUser
+@checkJsonValid
+def createPlaylist():
+    requestData = request.get_json()
+    playlistID = session.createPlaylist(requestData['playlistName'])
+    if playlistID > 0:
+        return jsonify(
+            {'playlistID': playlistID}
+        )
+    else:
+        return jsonify(
+            {'error': 'playlistName already exists'}
+        ), 400
+
+@app.route('/session/playlist/addSong', methods = ['PUT'])
+#@checkForUser
+@checkJsonValid
+def addSongToPlaylist():
+    requestData = request.get_json()
+    success = session.addSongToPlaylist(requestData['songID'], requestData['playlistID'])
+    if success:
+        return jsonify(
+            {'message': 'song added to playlist'}
+        )
+    else:
+        return jsonify(
+            {'error': 'song already in playlist'}
+        ), 400
+
+@app.route('/session/playlist/deleteSong', methods = ['DELETE'])
+#@checkForUser
+@checkJsonValid
 def deleteSongFromPlaylist():
-    #deleteSongFromPlaylist
+    requestData = request.get_json()
+    session.deleteSongFromPlaylist(requestData['songID'], requestData['playlistID'])
     return jsonify(
-        {'message': 'delete Playlist'}
+        {'message': 'song deleted from playlist'}
     )
+
+@app.route('/session/playlist/play', methods = ['POST'])
+#@checkForUser
+@checkJsonValid
+def playPlaylist():
+    requestData = request.get_json()
+    session.playPlaylist(requestData['playlistID'])
+    return jsonify(
+        {'message': 'playing playlist'}
+    )
+
+@app.route('/session/playlists', methods = ['GET'])
+#@checkForUser
+def getPlaylists():
+    playlists = session.getPlaylists()
+    return jsonify(
+        playlists
+    )
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

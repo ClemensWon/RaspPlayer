@@ -88,3 +88,61 @@ class DB:
     def getInterpret(self, interpretID):
         self.cur.execute("SELECT * FROM Interpret WHERE interpretID = ?",(interpretID,))
         return self.cur.fetchall()
+        
+
+    #################### PLAYLISTS ####################
+
+    def createPlaylist(self, playlistName):
+        try:
+            self.cur.execute("INSERT INTO Playlist (playlistName, nextSongPos) VALUES (?, ?)", (playlistName, 0))
+            self.conn.commit()
+            return self.cur.lastrowid
+        except:
+            return -1
+
+    def insertSongToPlaylist(self, songID, playlistID):
+        self.cur.execute("SELECT nextSongPos FROM Playlist WHERE playlistID = ?", (playlistID,))
+        nextSongPos = self.cur.fetchall()[0][0]
+        try:
+            self.cur.execute("INSERT INTO SongToPlaylist (playlistID, songID, songPos) VALUES (?, ?, ?)", (playlistID, songID, nextSongPos))
+            self.conn.commit()
+            return True
+        except:
+            return False
+
+    def deleteSongFromPlaylist(self, songID, playlistID):
+        self.cur.execute("SELECT songPos FROM SongToPlaylist WHERE songID = ? and playlistID = ?", (songID, playlistID))
+        songPos = self.cur.fetchall()[0][0]
+
+        self.cur.execute("UPDATE SongToPlaylist SET songPos = songPos-1 WHERE playlistID = ? and songPos > ?", (playlistID, songPos))
+
+        self.cur.execute("UPDATE Playlist SET nextSongPos = nextSongPos-1 WHERE playlistID = ?", (playlistID,))
+
+        self.cur.execute("DELETE FROM SongToPlaylist WHERE songID = ? and playlistID = ?", (songID, playlistID))
+
+        self.conn.commit()
+
+    def getPlaylists(self):
+        self.cur.execute("SELECT * FROM Playlist")
+        playlists = []
+        for (playlistID, playlistName, nextSongPos) in self.cur:
+            playlists.append({
+                'playlistID': playlistID,
+                'playlistName': playlistName
+            })
+        return playlists
+
+    def incrementNextSongPos(self, playlistID):
+        self.cur.execute("UPDATE Playlist SET nextSongPos = nextSongPos+1 WHERE playlistID = ?", (playlistID,))
+        self.conn.commit()
+
+    def getPlaylistName(self, playlistID):
+        self.cur.execute("SELECT playlistName FROM Playlist WHERE playlistID = ?", (playlistID,))
+        return self.cur.fetchall()[0][0]
+
+
+    #################### SONG ####################
+
+    def getSongURI(self, songID):
+        self.cur.execute("SELECT filepath FROM Song WHERE songID = ?", (songID,))
+        return self.cur.fetchall()[0][0]
