@@ -1,7 +1,7 @@
 DROP DATABASE RaspPlayer;
 
 
-DROP USER 'johnlennon';
+DROP USER 'johnlennon'@'localhost';
 
 
 CREATE DATABASE RaspPlayer;
@@ -24,7 +24,7 @@ INSERT INTO SoundBoxSettings (soundBoxID, masterPassword, sessionPin)
 VALUES (0, 'masterPasswordHash', 0000);
 
 CREATE TABLE User (
-    deviceID int primary key,
+    deviceID varchar(50) primary key,
     username varchar(20) not null,
     banned boolean not null,
     token varchar(500)
@@ -32,7 +32,7 @@ CREATE TABLE User (
 
 CREATE TABLE Song (
     songID int primary key auto_increment,
-    deviceID int NOT NULL,
+    deviceID varchar(50) NOT NULL,
     songName varchar(50) not null,
     genre varchar(30),
     duration int NOT NULL,
@@ -40,6 +40,7 @@ CREATE TABLE Song (
     skips int NOT NULL,
     album varchar(50) NOT NULL,
     replays int NOT NULL,
+    filepath varchar (500) NOT NULL,
     foreign key (deviceID) references User(deviceID) on delete cascade
 );
 
@@ -50,7 +51,8 @@ CREATE TABLE Interpret (
 
 CREATE TABLE Playlist (
     playlistID int primary key auto_increment,
-    playlistName varchar(30) not null
+    playlistName varchar(30) not null unique,
+    nextSongPos int NOT NULL
 );
 
 CREATE TABLE InterpretToSong (
@@ -69,5 +71,15 @@ CREATE TABLE SongToPlaylist (
     foreign key (playlistID) references Playlist(playlistID) on delete cascade,
     foreign key (songID) references Song(songID) on delete cascade
 );
+
+INSERT INTO User (deviceID, username, banned, token) VALUES ("999", "Alex", 0, "abc");
+
+INSERT INTO Song (deviceID, songName, genre, duration, likes, skips, album, replays, filepath) VALUES ("999", "Found God in a Tomato", "rock", 30, 2, 1, "High Viscera", 1, "file:///home/john/Music/Imagine.mp3");
+INSERT INTO Song (deviceID, songName, genre, duration, likes, skips, album, replays, filepath) VALUES ("999", "Cornflake", "rock", 35, 0, 0, "High Viscera", 0, "asdf");
+
+INSERT INTO Interpret (interpretID, interpretName) VALUES(1, "PPC");
+
+INSERT INTO InterpretToSong(songID, interpretID) VALUES (1, 1);
+INSERT INTO InterpretToSong(songID, interpretID) VALUES (2, 1);
 
 commit;

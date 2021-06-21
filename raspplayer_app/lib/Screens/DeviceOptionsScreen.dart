@@ -10,12 +10,27 @@ State<StatefulWidget> createState() => DeviceOptionsScreenState();
 
 class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
 
+  double _serverVolume;
+  String _serverPin;
+
+  String _pin;
   bool _allowMuting = true;
   bool _allowUpload = false;
   bool _limitAdding = false;
   double _skipPercentage = 20;
   double _mutingPercentage = 50;
   double _volumePercentage = 50;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _serverPin = "4000";
+    _serverVolume = 50;
+
+    _pin = _serverPin;
+    _volumePercentage = _serverVolume;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +60,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                   SizedBox.fromSize(
                     size: Size(75,30),
                     child: TextFormField(
-                      initialValue: '4000',
+                      initialValue: _pin,
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
@@ -251,7 +266,12 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
               action: SnackBarAction(
                 label: 'Ok',
                 onPressed: () {
-                  // Code to execute.
+                  if (_pin != _serverPin) {
+
+                  }
+                  if (_volumePercentage != _serverVolume) {
+
+                  }
                 },
               ),
             ),

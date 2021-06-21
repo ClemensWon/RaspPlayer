@@ -13,6 +13,7 @@ app.config['SECRET_KEY'] = 'SECRETKEY'
 
 songs = [{"id":0, "name" : "Sockosophie","artist" : "Kaeptn Peng", "genre" : "Rap", "released" : "2013", "album": "test-album", "addedBy": "Alex"},{"id":1,"name" : "Panikk in der Diskko","artist" : "ODMGIDA feat Kex Kuhl", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Bob"},{"id":2,"name" : "Awkward", "artist" : "Duzoe", "genre" : "Rap", "released" : "2020", "album": "test-album" , "addedBy": "Clemens"}]
 
+
 session = Session.Session('default')
 admin   = Admin.Admin()
 
@@ -54,7 +55,7 @@ def checkForUser(func):
         
         for user in session.users:
             print(user.deviceId)
-            if int(user.deviceId) == int(data.get('deviceId')):
+            if user.deviceId == data.get('deviceId'):
                 return func(*args, **kwargs)
             else:
                 continue
@@ -272,6 +273,15 @@ def addSongToQueue(songId):
         {'queue': songId}
     )
 
+@app.route('/Library/upload', methods = ['POST'])
+@checkForUser
+def uploadSong():
+    file = request.files['file']
+    #uploadSong
+    return jsonify(
+        {'upload': 'yes'}
+    )
+
 @app.route('/session/volume/<amount>', methods = ['PUT'])
 @checkForUser
 def setVolume(amount):
@@ -327,12 +337,65 @@ def getPlaylist():
         {'message': 'getPlaylist'}
     )
 
-@app.route('/session/playlist/delete/<songId>', methods = ['PUT'])
-@checkForUser
+
+#################### PLAYLIST ####################
+
+@app.route('/session/playlist/create', methods = ['PUT'])
+#@checkForUser
+@checkJsonValid
+def createPlaylist():
+    requestData = request.get_json()
+    playlistID = session.createPlaylist(requestData['playlistName'])
+    if playlistID > 0:
+        return jsonify(
+            {'playlistID': playlistID}
+        )
+    else:
+        return jsonify(
+            {'error': 'playlistName already exists'}
+        ), 400
+
+@app.route('/session/playlist/addSong', methods = ['PUT'])
+#@checkForUser
+@checkJsonValid
+def addSongToPlaylist():
+    requestData = request.get_json()
+    success = session.addSongToPlaylist(requestData['songID'], requestData['playlistID'])
+    if success:
+        return jsonify(
+            {'message': 'song added to playlist'}
+        )
+    else:
+        return jsonify(
+            {'error': 'song already in playlist'}
+        ), 400
+
+@app.route('/session/playlist/deleteSong', methods = ['DELETE'])
+#@checkForUser
+@checkJsonValid
 def deleteSongFromPlaylist():
-    #deleteSongFromPlaylist
+    requestData = request.get_json()
+    session.deleteSongFromPlaylist(requestData['songID'], requestData['playlistID'])
     return jsonify(
-        {'message': 'delete Playlist'}
+        {'message': 'song deleted from playlist'}
+    )
+
+@app.route('/session/playlist/play', methods = ['POST'])
+#@checkForUser
+@checkJsonValid
+def playPlaylist():
+    requestData = request.get_json()
+    session.playPlaylist(requestData['playlistID'])
+    return jsonify(
+        {'message': 'playing playlist'}
+    )
+
+@app.route('/session/playlists', methods = ['GET'])
+#@checkForUser
+def getPlaylists():
+    playlists = session.getPlaylists()
+    return jsonify(
+        playlists
     )
 
 #USERS
