@@ -118,3 +118,32 @@ class Session:
         responseDic = Song.Song(song[0], addedby[0][1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
         responseDic['artist'] = interpret[0][1]
         return responseDic
+
+    
+    #################### PLAYLIST ####################
+
+    def createPlaylist(self, playlistName):
+        playlistID = self.db.createPlaylist(playlistName)
+        if playlistID > 0:
+            self.mopidy.createPlaylist(playlistName)
+        return playlistID
+
+    def addSongToPlaylist(self, songID, playlistID):
+        success = self.db.insertSongToPlaylist(songID, playlistID)
+        if success:
+            self.db.incrementNextSongPos(playlistID)
+            playlistName = self.db.getPlaylistName(playlistID)
+            songURI = self.db.getSongURI(songID)
+            self.mopidy.songToPlaylist(playlistName, songURI)
+        return success
+
+    def deleteSongFromPlaylist(self, songID, playlistID):
+        self.db.deleteSongFromPlaylist(songID, playlistID)
+
+    def playPlaylist(self, playlistID):
+        playlistName = self.db.getPlaylistName(playlistID)
+        self.mopidy.loadPlaylist(playlistName)
+        self.mopidy.play()
+
+    def getPlaylists(self):
+        return self.db.getPlaylists()

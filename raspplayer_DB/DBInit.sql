@@ -1,7 +1,7 @@
 DROP DATABASE RaspPlayer;
 
 
-DROP USER 'johnlennon';
+DROP USER 'johnlennon'@'localhost';
 
 
 CREATE DATABASE RaspPlayer;
@@ -40,6 +40,7 @@ CREATE TABLE Song (
     skips int NOT NULL,
     album varchar(50) NOT NULL,
     replays int NOT NULL,
+    filepath varchar (500) NOT NULL,
     foreign key (deviceID) references User(deviceID) on delete cascade
 );
 
@@ -50,7 +51,8 @@ CREATE TABLE Interpret (
 
 CREATE TABLE Playlist (
     playlistID int primary key auto_increment,
-    playlistName varchar(30) not null
+    playlistName varchar(30) not null unique,
+    nextSongPos int NOT NULL
 );
 
 CREATE TABLE InterpretToSong (
@@ -72,8 +74,8 @@ CREATE TABLE SongToPlaylist (
 
 INSERT INTO User (deviceID, username, banned, token) VALUES ("999", "Alex", 0, "abc");
 
-INSERT INTO Song (songID, deviceID, songName, genre, duration, likes, skips, album, replays) VALUES (1, "999", "Found God in a Tomato", "rock", 30, 2, 1, "High Viscera", 1);
-INSERT INTO Song (songID, deviceID, songName, genre, duration, likes, skips, album, replays) VALUES (2, "999", "Cornflake", "rock", 35, 0, 0, "High Viscera", 0);
+INSERT INTO Song (deviceID, songName, genre, duration, likes, skips, album, replays, filepath) VALUES ("999", "Found God in a Tomato", "rock", 30, 2, 1, "High Viscera", 1, "file:///home/john/Music/Imagine.mp3");
+INSERT INTO Song (deviceID, songName, genre, duration, likes, skips, album, replays, filepath) VALUES ("999", "Cornflake", "rock", 35, 0, 0, "High Viscera", 0, "asdf");
 
 INSERT INTO Interpret (interpretID, interpretName) VALUES(1, "PPC");
 
