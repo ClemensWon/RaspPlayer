@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:raspplayer_app/Services/RestService.dart';
+import 'package:raspplayer_app/model/Playlist.dart';
 
 class PlayListItem extends StatelessWidget {
   final int id;
@@ -8,6 +10,10 @@ class PlayListItem extends StatelessWidget {
   final int totalSongs;
 
   PlayListItem({this.id, this.playlistTitle = 'Playlist', this.username = 'User', this.totalSongs});
+
+  factory PlayListItem.fromPlaylist(Playlist playList) {
+    return PlayListItem(id: playList.id, playlistTitle:  playList.playlistName, username: playList.username, totalSongs: playList.songCount);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +45,13 @@ class PlayListItem extends StatelessWidget {
                   ),
                   TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, 'Main');
+                        RestService restService = new RestService();
+                        restService.playPlaylist(id).then((success) {
+                          if (success) {
+                            Navigator.pushNamed(context, 'Main');
+                          }
+                        });
+
                       },
                       child: Text('Start'),
                   ),

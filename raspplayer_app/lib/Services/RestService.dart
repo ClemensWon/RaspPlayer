@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:raspplayer_app/Services/UserData.dart';
+import 'package:raspplayer_app/model/Playlist.dart';
 import 'dart:convert';
 import 'package:raspplayer_app/model/User.dart';
 import 'package:raspplayer_app/model/Song.dart';
+
 
 class RestService {
   final String hostname = "http://10.0.0.37:5000";
@@ -213,5 +215,50 @@ class RestService {
     }
     return "";
   }
+
+  Future<List<Playlist>> getPlaylists() async {
+    List<Playlist> result = [];
+    final response = await http.get(Uri.parse(hostname + '/session/playlists'), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token,
+    });
+    if (response.statusCode == 200) {
+      jsonDecode(response.body).forEach((element) {
+        result.add(Playlist.fromJson(element));
+      });
+      return result;
+    }
+    return [];
+  }
+
+  Future<int> createPlaylist(String playlistName) async {
+    final response = await http.put(Uri.parse(hostname+ '/session/playlist/create'), headers: {
+    "content-type" : "application/json",
+    "accept" : "application/json",
+    },
+    body: json.encode({
+    'playlistName': playlistName,
+    }));
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['playlistID'] as int;
+    }
+    stderr.writeln(response.body);
+    return -1;
+  }
+
+  Future<bool> playPlaylist(int playlistID) async {
+    final response = await http.post(
+        Uri.parse(hostname+ '/session/playlist/play'),
+        headers: {
+          "content-type" : "application/json",
+          "accept" : "application/json",
+        },
+        body: json.encode({
+          'playlistID': playlistID,
+        })
+    );
+    return response.statusCode == 200;
+  }
+
 }
 

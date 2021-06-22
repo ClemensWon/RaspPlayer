@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:raspplayer_app/Components/CreatePlaylistDialog.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Components/PlayListItem.dart';
+import 'package:raspplayer_app/Services/RestService.dart';
 
 class PlaylistsScreen extends StatefulWidget {
   @override
@@ -9,26 +11,7 @@ class PlaylistsScreen extends StatefulWidget {
 }
 
 class PlaylistsScreenState extends State<PlaylistsScreen> {
-  final List<PlayListItem> playlistList = <PlayListItem>[
-    PlayListItem(
-      id: 1,
-      playlistTitle: 'Awesome Mix',
-      username: 'Michi',
-      totalSongs: 30,
-    ),
-    PlayListItem(
-      id: 2,
-      playlistTitle: 'Ur geile Oldies',
-      username: 'Clemens',
-      totalSongs: 69,
-    ),
-    PlayListItem(
-      id: 3,
-      playlistTitle: 'AustroPop, gemma!',
-      username: 'Martin',
-      totalSongs: 44,
-    ),
-  ];
+  List<PlayListItem> playlistList = <PlayListItem>[];
 
   Widget playListItemTemplate(playlist) {
     return Card(
@@ -46,6 +29,22 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    RestService restService = new RestService();
+    final List<PlayListItem> tmp = <PlayListItem>[];
+    restService.getPlaylists().then((result) {
+    setState((){
+      result.forEach((element) {
+        tmp.add(new PlayListItem.fromPlaylist(element));
+      });
+      playlistList = tmp;
+    });
+
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
@@ -59,7 +58,27 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
           child: ListView(
             children: playlistList,
           ),
-      )
+      ),
+      floatingActionButton: IconButton(icon: Icon(Icons.add_circle),
+        onPressed: () {
+          showDialog(context: context, builder: (build) {
+            return CreatePlayListDialog();
+          }).then((value) {
+            RestService restService = new RestService();
+            final List<PlayListItem> tmp = <PlayListItem>[];
+            restService.getPlaylists().then((result) {
+              setState((){
+                result.forEach((element) {
+                  tmp.add(new PlayListItem.fromPlaylist(element));
+                });
+                playlistList = tmp;
+              });
+            });
+          });
+        },
+        iconSize: 48,
+        color: Colors.blue,
+      ),
     );
   }
 }
