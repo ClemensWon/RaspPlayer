@@ -361,7 +361,7 @@ def getPlaylist():
 @checkJsonValid
 def createPlaylist():
     requestData = request.get_json()
-    playlistID = session.createPlaylist(requestData['playlistName'])
+    playlistID = session.createPlaylist(requestData['playlistName'], requestData['userName'])
     if playlistID > 0:
         return jsonify(
             {'playlistID': playlistID}
@@ -412,6 +412,14 @@ def getPlaylists():
     playlists = session.getPlaylists()
     return jsonify(
         playlists
+    )
+
+@app.route('/session/playlist/songs/<playlistID>', methods = ['GET'])
+#@checkForUser
+def getSongsFromPlaylist(playlistID):
+    songs = session.getSongsFromPlaylist(playlistID)
+    return jsonify(
+        songs
     )
 
 

@@ -52,7 +52,8 @@ CREATE TABLE Interpret (
 CREATE TABLE Playlist (
     playlistID int primary key auto_increment,
     playlistName varchar(30) not null unique,
-    nextSongPos int NOT NULL
+    nextSongPos int NOT NULL,
+    creator varchar(20) NOT NULL
 );
 
 CREATE TABLE InterpretToSong (

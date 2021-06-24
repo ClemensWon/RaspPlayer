@@ -122,8 +122,8 @@ class Session:
     
     #################### PLAYLIST ####################
 
-    def createPlaylist(self, playlistName):
-        playlistID = self.db.createPlaylist(playlistName)
+    def createPlaylist(self, playlistName, username):
+        playlistID = self.db.createPlaylist(playlistName, username)
         if playlistID > 0:
             self.mopidy.createPlaylist(playlistName)
         return playlistID
@@ -147,3 +147,6 @@ class Session:
 
     def getPlaylists(self):
         return self.db.getPlaylists()
+
+    def getSongsFromPlaylist(self, playlistID):
+        return self.db.getSongsFromPlaylist(playlistID)

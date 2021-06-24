@@ -92,9 +92,9 @@ class DB:
 
     #################### PLAYLISTS ####################
 
-    def createPlaylist(self, playlistName):
+    def createPlaylist(self, playlistName, username):
         try:
-            self.cur.execute("INSERT INTO Playlist (playlistName, nextSongPos) VALUES (?, ?)", (playlistName, 0))
+            self.cur.execute("INSERT INTO Playlist (playlistName, nextSongPos, creator) VALUES (?, ?, ?)", (playlistName, 0, username))
             self.conn.commit()
             return self.cur.lastrowid
         except:
@@ -125,10 +125,11 @@ class DB:
     def getPlaylists(self):
         self.cur.execute("SELECT * FROM Playlist")
         playlists = []
-        for (playlistID, playlistName, nextSongPos) in self.cur:
+        for (playlistID, playlistName, nextSongPos, creator) in self.cur:
             playlists.append({
                 'playlistID': playlistID,
-                'playlistName': playlistName
+                'playlistName': playlistName,
+                'creator': creator
             })
         return playlists
 
@@ -139,6 +140,25 @@ class DB:
     def getPlaylistName(self, playlistID):
         self.cur.execute("SELECT playlistName FROM Playlist WHERE playlistID = ?", (playlistID,))
         return self.cur.fetchall()[0][0]
+
+    def getSongsFromPlaylist(self, playlistID):
+        self.cur.execute("SELECT * FROM SongToPlaylist INNER JOIN Song ON SongToPlaylist.songID=Song.songID WHERE playlistID = ?", (playlistID,))
+        songs = []
+        for (playlistID, songIDSongToPlaylist, songPos, songID, deviceID, songName, genre, duration, likes, skips, album, replays, filepath) in self.cur:
+            songs.append({
+                'songID': songID,
+                'deviceID': deviceID,
+                'songName': songName,
+                'genre': genre,
+                'duration': duration,
+                'likes': likes,
+                'skips': skips,
+                'album': album,
+                'replays': songID,
+                'filepath': filepath,
+                'songPos': songPos
+            })
+        return songs
 
 
     #################### SONG ####################
