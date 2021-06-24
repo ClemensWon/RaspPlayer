@@ -266,15 +266,6 @@ def addSongToQueue(songId):
         {'queue': songId}
     )
 
-@app.route('/Library/upload', methods = ['POST'])
-@checkForUser
-def uploadSong():
-    file = request.files['file']
-    #uploadSong
-    return jsonify(
-        {'upload': 'yes'}
-    )
-
 @app.route('/session/volume/<amount>', methods = ['PUT'])
 @checkForUser
 def setVolume(amount):
@@ -328,6 +319,31 @@ def getPlaylist():
     #getPlaylistData
     return jsonify(
         {'message': 'getPlaylist'}
+    )
+
+
+#################### SONG ####################
+
+@app.route('/library/upload', methods = ['POST'])
+#@checkForUser
+def uploadSong():
+    file = request.files['file']
+    songID = session.addSong(file, request.form.get('deviceID'))
+    if songID > 0:
+        return jsonify(
+            {'message': 'song added to library'}
+        )
+    else:
+        return jsonify(
+            {'error': 'song already in library'}
+        ), 400
+
+@app.route('/library/songs', methods = ['GET'])
+#@checkForUser
+def getSongs():
+    songs = session.getSongs()
+    return jsonify(
+        songs
     )
 
 
@@ -399,7 +415,7 @@ def getSongsFromPlaylist(playlistID):
         songs
     )
 
-#USERS
+#################### USER ####################
 
 @app.route('/users/ban/<deviceId>', methods = ["PUT"])
 @checkForAdmin

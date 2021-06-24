@@ -1,5 +1,8 @@
 import json
 from CLasses import MopidyConnection, DB, User, Song
+import os
+from werkzeug.utils import secure_filename
+import eyed3
 
 class Session:
     def __init__(self,sessionPin):
@@ -150,3 +153,22 @@ class Session:
 
     def getSongsFromPlaylist(self, playlistID):
         return self.db.getSongsFromPlaylist(playlistID)
+
+
+    #################### SONG ####################
+
+    def addSong(self, file, deviceID):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join('/home/john/Music/', filename)
+        songID = self.db.addSong("file://" + filepath, deviceID)
+        if songID > 0:
+            file.save(filepath)
+            audiofile=eyed3.load(filepath)
+            try:
+                self.db.addSongMetaData(songID, audiofile.tag.title, audiofile.tag.artist, audiofile.tag.album, audiofile.tag.genre.name, int(audiofile.info.time_secs))
+            except:
+                self.db.addSongMetaData(songID, "None", "None", "None", "None", 0)
+        return songID
+
+    def getSongs(self):
+        return self.db.getSongs()

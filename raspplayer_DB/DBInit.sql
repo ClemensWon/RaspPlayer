@@ -40,13 +40,13 @@ CREATE TABLE Song (
     skips int NOT NULL,
     album varchar(50) NOT NULL,
     replays int NOT NULL,
-    filepath varchar (500) NOT NULL,
+    filepath varchar (500) NOT NULL unique,
     foreign key (deviceID) references User(deviceID) on delete cascade
 );
 
 CREATE TABLE Interpret (
     interpretID int primary key auto_increment,
-    interpretName varchar(50) not null
+    interpretName varchar(50) not null unique
 );
 
 CREATE TABLE Playlist (

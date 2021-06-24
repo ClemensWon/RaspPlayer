@@ -167,3 +167,46 @@ class DB:
     def getSongURI(self, songID):
         self.cur.execute("SELECT filepath FROM Song WHERE songID = ?", (songID,))
         return self.cur.fetchall()[0][0]
+
+    def addSong(self, filepath, deviceID):
+        try:
+            self.cur.execute("INSERT INTO Song (deviceID, songName, genre, duration, likes, skips, album, replays, filepath) VALUES (?, ?, ?, ?, ?, ?, ? ,? ,?)", (deviceID, "", "", 0, 0, 0, "", 0, filepath))
+            self.conn.commit()
+            return self.cur.lastrowid
+        except:
+            return -1
+
+    def addSongMetaData(self, songID, songName, interpretName, album, genre, duration):
+        self.cur.execute("UPDATE Song SET songName = ?, album = ?, genre = ?, duration = ? WHERE songID = ?", (songName, album, genre, duration, songID))
+        self.conn.commit()
+
+        try:
+            self.cur.execute("INSERT INTO Interpret (interpretName) VALUES (?)", (interpretName,))
+            self.conn.commit()
+            interpretID = self.cur.lastrowid
+        except:
+            elf.cur.execute("SELECT interpretID FROM Interpret WHERE interpretName = ?", (interpretName,))
+            self.conn.commit()
+            interpretID = self.cur.fetchall()[0][0]
+
+        self.cur.execute("INSERT INTO InterpretToSong (songID, interpretID) VALUES (? ,?)", (songID, interpretID))
+        self.conn.commit()
+
+    def getSongs(self):
+        self.cur.execute("SELECT * FROM User INNER JOIN Song ON User.deviceID = Song.deviceID INNER JOIN InterpretToSong ON Song.songID = InterpretToSong.songID INNER JOIN Interpret ON InterpretToSong.interpretID = Interpret.interpretID")
+        songs = []
+        for (deviceID, username, banned, token, songID, deviceIDSong, songName, genre, duration, likes, skips, album, replays, filepath, songIDInterpretToSong, interpretIDInterpretToSong, interpretID, interpretName) in self.cur:
+            songs.append({
+                'songID': songID,
+                'addedBy': username,
+                'songName': songName,
+                'genre': genre,
+                'duration': duration,
+                'likes': likes,
+                'skips': skips,
+                'album': album,
+                'replays': replays,
+                'filepath': filepath,
+                'interpretName': interpretName
+            })
+        return songs
