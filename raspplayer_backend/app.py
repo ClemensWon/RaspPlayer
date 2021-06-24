@@ -338,7 +338,7 @@ def getPlaylist():
 @checkJsonValid
 def createPlaylist():
     requestData = request.get_json()
-    playlistID = session.createPlaylist(requestData['playlistName'], requestData['userName'])
+    playlistID = session.createPlaylist(requestData['playlistName'], requestData['deviceID'])
     if playlistID > 0:
         return jsonify(
             {'playlistID': playlistID}

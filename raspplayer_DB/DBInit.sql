@@ -53,7 +53,8 @@ CREATE TABLE Playlist (
     playlistID int primary key auto_increment,
     playlistName varchar(30) not null unique,
     nextSongPos int NOT NULL,
-    creator varchar(20) NOT NULL
+    deviceID varchar(50) NOT NULL,
+    foreign key (deviceID) references User(deviceID) on delete cascade
 );
 
 CREATE TABLE InterpretToSong (

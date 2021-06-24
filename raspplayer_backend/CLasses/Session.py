@@ -122,8 +122,8 @@ class Session:
     
     #################### PLAYLIST ####################
 
-    def createPlaylist(self, playlistName, username):
-        playlistID = self.db.createPlaylist(playlistName, username)
+    def createPlaylist(self, playlistName, deviceID):
+        playlistID = self.db.createPlaylist(playlistName, deviceID)
         if playlistID > 0:
             self.mopidy.createPlaylist(playlistName)
         return playlistID

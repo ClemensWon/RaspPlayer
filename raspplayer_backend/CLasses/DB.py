@@ -92,9 +92,9 @@ class DB:
 
     #################### PLAYLISTS ####################
 
-    def createPlaylist(self, playlistName, username):
+    def createPlaylist(self, playlistName, deviceID):
         try:
-            self.cur.execute("INSERT INTO Playlist (playlistName, nextSongPos, creator) VALUES (?, ?, ?)", (playlistName, 0, username))
+            self.cur.execute("INSERT INTO Playlist (playlistName, nextSongPos, deviceID) VALUES (?, ?, ?)", (playlistName, 0, deviceID))
             self.conn.commit()
             return self.cur.lastrowid
         except:
@@ -123,13 +123,14 @@ class DB:
         self.conn.commit()
 
     def getPlaylists(self):
-        self.cur.execute("SELECT * FROM Playlist")
+        self.cur.execute("SELECT * FROM Playlist INNER JOIN User ON Playlist.deviceID = User.deviceID")
         playlists = []
-        for (playlistID, playlistName, nextSongPos, creator) in self.cur:
+        for (playlistID, playlistName, nextSongPos, deviceIDPlaylist, deviceID, username, banned, token) in self.cur:
             playlists.append({
                 'playlistID': playlistID,
                 'playlistName': playlistName,
-                'creator': creator
+                'creator': username,
+                'numberOfSongs': nextSongPos
             })
         return playlists
 
