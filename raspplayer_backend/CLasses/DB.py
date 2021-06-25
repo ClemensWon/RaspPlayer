@@ -143,12 +143,12 @@ class DB:
         return self.cur.fetchall()[0][0]
 
     def getSongsFromPlaylist(self, playlistID):
-        self.cur.execute("SELECT * FROM SongToPlaylist INNER JOIN Song ON SongToPlaylist.songID=Song.songID WHERE playlistID = ?", (playlistID,))
+        self.cur.execute("SELECT * FROM SongToPlaylist INNER JOIN Song ON SongToPlaylist.songID=Song.songID INNER JOIN InterpretToSong ON Song.songID = InterpretToSong.songID INNER JOIN Interpret ON InterpretToSong.interpretID = Interpret.interpretID INNER JOIN User ON Song.deviceID = User.deviceID WHERE playlistID = ?", (playlistID,))
         songs = []
-        for (playlistID, songIDSongToPlaylist, songPos, songID, deviceID, songName, genre, duration, likes, skips, album, replays, filepath) in self.cur:
+        for (playlistID, songIDSongToPlaylist, songPos, songID, deviceIDSong, songName, genre, duration, likes, skips, album, replays, filepath, songIDInterpretToSong, interpretIDInterpretToSong, interpretID, interpretName, deviceID, username, banned, token) in self.cur:
             songs.append({
                 'songID': songID,
-                'deviceID': deviceID,
+                'addedBy': username,
                 'songName': songName,
                 'genre': genre,
                 'duration': duration,
@@ -157,7 +157,8 @@ class DB:
                 'album': album,
                 'replays': songID,
                 'filepath': filepath,
-                'songPos': songPos
+                'songPos': songPos,
+                'interpretName': interpretName
             })
         return songs
 

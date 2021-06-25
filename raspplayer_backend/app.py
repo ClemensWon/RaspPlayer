@@ -207,45 +207,11 @@ def getCurrentSong():
         song
     )
 
-@app.route('/session/currentSong/pause', methods = ["PUT"])
-def currentSongPause():
-    session.pause()
-    return 'pause/resume'
-
 @app.route('/session/setCurrentSong/<songId>', methods = ["PUT"])
 @checkForAdmin
 @checkJsonValid
 def setCurrentSong(songId):
     session.currentSong = songId
-    return jsonify(
-        {'currentSong': session.currentSong}
-    )
-
-@app.route('/session/currentSong/skip', methods = ['PUT'])
-@checkForUser
-def skipCurrentSong():
-    session.skip()
-    return jsonify(
-        {'currentSong': session.currentSong}
-    )
-
-@app.route('/session/currentSong/play', methods = ['PUT'])
-@checkForUser
-def playCurrentSong():
-    session.play()
-    return jsonify(
-        {'currentSong': session.currentSong}
-    )
-
-@app.route('/session/setPlaylist')
-def setPlaylist():
-    #setPlaylistId
-    return 'setPlaylist'
-
-@app.route('/session/currentSong/stop', methods = ['GET'])
-@checkForUser
-def replayCurrentSong():
-    session.replay()
     return jsonify(
         {'currentSong': session.currentSong}
     )
@@ -256,30 +222,6 @@ def startSession():
     session = Session.Session("default")
     return jsonify(
         {'session': "Created New"}
-    )
-
-@app.route('/session/queue/add/<songId>', methods = ['PUT'])
-@checkForUser
-def addSongToQueue(songId):
-    session.songToQueue(songId)
-    return jsonify(
-        {'queue': songId}
-    )
-
-@app.route('/session/volume/<amount>', methods = ['PUT'])
-@checkForUser
-def setVolume(amount):
-    session.setvolume(int(amount))
-    return jsonify(
-        {'volume': amount}
-    )
-
-@app.route('/session/volume/mute', methods = ['PUT'])
-@checkForUser
-def muteVolume():
-    session.mute()
-    return jsonify(
-        {'volume': 'muted'}
     )
 
 @app.route('/session/mute/<username>', methods = ['PUT'])
@@ -297,14 +239,6 @@ def returnUsers():
         users
     )
 
-@app.route('/session/queue/return', methods = ['GET'])
-@checkForUser
-def returnQueue():
-    songs = session.returnQueue()
-    return jsonify(
-        songs
-    )
-
 @app.route('/session/queue/delete/<songId>', methods = ['PUT'])
 @checkForUser
 def deleteSongFromQueue():
@@ -313,12 +247,64 @@ def deleteSongFromQueue():
         songs
     )
 
-@app.route('/session/playlist/get/', methods = ['GET'])
+
+#################### PLAYER CONTROLS ####################
+
+@app.route('/session/volume/<amount>', methods = ['PUT'])
 @checkForUser
-def getPlaylist():
-    #getPlaylistData
+def setVolume(amount):
+    session.setvolume(int(amount))
     return jsonify(
-        {'message': 'getPlaylist'}
+        {'volume': amount}
+    )
+
+@app.route('/session/volume/mute', methods = ['PUT'])
+@checkForUser
+def muteVolume():
+    session.mute()
+    return jsonify(
+        {'volume': 'muted'}
+    )
+
+@app.route('/session/currentSong/skip', methods = ['PUT'])
+@checkForUser
+def skipCurrentSong():
+    session.skip()
+    return jsonify(
+        {'currentSong': session.currentSong}
+    )
+
+@app.route('/session/currentSong/pause', methods = ["PUT"])
+def currentSongPause():
+    session.pause()
+    return 'pause/resume'
+
+@app.route('/session/currentSong/replay', methods = ['GET'])
+@checkForUser
+def replayCurrentSong():
+    session.replay()
+    return jsonify(
+        {'currentSong': session.currentSong}
+    )
+
+
+#################### QUEUE ####################
+
+@app.route('/session/queue', methods = ['GET'])
+#@checkForUser
+def returnQueue():
+    songs = session.returnQueue()
+    return jsonify(
+        songs
+    )
+
+@app.route('/session/queue/addSong', methods = ['PUT'])
+#@checkForUser
+def addSongToQueue():
+    requestData = request.get_json()
+    session.songToQueue(requestData['songID'])
+    return jsonify(
+        {'queue': songId}
     )
 
 
@@ -328,7 +314,7 @@ def getPlaylist():
 #@checkForUser
 def uploadSong():
     file = request.files['file']
-    songID = session.addSong(file, request.form.get('deviceID'))
+    songID = session.addSong(file, request.headers.get('deviceID'))
     if songID > 0:
         return jsonify(
             {'message': 'song added to library'}

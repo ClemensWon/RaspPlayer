@@ -71,45 +71,9 @@ class Session:
         token = self.db.getToken(deviceId)
         return token.fetchall()[0][0]
 
-    def returnQueue (self): 
-        queue = []
-        for son in self.queue:
-            so = self.db.getSpecSong(son)
-            for song in so:
-                s = self.buildSong(song,)
-                queue.append(s)           
-        return queue
-
-    def setvolume(self, volume):
-        if volume < 0:
-            volume = 0
-        elif volume > 100:
-            volume = 100
-
-        self.mopidy.volume(volume)
-        self.volume = volume
-
-    def mute(self):
-        self.volume = 0
-        self.mopidy.mute()
-
     def songToQueue(self, songID):
         #TODO: get songURI from DB
         self.nextInsertPos = self.mopidy.songToQueue(songURI, self.nextInsertPos)
-
-    def replay(self):
-        self.mopidy.replay()
-
-    def skip(self):
-        self.mopidy.skip()
-        self.currentSong += 1
-
-    def play(self):
-        self.mopidy.loadPlaylist("all")
-        self.mopidy.play()
-
-    def pause(self):
-        self.mopidy.pause_resume()
 
     def kickAll(self):
         self.users = []
@@ -121,6 +85,44 @@ class Session:
         responseDic = Song.Song(song[0], addedby[0][1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
         responseDic['artist'] = interpret[0][1]
         return responseDic
+
+
+    #################### PLAYER CONTROLS ####################
+
+    def replay(self):
+        self.mopidy.replay()
+
+    def skip(self):
+        self.mopidy.skip()
+        self.currentSong += 1
+
+    def pause(self):
+        self.mopidy.pause_resume()
+
+    def mute(self):
+        self.volume = 0
+        self.mopidy.mute()
+
+    def setvolume(self, volume):
+        if volume < 0:
+            volume = 0
+        elif volume > 100:
+            volume = 100
+
+        self.mopidy.volume(volume)
+        self.volume = volume
+
+
+    #################### QUEUE ####################
+
+    def returnQueue (self): 
+        queue = []
+        for son in self.queue:
+            so = self.db.getSpecSong(son)
+            for song in so:
+                s = self.buildSong(song,)
+                queue.append(s)           
+        return queue
 
     
     #################### PLAYLIST ####################
