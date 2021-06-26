@@ -71,10 +71,6 @@ class Session:
         token = self.db.getToken(deviceId)
         return token.fetchall()[0][0]
 
-    def songToQueue(self, songID):
-        #TODO: get songURI from DB
-        self.nextInsertPos = self.mopidy.songToQueue(songURI, self.nextInsertPos)
-
     def kickAll(self):
         self.users = []
 
@@ -117,12 +113,20 @@ class Session:
 
     def returnQueue (self): 
         queue = []
-        for son in self.queue:
-            so = self.db.getSpecSong(son)
-            for song in so:
-                s = self.buildSong(song,)
-                queue.append(s)           
+        for songID in self.queue:
+            print(songID)
+            song = self.db.getSong(songID)
+            print(song)
+            queue.append(song)
+        print(queue)
         return queue
+
+    def songToQueue(self, songID):
+        songURI = self.db.getSongURI(songID)
+        print(songURI)
+        self.nextInsertPos = self.mopidy.songToQueue(songURI, self.nextInsertPos)
+        self.queue.insert(self.nextInsertPos-1, songID)
+        return self.nextInsertPos-1
 
     
     #################### PLAYLIST ####################
@@ -149,6 +153,10 @@ class Session:
         playlistName = self.db.getPlaylistName(playlistID)
         self.mopidy.loadPlaylist(playlistName)
         self.mopidy.play()
+        self.queue.clear()
+        playlistSongs = self.db.getSongsFromPlaylist()
+        for song in playlistSongs:
+            self.queue.append(song['songID'])
 
     def getPlaylists(self):
         return self.db.getPlaylists()

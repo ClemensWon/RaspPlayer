@@ -211,3 +211,22 @@ class DB:
                 'interpretName': interpretName
             })
         return songs
+
+    def getSong(self, songID):
+        self.cur.execute("SELECT * FROM User INNER JOIN Song ON User.deviceID = Song.deviceID INNER JOIN InterpretToSong ON Song.songID = InterpretToSong.songID INNER JOIN Interpret ON InterpretToSong.interpretID = Interpret.interpretID WHERE Song.songID = ?", (songID,))
+        song = {}
+        for (deviceID, username, banned, token, songID, deviceIDSong, songName, genre, duration, likes, skips, album, replays, filepath, songIDInterpretToSong, interpretIDInterpretToSong, interpretID, interpretName) in self.cur:
+            song = {
+                'songID': songID,
+                'addedBy': username,
+                'songName': songName,
+                'genre': genre,
+                'duration': duration,
+                'likes': likes,
+                'skips': skips,
+                'album': album,
+                'replays': replays,
+                'filepath': filepath,
+                'interpretName': interpretName
+            }
+        return song

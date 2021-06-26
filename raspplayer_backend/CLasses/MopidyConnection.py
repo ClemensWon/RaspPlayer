@@ -40,9 +40,9 @@ class MopidyConnection:
         self.client.connect("localhost", 6600)
         returnValue = 0
         id = self.client.addid(songURI)
-        status = self.client.status()["nextsong"]
+        status = self.client.status()
         if "nextsong" in status:
-            nextInsertPos = status["nextsong"]
+            nextInsertPos = int(status["nextsong"])
             if nextInsertPos < SessionNextInsertPos:
                 nextInsertPos = SessionNextInsertPos
             self.client.moveid(id, nextInsertPos)

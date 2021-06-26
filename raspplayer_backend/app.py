@@ -293,18 +293,18 @@ def replayCurrentSong():
 @app.route('/session/queue', methods = ['GET'])
 #@checkForUser
 def returnQueue():
-    songs = session.returnQueue()
+    queue = session.returnQueue()
     return jsonify(
-        songs
+        queue
     )
 
-@app.route('/session/queue/addSong', methods = ['PUT'])
+@app.route('/session/queue/addSong', methods = ['POST'])
 #@checkForUser
 def addSongToQueue():
     requestData = request.get_json()
-    session.songToQueue(requestData['songID'])
+    songPos = session.songToQueue(requestData['songID'])
     return jsonify(
-        {'queue': songId}
+        {'songPos': songPos}
     )
 
 
