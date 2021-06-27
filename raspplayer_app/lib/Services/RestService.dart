@@ -63,7 +63,7 @@ class RestService {
 
   Future<List<Song>> getSongs() async{
     List<Song> result = [];
-    final response = await http.get(Uri.parse(hostname + '/songs'), headers: {
+    final response = await http.get(Uri.parse(hostname + '/library/songs'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
@@ -78,7 +78,7 @@ class RestService {
 
   Future<List<Song>> getQueue() async {
     List<Song> result = [];
-    final response = await http.get(Uri.parse(hostname+ '/session/queue/return'), headers: {
+    final response = await http.get(Uri.parse(hostname+ '/session/queue'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
@@ -110,7 +110,7 @@ class RestService {
   }
 
   Future<bool> playCurrentSong() async {
-    final response = await http.put(Uri.parse(hostname + '/session/currentSong/play'), headers: {
+    final response = await http.put(Uri.parse(hostname + '/session/start'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
@@ -134,7 +134,7 @@ class RestService {
   }
 
   Future<bool> skipCurrentSong() async {
-    final response = await http.get(Uri.parse(hostname + '/session/currentSong/skip'), headers: {
+    final response = await http.put(Uri.parse(hostname + '/session/currentSong/skip'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
@@ -192,19 +192,24 @@ class RestService {
 
 
   Future<bool> addSongToQueue(Song song) async{
-    final response = await http.put(Uri.parse(hostname + '/session/queue/add/' + song.id.toString()), headers: {
+    final response = await http.post(Uri.parse(hostname + '/session/queue/addSong'), headers: {
       'Accept': 'application/json',
+      "content-type" : "application/json",
       'token': UserData.token
-    });
+    },
+    body: json.encode({
+      'songID': song.id.toString(),
+    }));
     return response.statusCode == 200;
   }
 
   Future<Song> uploadSong(File file) async {
-    var request = http.MultipartRequest('POST',Uri.parse(hostname + '/upload'))
+    var request = http.MultipartRequest('POST',Uri.parse(hostname + '/library/upload'))
       ..files.add(await http.MultipartFile.fromPath('file', file.path, filename: file.path.split("/").last, contentType: MediaType('audio', 'mpeg')));
     request.headers.addAll({
       'Accept': 'application/json',
       'token': UserData.token,
+      'deviceID': UserData.deviceID
     });
     final response = await request.send();
     stderr.writeln(response);
@@ -274,11 +279,13 @@ class RestService {
 
   Future<int> createPlaylist(String playlistName) async {
     final response = await http.put(Uri.parse(hostname+ '/session/playlist/create'), headers: {
-    "content-type" : "application/json",
-    "accept" : "application/json",
+      "content-type" : "application/json",
+      "accept" : "application/json",
+      'token': UserData.token,
     },
     body: json.encode({
-    'playlistName': playlistName,
+      'playlistName': playlistName,
+      'deviceID': UserData.deviceID
     }));
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['playlistID'] as int;

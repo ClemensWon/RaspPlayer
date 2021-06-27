@@ -14,9 +14,9 @@ class Song {
   factory Song.fromJson(final json) {
     return Song(songTitle: json['songName'] as String,
         album: json['album'] as String,
-        username: json['deviceId'].toString() as String,
-        artist: json['artist'] as String,
-        id: json['songId'] as int,
+        username: json['addedBy'] as String,
+        artist: json['interpretName'] as String,
+        id: json['songID'] as int,
         duration: json['duration'],
         genre: json['genre'],
         skips:  json['skips'],
