@@ -294,10 +294,27 @@ class RestService {
     return -1;
   }
 
+  Future<bool> addSongToPlaylist(Song song, int playlistID) async {
+    final response = await http.put(
+      Uri.parse(hostname+'/session/playlist/addSong'),
+      headers: {
+        'token': UserData.token,
+        "content-type" : "application/json",
+        "accept" : "application/json",
+      },
+      body: json.encode({
+        'songID': song.id.toString(),
+        'playlistID': playlistID.toString()
+      })
+    );
+    return response.statusCode == 200;
+  }
+
   Future<bool> playPlaylist(int playlistID) async {
     final response = await http.post(
         Uri.parse(hostname+ '/session/playlist/play'),
         headers: {
+          'token': UserData.token,
           "content-type" : "application/json",
           "accept" : "application/json",
         },

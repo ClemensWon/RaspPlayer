@@ -59,8 +59,6 @@ class CreatePlayListDialog extends StatelessWidget{
                         ),
                       ],
                     ),
-
-
                   ],
                 ),
               ),
@@ -70,5 +68,4 @@ class CreatePlayListDialog extends StatelessWidget{
       ),
     );
   }
-
 }
