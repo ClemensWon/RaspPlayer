@@ -55,19 +55,44 @@ class MainScreenState extends State<MainScreen> {
         List<SongListItem> tmp = [];
         songs = response;
         setState(() {
-          _songTitle = response.first.songTitle;
-          _artist = response.first.artist;
-          _album = response.first.album;
-          _user = response.first.username;
-          _duration = response.first.duration.toString();
-          _genre = response.first.genre;
-          _skips = response.first.skips.toString();
-          _likes = response.first.likes.toString();
-          response.forEach((element) {
-           tmp.add(SongListItem.fromSong(song: element));
-          });
-          queue = tmp;
+          if (response.first.songTitle != null) {
+            _songTitle = response.first.songTitle;
+            _artist = response.first.artist;
+            _album = response.first.album;
+            _user = response.first.username;
+            _duration = response.first.duration.toString();
+            _genre = response.first.genre;
+            _skips = response.first.skips.toString();
+            _likes = response.first.likes.toString();
+            response.forEach((element) {
+              tmp.add(SongListItem.fromSong(song: element));
+            });
+            queue = tmp;
+          }
+          else {
+            setState(() {
+              _songTitle = "no song playing";
+              _artist = '';
+              _album = '';
+              _user = '';
+              _duration = '';
+              _genre = '';
+              _skips = '';
+              _likes = '';
+            });
+          }
         });
+      } else {
+        setState(() {
+          _songTitle = "no song playing";
+          _artist = '';
+          _album = '';
+          _user = '';
+          _duration = '';
+          _genre = '';
+          _skips = '';
+          _likes = '';
+          });
       }
 
     });
@@ -260,7 +285,7 @@ class MainScreenState extends State<MainScreen> {
                 ),
                 if (UserData.role == 'Owner')IconButton(
                   onPressed: () {
-                    _restService.playCurrentSong().then((success) {
+                    _restService.playQueue().then((success) {
                       if (!success) {
                         displayErrorMessage();
                       }

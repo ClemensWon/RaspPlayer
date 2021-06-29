@@ -51,7 +51,7 @@ class RestService {
       'deviceId': deviceID
     }));
     if (response.statusCode == 200) {
-      stderr.writeln(response.body);
+      //stderr.writeln(response.body);
       Map jsonObject = json.decode(response.body);
       UserData.token = jsonObject['token'] as String;
       UserData.nickname = nickname;
@@ -67,6 +67,7 @@ class RestService {
       'Accept': 'application/json',
       'token': UserData.token
     });
+    stderr.writeln(response.body);
     if (response.statusCode == 200) {
         jsonDecode(response.body).forEach((element) {
           result.add(Song.fromJson(element));
@@ -109,8 +110,8 @@ class RestService {
     return null;
   }
 
-  Future<bool> playCurrentSong() async {
-    final response = await http.put(Uri.parse(hostname + '/session/start'), headers: {
+  Future<bool> playQueue() async {
+    final response = await http.put(Uri.parse(hostname + '/session/queue/play'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
@@ -212,7 +213,7 @@ class RestService {
       'deviceID': UserData.deviceID
     });
     final response = await request.send();
-    stderr.writeln(response);
+    //stderr.writeln("abc");
     return null;
   }
 
@@ -226,7 +227,7 @@ class RestService {
     });
     if (response.statusCode == 200) {
       result = jsonDecode(response.body);
-      stderr.writeln(result["bestDj"]);
+      //err.writeln(result["bestDj"]);
       return result;
     }
     return null;
@@ -240,14 +241,14 @@ class RestService {
       'token': UserData.token
     });
     if (response.statusCode == 200) {
-      stderr.writeln(jsonDecode(response.body)['volume']);
+      //stderr.writeln(jsonDecode(response.body)['volume']);
       return  int.parse(jsonDecode(response.body)['volume']);
     }
     return -1;
   }
 
   Future<String> setSessionPin(String sessionPin) async {
-    stderr.writeln(sessionPin);
+    //stderr.writeln(sessionPin);
     final response = await http.post(Uri.parse(hostname + "/settings/sessionPin"), headers: {
       "content-type": "application/json",
       "accept": "application/json",
@@ -290,7 +291,7 @@ class RestService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['playlistID'] as int;
     }
-    stderr.writeln(response.body);
+    //stderr.writeln(response.body);
     return -1;
   }
 
