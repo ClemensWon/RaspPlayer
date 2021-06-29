@@ -307,6 +307,15 @@ def addSongToQueue():
         {'songPos': songPos}
     )
 
+@app.route('/session/queue/play', methods = ['POST'])
+#@checkForUser
+@checkJsonValid
+def playQueue():
+    
+    return jsonify(
+        {'message': 'playing queue'}
+    )
+
 
 #################### SONG ####################
 

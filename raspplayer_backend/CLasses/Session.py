@@ -13,7 +13,7 @@ class Session:
         self.currentSong = 1
         self.nextInsertPos = 0
         self.currentPlaylist = ''
-        self.volume = 0
+        self.volume = 100
         self.mopidy = MopidyConnection.MopidyConnection()
         self.db = DB.DB()
 
@@ -128,6 +128,9 @@ class Session:
         self.queue.insert(self.nextInsertPos-1, songID)
         return self.nextInsertPos-1
 
+    def playQueue(self):
+        self.mopdidy.play()
+
     
     #################### PLAYLIST ####################
 
@@ -154,7 +157,7 @@ class Session:
         self.mopidy.loadPlaylist(playlistName)
         self.mopidy.play()
         self.queue.clear()
-        playlistSongs = self.db.getSongsFromPlaylist()
+        playlistSongs = self.db.getSongsFromPlaylist(playlistID)
         for song in playlistSongs:
             self.queue.append(song['songID'])
 
