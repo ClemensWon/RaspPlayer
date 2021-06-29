@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 import 'package:raspplayer_app/model/Playlist.dart';
+import 'package:raspplayer_app/Components/SongListItem.dart';
+import 'package:raspplayer_app/model/Song.dart';
 
 class PlayListItem extends StatelessWidget {
   final int id;
@@ -39,7 +41,10 @@ class PlayListItem extends StatelessWidget {
                 children: <Widget>[
                   TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, 'Playlist');
+                        RestService restService = new RestService();
+                        restService.getSongsFromPlaylist(id).then((result) {
+                          Navigator.pushNamed(context, 'Playlist', arguments: {'playlist': result, 'isQueue': false, 'playlistID': id});
+                        });
                       },
                       child: Text('Show Songs'),
                   ),

@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Components/SongListItem.dart';
+import 'package:raspplayer_app/model/Song.dart';
 import 'dart:io';
+
+import 'package:raspplayer_app/Services/RestService.dart';
 
 class PlaylistScreen extends StatefulWidget {
   @override
@@ -10,25 +13,59 @@ class PlaylistScreen extends StatefulWidget {
 }
 
 class PlaylistScreenState extends State<PlaylistScreen> {
-  final List<SongListItem> songList = [];
+  List<SongListItem> songList = [];
   List<SongListItem> displayList = [];
+  List<Song> sourceList = [];
+  bool isFirst = true;
 
   @override
   Widget build(BuildContext context) {
     Map arguments = ModalRoute.of(context).settings.arguments;
+    if(isFirst) {
+      sourceList = arguments['playlist'];
+      isFirst = false;
+    }
+    displayList = [];
+    songList = [];
 
-    arguments['playlist'].forEach((song) {
+    sourceList.forEach((song) {
       songList.add(SongListItem.fromSong(
-        key: Key(song.id.toString()),
+        //key: Key(song.id.toString()),
         song: song,
         child: IconButton(
             icon: Icon(Icons.cancel),
             onPressed: () {
               setState(() {
-                displayList.removeWhere((element) {
-                  stderr.writeln(element.key == Key(song.id.toString()));
-                  return element.key == Key(song.id.toString());
-                });
+                RestService restService = new RestService();
+                if (arguments['isQueue']) {
+                  restService.deleteSongFromQueue(song.id).then((result) {
+                    if (result) {
+                      sourceList.removeWhere((element) {
+                        return element.id == song.id;
+                      });
+                      songList.removeWhere((element) {
+                        return element.key == new Key(song.id.toString());
+                      });
+                      displayList = songList;
+
+                    }
+                  });
+                } else {
+                  restService.deleteSongFromPlaylist(song.id, arguments['playlistID']).then((result) {
+                    if (result) {
+
+                      sourceList.removeWhere((element) {
+                        stderr.write(element.id == song.id);
+                        return element.id == song.id;
+                      });
+                      songList.removeWhere((element) {
+                        return element.key == new Key(song.id.toString());
+                      });
+                      displayList = songList;
+                      stderr.write(displayList);
+                    }
+                  });
+                }
               });
             },
             color: Color.fromRGBO(0, 1, 49, 1)),
@@ -43,7 +80,8 @@ class PlaylistScreenState extends State<PlaylistScreen> {
       body: Container(
           width: double.infinity,
           margin: EdgeInsets.all(10),
-          child: ReorderableListView(
+          child: ListView(
+            /*
             onReorder: (int oldIndex, int newIndex) {
               setState(() {
                 if (oldIndex < newIndex) {
@@ -53,6 +91,7 @@ class PlaylistScreenState extends State<PlaylistScreen> {
                 songList.insert(newIndex, item);
               });
             },
+            */
             children: displayList,
           )),
       floatingActionButton: ElevatedButton(
