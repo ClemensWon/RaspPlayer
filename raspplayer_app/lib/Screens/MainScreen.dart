@@ -294,7 +294,7 @@ class MainScreenState extends State<MainScreen> {
             "Show Playlist"
           ),
           onPressed: () {
-            Navigator.pushNamed(context, 'Playlist', arguments: {'playlist': songs});
+            Navigator.pushNamed(context, 'Playlist', arguments: {'playlist': songs, 'isQueue': true});
           },
         ),
       ),

@@ -10,7 +10,7 @@ import 'package:raspplayer_app/model/Song.dart';
 
 
 class RestService {
-  final String hostname = "http://10.0.0.47:5000";
+  final String hostname = "http://10.0.0.14:5000";
 
   //Test functionality
   void testFetch() async{
@@ -90,6 +90,14 @@ class RestService {
       return result;
     }
     return null;
+  }
+
+  Future<bool> deleteSongFromQueue(int songID) async {
+    final response = await http.put(Uri.parse(hostname + '/session/queue/delete/' + songID.toString()), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    return response.statusCode == 200;
   }
 
   Future<List<User>> getUsers() async{
@@ -268,6 +276,7 @@ class RestService {
       'Accept': 'application/json',
       'token': UserData.token,
     });
+    stderr.write(response.body);
     if (response.statusCode == 200) {
       jsonDecode(response.body).forEach((element) {
         result.add(Playlist.fromJson(element));
@@ -310,6 +319,20 @@ class RestService {
     return response.statusCode == 200;
   }
 
+  Future<bool> deleteSongFromPlaylist(int songID, int playlistID) async {
+    final response = await http.delete(Uri.parse(hostname + '/session/playlist/deleteSong'), headers: {
+      'Accept': 'application/json',
+      "content-type" : "application/json",
+      'token': UserData.token
+    },
+    body: jsonEncode({
+      'songID': songID,
+      'playlistID': playlistID
+    })
+    );
+    return response.statusCode == 200;
+  }
+
   Future<bool> playPlaylist(int playlistID) async {
     final response = await http.post(
         Uri.parse(hostname+ '/session/playlist/play'),
@@ -323,6 +346,21 @@ class RestService {
         })
     );
     return response.statusCode == 200;
+  }
+
+  Future<List<Song>> getSongsFromPlaylist(int playlistID) async{
+    List<Song> result = [];
+    final response = await http.get(Uri.parse(hostname + '/session/playlist/songs/' + playlistID.toString()), headers: {
+      'Accept': 'application/json',
+      'token': UserData.token
+    });
+    if (response.statusCode == 200) {
+      jsonDecode(response.body).forEach((element) {
+        result.add(Song.fromJson(element));
+      });
+      return result;
+    }
+    return null;
   }
 
 }
