@@ -6,6 +6,12 @@ class MopidyConnection:
         self.client.timeout = 10
         self.client.idletimeout = None
 
+    def status(self):
+        self.client.connect("localhost", 6600)
+        status = self.client.status()
+        self.client.disconnect()
+        return status
+
     def play(self):
         self.client.connect("localhost", 6600)
         self.client.play()

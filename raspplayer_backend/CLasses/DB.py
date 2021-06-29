@@ -186,8 +186,7 @@ class DB:
             self.conn.commit()
             interpretID = self.cur.lastrowid
         except:
-            elf.cur.execute("SELECT interpretID FROM Interpret WHERE interpretName = ?", (interpretName,))
-            self.conn.commit()
+            self.cur.execute("SELECT interpretID FROM Interpret WHERE interpretName = ?", (interpretName,))
             interpretID = self.cur.fetchall()[0][0]
 
         self.cur.execute("INSERT INTO InterpretToSong (songID, interpretID) VALUES (? ,?)", (songID, interpretID))

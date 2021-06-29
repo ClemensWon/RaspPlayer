@@ -3,6 +3,7 @@ from CLasses import MopidyConnection, DB, User, Song
 import os
 from werkzeug.utils import secure_filename
 import eyed3
+import threading
 
 class Session:
     def __init__(self,sessionPin):
@@ -112,13 +113,18 @@ class Session:
     #################### QUEUE ####################
 
     def returnQueue (self): 
+        status = self.mopidy.status()
         queue = []
-        for songID in self.queue:
-            print(songID)
-            song = self.db.getSong(songID)
-            print(song)
-            queue.append(song)
-        print(queue)
+        if 'song' in status:
+            mopidySongPos = int(status['song'])
+            counter = 0
+            for songID in self.queue:
+                if counter >= mopidySongPos:
+                    print(songID)
+                    song = self.db.getSong(songID)
+                    print(song)
+                    queue.append(song)
+                counter += 1
         return queue
 
     def songToQueue(self, songID):
@@ -131,6 +137,11 @@ class Session:
     def playQueue(self):
         self.mopdidy.play()
 
+    def updateQueue(self):
+        status = self.mopdidy.status()
+        if 'song' in status:
+            mopidySongPos = status['song']
+            
     
     #################### PLAYLIST ####################
 

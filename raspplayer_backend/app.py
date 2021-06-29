@@ -267,7 +267,7 @@ def muteVolume():
     )
 
 @app.route('/session/currentSong/skip', methods = ['PUT'])
-@checkForUser
+#@checkForUser
 def skipCurrentSong():
     session.skip()
     return jsonify(
