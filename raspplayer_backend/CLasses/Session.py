@@ -9,6 +9,7 @@ class Session:
     def __init__(self,sessionPin):
         self.sessionPin = sessionPin
         self.usersAll = []
+        self.muted = [1]
         self.users = []
         self.queue = []
         self.currentSong = 1
