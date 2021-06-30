@@ -40,11 +40,18 @@ class ConnectScreenState extends State<ConnectScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                'RaspPlayer',
-                style: TextStyle(fontSize: 28),
-                textAlign: TextAlign.center,
-
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0,0,0,30),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image(
+                      image: AssetImage('assets/img/logo_withText.png'),
+                      width: 200,
+                      alignment: Alignment.center,
+                    ),
+                  ],
+                ),
               ),
               Text(
                 'Type in a Nickname and the password to connect with the RaspPlayer!',
