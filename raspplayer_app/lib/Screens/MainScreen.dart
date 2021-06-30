@@ -60,7 +60,7 @@ class MainScreenState extends State<MainScreen> {
       if (route.settings.name == "Main") {
         loadQueue();
       } else {
-        timer.cancel();
+        //timer.cancel();
       }
     });
 
