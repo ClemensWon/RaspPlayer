@@ -53,13 +53,12 @@ class PlaylistScreenState extends State<PlaylistScreen> {
                 } else {
                   restService.deleteSongFromPlaylist(song.id, arguments['playlistID']).then((result) {
                     if (result) {
-
                       sourceList.removeWhere((element) {
                         stderr.write(element.id == song.id);
                         return element.id == song.id;
                       });
                       songList.removeWhere((element) {
-                        return element.key == new Key(song.id.toString());
+                        return element.key.toString() == song.id.toString();
                       });
                       displayList = songList;
                       stderr.write(displayList);

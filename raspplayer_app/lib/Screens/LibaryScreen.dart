@@ -19,78 +19,16 @@ class LibraryScreenSate extends State<LibraryScreen> {
   final List<SongListItem> songList = [];
   final List<StatelessWidget> addToList = [];
   List<SongListItem> displayList = [];
+  final RestService restService = new RestService();
   bool showFab = true;
   Map checked = {};
 
   @override
   void initState() {
     super.initState();
-    RestService restService = new RestService();
-    restService.getSongs().then((songs) => {
-          setState(() {
-            songs.forEach((song) {
-              checked[song] = false;
-              songList.add(SongListItem.fromSong(
-                key: Key(song.id.toString()),
-                song: song,
-                child: StatefulBuilder(
-                    builder: (BuildContext context, StateSetter setState) {
-                  return Checkbox(
-                      key: Key(song.id.toString() + "_checkbox"),
-                      value: checked[song],
-                      onChanged: (changeValue) {
-                        setState(() {
-                          checked[song] = changeValue;
-                        });
-                      });
-                }),
-              ));
-              displayList = songList;
-            });
-          })
-        });
-    addToList.add(Card(
-      child: ListTile(
-        title: Text("Queue"),
-        onTap: () {
-          checked.forEach((key, value) {
-            if (value) {
-              restService.addSongToQueue(key).then((success) {
-                if (success) {
-                  Navigator.pushReplacementNamed(context, 'Main');
-                } else {
-                  Navigator.pushReplacementNamed(context, 'Main');
-                }
-              });
+    loadSongs();
+    loadBottomSheetOptions();
 
-            }
-          });
-
-        },
-      )
-    ));
-    restService.getPlaylists().then((playlists) {
-      playlists.forEach((element) {
-        addToList.add(Card(
-          child: ListTile(
-            title: Text(element.playlistName),
-            onTap: () {
-              checked.forEach((key, value) {
-                if(value) {
-                  restService.addSongToPlaylist(key, element.id).then((success) {
-                    if (success) {
-                      Navigator.pushReplacementNamed(context, 'Playlists');
-                    } else {
-                      Navigator.pushReplacementNamed(context, 'Playlists');
-                    }
-                  });
-                }
-              });
-            },
-          ),
-        ));
-      });
-    });
   }
 
   @override
@@ -174,7 +112,9 @@ class LibraryScreenSate extends State<LibraryScreen> {
                   )),
               onPressed: () {
                 filePickerService.getFile().then((file) {
-                  restService.uploadSong(file).then((value) => null);
+                  restService.uploadSong(file).then((value){
+                    loadSongs();
+                  });
                   stderr.writeln(file);
                 });
                 stderr.writeln();
@@ -184,6 +124,75 @@ class LibraryScreenSate extends State<LibraryScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  void loadSongs() {
+    restService.getSongs().then((songs) => {
+      setState(() {
+        songs.forEach((song) {
+          checked[song] = false;
+          songList.add(SongListItem.fromSong(
+            key: Key(song.id.toString()),
+            song: song,
+            child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Checkbox(
+                      key: Key(song.id.toString() + "_checkbox"),
+                      value: checked[song],
+                      onChanged: (changeValue) {
+                        setState(() {
+                          checked[song] = changeValue;
+                        });
+                      });
+                }),
+          ));
+          displayList = songList;
+        });
+      })
+    });
+  }
+
+  void loadBottomSheetOptions() {
+    addToList.add(Card(
+        child: ListTile(
+          title: Text("Queue"),
+          onTap: () {
+            checked.forEach((key, value) {
+              if (value) {
+                restService.addSongToQueue(key).then((success) {
+                  if (success) {
+                    Navigator.pushReplacementNamed(context, 'Main');
+                  } else {
+                    Navigator.pushReplacementNamed(context, 'Main');
+                  }
+                });
+              }
+            });
+          },
+        )
+    ));
+    restService.getPlaylists().then((playlists) {
+      playlists.forEach((element) {
+        addToList.add(Card(
+          child: ListTile(
+            title: Text(element.playlistName),
+            onTap: () {
+              checked.forEach((key, value) {
+                if(value) {
+                  restService.addSongToPlaylist(key, element.id).then((success) {
+                    if (success) {
+                      Navigator.pushReplacementNamed(context, 'Playlists');
+                    } else {
+                      Navigator.pushReplacementNamed(context, 'Playlists');
+                    }
+                  });
+                }
+              });
+            },
+          ),
+        ));
+      });
+    });
   }
 
   void bottomSheetMethod(BuildContext context) {
