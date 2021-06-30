@@ -13,6 +13,8 @@ class Session:
         self.queue = []
         self.currentSong = 1
         self.nextInsertPos = 0
+        self.lastSongPos = 0
+        self.queueStarted = False
         self.currentPlaylist = ''
         self.volume = 100
         self.mopidy = MopidyConnection.MopidyConnection()
@@ -115,21 +117,26 @@ class Session:
 
     #################### QUEUE ####################
 
-    def returnQueue (self): 
+    def returnQueue (self):
         status = self.mopidy.status()
-        queue = []
         if 'song' in status:
             mopidySongPos = int(status['song'])
+            songsToDelete = mopidySongPos - self.lastSongPos
+            print("lastSongPos: " + str(self.lastSongPos))
+            print("mopidySongPos: " + str(mopidySongPos))
             counter = 0
-            for songID in self.queue:
-                if counter >= mopidySongPos:
-                    song = self.db.getSong(songID)
-                    queue.append(song)
+            while counter < songsToDelete:
+                self.queue.pop(0)
+                print('song removed from queue')
                 counter += 1
-        else:
-            for songID in self.queue:
-                song = self.db.getSong(songID)
-                queue.append(song)
+            self.lastSongPos = mopidySongPos
+        elif self.queueStarted:
+            self.queue.clear()
+            self.queueStarted = False
+        queue = []
+        for songID in self.queue:
+            song = self.db.getSong(songID)
+            queue.append(song)
         return queue
 
     def songToQueue(self, songIDs):
@@ -141,11 +148,7 @@ class Session:
 
     def playQueue(self):
         self.mopidy.play()
-
-    def updateQueue(self):
-        status = self.mopidy.status()
-        if 'song' in status:
-            mopidySongPos = status['song']
+        self.queueStarted = True
             
     
     #################### PLAYLIST ####################
@@ -176,6 +179,7 @@ class Session:
         playlistSongs = self.db.getSongsFromPlaylist(playlistID)
         for song in playlistSongs:
             self.queue.append(song['songID'])
+        self.queueStarted = True
 
     def getPlaylists(self):
         return self.db.getPlaylists()
