@@ -19,21 +19,7 @@ class UserListScreenState extends State<UserListScreen> {
   @override
   void initState() {
     super.initState();
-    RestService rs = new RestService();
-    rs.getUsers().then((result) {
-      int keyValue = 0;
-      setState(() {
-        result.forEach((element) {
-          if(element.username == 'master') {
-            userListItem = [...userListItem, new UserListItem(key: Key(keyValue.toString() + "userListItem"), username: element.username, adminView: false, allowMute: false, isMuted: element.isMuted, isBanned: element.isBanned)];
-          }
-          else {
-            userListItem = [...userListItem, new UserListItem(key: Key(keyValue.toString() + "userListItem"), username: element.username, adminView: _adminView, allowMute: _allowMute, isMuted: element.isMuted, isBanned: element.isBanned,)];
-          }
-          keyValue++;
-        });
-      });
-    });
+    loadUser();
   }
 
   @override
@@ -47,9 +33,14 @@ class UserListScreenState extends State<UserListScreen> {
       body: Container(
         width: double.infinity,
         margin: EdgeInsets.all(10),
-        child: ListView(
-          children: userListItem,
-        ),
+        child: RefreshIndicator(
+          onRefresh: () async{
+            loadUser();
+          },
+          child: ListView(
+            children: userListItem,
+          ),
+        )
       ),
       floatingActionButton: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -107,5 +98,24 @@ class UserListScreenState extends State<UserListScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  void loadUser() {
+    userListItem = [];
+    RestService rs = new RestService();
+    rs.getUsers().then((result) {
+      int keyValue = 0;
+      setState(() {
+        result.forEach((element) {
+          if(element.username == 'master') {
+            userListItem = [...userListItem, new UserListItem(key: Key(keyValue.toString() + "userListItem"), username: element.username, adminView: false, allowMute: false, isMuted: element.isMuted, isBanned: element.isBanned)];
+          }
+          else {
+            userListItem = [...userListItem, new UserListItem(key: Key(keyValue.toString() + "userListItem"), username: element.username, adminView: _adminView, allowMute: _allowMute, isMuted: element.isMuted, isBanned: element.isBanned,)];
+          }
+          keyValue++;
+        });
+      });
+    });
   }
 }

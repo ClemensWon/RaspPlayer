@@ -16,7 +16,7 @@ class LibraryScreen extends StatefulWidget {
 
 class LibraryScreenSate extends State<LibraryScreen> {
   final FilePickerService filePickerService = new FilePickerService();
-  final List<SongListItem> songList = [];
+  List<SongListItem> songList = [];
   final List<StatelessWidget> addToList = [];
   List<SongListItem> displayList = [];
   final RestService restService = new RestService();
@@ -44,44 +44,50 @@ class LibraryScreenSate extends State<LibraryScreen> {
       drawer: NavigationDrawer(),
       body: Container(
         margin: EdgeInsets.all(10),
-        child: ReorderableListView(
-          header: TextFormField(
-            onChanged: (String searchText) {
-              setState(() {
-                displayList = songList.where((element) {
-                  return element.username
-                          .toUpperCase()
-                          .contains(searchText.toUpperCase()) ||
-                      element.artist
-                          .toUpperCase()
-                          .contains(searchText.toUpperCase()) ||
-                      element.songTitle
-                          .toUpperCase()
-                          .contains(searchText.toUpperCase());
-                }).toList();
-              });
-            },
-            textAlign: TextAlign.start,
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              suffixIcon: Icon(Icons.search),
-              focusColor: Color.fromRGBO(0, 1, 49, 1),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            loadSongs();
+            loadBottomSheetOptions();
+          },
+          child: ReorderableListView(
+            header: TextFormField(
+              onChanged: (String searchText) {
+                setState(() {
+                  displayList = songList.where((element) {
+                    return element.username
+                        .toUpperCase()
+                        .contains(searchText.toUpperCase()) ||
+                        element.artist
+                            .toUpperCase()
+                            .contains(searchText.toUpperCase()) ||
+                        element.songTitle
+                            .toUpperCase()
+                            .contains(searchText.toUpperCase());
+                  }).toList();
+                });
+              },
+              textAlign: TextAlign.start,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                suffixIcon: Icon(Icons.search),
+                focusColor: Color.fromRGBO(0, 1, 49, 1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
               ),
             ),
+            onReorder: (int oldIndex, int newIndex) {
+              setState(() {
+                if (oldIndex < newIndex) {
+                  newIndex -= 1;
+                }
+                final SongListItem item = songList.removeAt(oldIndex);
+                songList.insert(newIndex, item);
+              });
+            },
+            children: displayList,
           ),
-          onReorder: (int oldIndex, int newIndex) {
-            setState(() {
-              if (oldIndex < newIndex) {
-                newIndex -= 1;
-              }
-              final SongListItem item = songList.removeAt(oldIndex);
-              songList.insert(newIndex, item);
-            });
-          },
-          children: displayList,
-        ),
+        )
       ),
       floatingActionButton: Builder(
         builder: (context) =>
@@ -127,6 +133,7 @@ class LibraryScreenSate extends State<LibraryScreen> {
   }
 
   void loadSongs() {
+    songList = [];
     restService.getSongs().then((songs) => {
       setState(() {
         songs.forEach((song) {
@@ -157,16 +164,14 @@ class LibraryScreenSate extends State<LibraryScreen> {
         child: ListTile(
           title: Text("Queue"),
           onTap: () {
+            List<int> songIDList = [];
             checked.forEach((key, value) {
               if (value) {
-                restService.addSongToQueue(key).then((success) {
-                  if (success) {
-                    Navigator.pushReplacementNamed(context, 'Main');
-                  } else {
-                    Navigator.pushReplacementNamed(context, 'Main');
-                  }
-                });
+                songIDList.add(key.id);
               }
+            });
+            restService.addSongToQueue(songIDList).then((value) {
+              Navigator.pushReplacementNamed(context, 'Main');
             });
           },
         )
@@ -177,16 +182,14 @@ class LibraryScreenSate extends State<LibraryScreen> {
           child: ListTile(
             title: Text(element.playlistName),
             onTap: () {
+              List<int> songIDList = [];
               checked.forEach((key, value) {
-                if(value) {
-                  restService.addSongToPlaylist(key, element.id).then((success) {
-                    if (success) {
-                      Navigator.pushReplacementNamed(context, 'Playlists');
-                    } else {
-                      Navigator.pushReplacementNamed(context, 'Playlists');
-                    }
-                  });
+                if (value) {
+                  songIDList.add(key.id);
                 }
+              });
+              restService.addSongToPlaylist(songIDList, element.id).then((value) {
+                Navigator.pushReplacementNamed(context, 'Playlists');
               });
             },
           ),

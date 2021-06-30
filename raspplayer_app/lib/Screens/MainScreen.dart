@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -8,6 +10,7 @@ import 'package:raspplayer_app/Components/SongListItem.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 import 'package:raspplayer_app/Services/UserData.dart';
 import 'package:raspplayer_app/model/Song.dart';
+import 'dart:async';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -50,52 +53,17 @@ class MainScreenState extends State<MainScreen> {
   @override
   void initState(){
     super.initState();
-    _restService.getQueue().then((response) {
-      if (response != []) {
-        List<SongListItem> tmp = [];
-        songs = response;
-        setState(() {
-          if (response.first.songTitle != null) {
-            _songTitle = response.first.songTitle;
-            _artist = response.first.artist;
-            _album = response.first.album;
-            _user = response.first.username;
-            _duration = response.first.duration.toString();
-            _genre = response.first.genre;
-            _skips = response.first.skips.toString();
-            _likes = response.first.likes.toString();
-            response.forEach((element) {
-              tmp.add(SongListItem.fromSong(song: element));
-            });
-            queue = tmp;
-          }
-          else {
-            setState(() {
-              _songTitle = "no song playing";
-              _artist = '';
-              _album = '';
-              _user = '';
-              _duration = '';
-              _genre = '';
-              _skips = '';
-              _likes = '';
-            });
-          }
-        });
+    loadQueue();
+    Timer.periodic(new Duration(seconds: 1), (timer) {
+      var route = ModalRoute.of(context);
+      stderr.writeln(route.settings.name);
+      if (route.settings.name == "Main") {
+        loadQueue();
       } else {
-        setState(() {
-          _songTitle = "no song playing";
-          _artist = '';
-          _album = '';
-          _user = '';
-          _duration = '';
-          _genre = '';
-          _skips = '';
-          _likes = '';
-          });
+        timer.cancel();
       }
-
     });
+
     //MainScreenProvider mainScreenProvider = Provider.of<MainScreenProvider>(context);
 
   }
@@ -325,6 +293,55 @@ class MainScreenState extends State<MainScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
+  }
+
+  void loadQueue() {
+    _restService.getQueue().then((response) {
+      if (response != []) {
+        List<SongListItem> tmp = [];
+        songs = response;
+        setState(() {
+          if (response.first.songTitle != null) {
+            _songTitle = response.first.songTitle;
+            _artist = response.first.artist;
+            _album = response.first.album;
+            _user = response.first.username;
+            _duration = response.first.duration.toString();
+            _genre = response.first.genre;
+            _skips = response.first.skips.toString();
+            _likes = response.first.likes.toString();
+            response.forEach((element) {
+              tmp.add(SongListItem.fromSong(song: element));
+            });
+            queue = tmp;
+          }
+          else {
+            setState(() {
+              _songTitle = "no song playing";
+              _artist = '';
+              _album = '';
+              _user = '';
+              _duration = '';
+              _genre = '';
+              _skips = '';
+              _likes = '';
+            });
+          }
+        });
+      } else {
+        setState(() {
+          _songTitle = "no song playing";
+          _artist = '';
+          _album = '';
+          _user = '';
+          _duration = '';
+          _genre = '';
+          _skips = '';
+          _likes = '';
+        });
+      }
+
+    });
   }
 }
 

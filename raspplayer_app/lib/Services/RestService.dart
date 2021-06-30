@@ -10,7 +10,7 @@ import 'package:raspplayer_app/model/Song.dart';
 
 
 class RestService {
-  final String hostname = "http://10.0.0.14:5000";
+  final String hostname = "http://10.0.0.47:5000";
 
   //Test functionality
   void testFetch() async{
@@ -119,7 +119,7 @@ class RestService {
   }
 
   Future<bool> playQueue() async {
-    final response = await http.put(Uri.parse(hostname + '/session/queue/play'), headers: {
+    final response = await http.post(Uri.parse(hostname + '/session/queue/play'), headers: {
       'Accept': 'application/json',
       'token': UserData.token
     });
@@ -200,14 +200,14 @@ class RestService {
 
 
 
-  Future<bool> addSongToQueue(Song song) async{
-    final response = await http.post(Uri.parse(hostname + '/session/queue/addSong'), headers: {
+  Future<bool> addSongToQueue(List<int> songIDList) async{
+    final response = await http.post(Uri.parse(hostname + '/session/queue/addSongs'), headers: {
       'Accept': 'application/json',
       "content-type" : "application/json",
       'token': UserData.token
     },
     body: json.encode({
-      'songID': song.id.toString(),
+      'songIDs': songIDList,
     }));
     return response.statusCode == 200;
   }
@@ -304,16 +304,16 @@ class RestService {
     return -1;
   }
 
-  Future<bool> addSongToPlaylist(Song song, int playlistID) async {
+  Future<bool> addSongToPlaylist(List<int> songIds, int playlistID) async {
     final response = await http.put(
-      Uri.parse(hostname+'/session/playlist/addSong'),
+      Uri.parse(hostname+'/session/playlist/addSongs'),
       headers: {
         'token': UserData.token,
         "content-type" : "application/json",
         "accept" : "application/json",
       },
       body: json.encode({
-        'songID': song.id.toString(),
+        'songIDs': songIds,
         'playlistID': playlistID.toString()
       })
     );

@@ -45,9 +45,14 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
       body: Container(
           width: double.infinity,
           margin: EdgeInsets.all(10),
-          child: ListView(
-            children: playlistList,
-          ),
+          child: RefreshIndicator(
+            onRefresh: () async{
+              loadPlaylists();
+            },
+            child: ListView(
+              children: playlistList,
+            ),
+          )
       ),
       floatingActionButton: IconButton(icon: Icon(Icons.add_circle),
         onPressed: () {
