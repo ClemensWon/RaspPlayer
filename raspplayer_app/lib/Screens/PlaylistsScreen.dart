@@ -31,17 +31,7 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
   @override
   void initState() {
     super.initState();
-    RestService restService = new RestService();
-    final List<PlayListItem> tmp = <PlayListItem>[];
-    restService.getPlaylists().then((result) {
-    setState((){
-      result.forEach((element) {
-        tmp.add(new PlayListItem.fromPlaylist(element));
-      });
-      playlistList = tmp;
-    });
-
-    });
+    loadPlaylists();
   }
 
   @override
@@ -64,21 +54,26 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
           showDialog(context: context, builder: (build) {
             return CreatePlayListDialog();
           }).then((value) {
-            RestService restService = new RestService();
-            final List<PlayListItem> tmp = <PlayListItem>[];
-            restService.getPlaylists().then((result) {
-              setState((){
-                result.forEach((element) {
-                  tmp.add(new PlayListItem.fromPlaylist(element));
-                });
-                playlistList = tmp;
-              });
-            });
+            loadPlaylists();
           });
         },
         iconSize: 48,
         color: Colors.blue,
       ),
     );
+  }
+
+  void loadPlaylists() {
+    RestService restService = new RestService();
+    final List<PlayListItem> tmp = <PlayListItem>[];
+    restService.getPlaylists().then((result) {
+      setState((){
+        result.forEach((element) {
+          tmp.add(new PlayListItem.fromPlaylist(element, loadPlaylists));
+        });
+        playlistList = tmp;
+      });
+
+    });
   }
 }

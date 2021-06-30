@@ -30,42 +30,51 @@ class PlaylistScreenState extends State<PlaylistScreen> {
 
     sourceList.forEach((song) {
       songList.add(SongListItem.fromSong(
-        //key: Key(song.id.toString()),
+        key: Key(song.id.toString()),
         song: song,
         child: IconButton(
             icon: Icon(Icons.cancel),
             onPressed: () {
-              setState(() {
                 RestService restService = new RestService();
                 if (arguments['isQueue']) {
                   restService.deleteSongFromQueue(song.id).then((result) {
-                    if (result) {
-                      sourceList.removeWhere((element) {
-                        return element.id == song.id;
-                      });
-                      songList.removeWhere((element) {
-                        return element.key == new Key(song.id.toString());
-                      });
-                      displayList = songList;
+                    setState(() {
+                      if (result) {
+                        sourceList.removeWhere((element) {
+                          return element.id == song.id;
+                        });
+                        songList.removeWhere((element) {
+                          return element.key == new Key(song.id.toString());
+                        });
+                        displayList = songList;
 
-                    }
+                      }
+                    });
+
                   });
                 } else {
                   restService.deleteSongFromPlaylist(song.id, arguments['playlistID']).then((result) {
-                    if (result) {
-                      sourceList.removeWhere((element) {
-                        stderr.write(element.id == song.id);
-                        return element.id == song.id;
-                      });
-                      songList.removeWhere((element) {
-                        return element.key.toString() == song.id.toString();
-                      });
-                      displayList = songList;
-                      stderr.write(displayList);
-                    }
+                    setState(() {
+                      if (result) {
+                        sourceList.removeWhere((element) {
+                          stderr.write("SourceList ");
+                          stderr.writeln(element.id == song.id);
+                          return element.id == song.id;
+                        });
+                        songList.removeWhere((element) {
+                          stderr.write(element);
+                          stderr.write(song.id.toString());
+                          stderr.writeln(element.key == Key(song.id.toString()));
+                          return element.key == Key(song.id.toString());
+                        });
+                        displayList = songList;
+                        stderr.write(displayList);
+                      }
+                    });
+
                   });
                 }
-              });
+
             },
             color: Color.fromRGBO(0, 1, 49, 1)),
       ));

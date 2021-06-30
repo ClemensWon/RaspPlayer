@@ -10,11 +10,12 @@ class PlayListItem extends StatelessWidget {
   final String playlistTitle;
   final String username;
   final int totalSongs;
+  final onReturn;
 
-  PlayListItem({this.id, this.playlistTitle = 'Playlist', this.username = 'User', this.totalSongs});
+  PlayListItem({this.id, this.playlistTitle = 'Playlist', this.username = 'User', this.totalSongs, this.onReturn});
 
-  factory PlayListItem.fromPlaylist(Playlist playList) {
-    return PlayListItem(id: playList.id, playlistTitle:  playList.playlistName, username: playList.username, totalSongs: playList.songCount);
+  factory PlayListItem.fromPlaylist(Playlist playList, final onReturn) {
+    return PlayListItem(id: playList.id, playlistTitle:  playList.playlistName, username: playList.username, totalSongs: playList.songCount, onReturn: onReturn,);
   }
 
   @override
@@ -43,7 +44,9 @@ class PlayListItem extends StatelessWidget {
                       onPressed: () {
                         RestService restService = new RestService();
                         restService.getSongsFromPlaylist(id).then((result) {
-                          Navigator.pushNamed(context, 'Playlist', arguments: {'playlist': result, 'isQueue': false, 'playlistID': id});
+                          Navigator.pushNamed(context, 'Playlist', arguments: {'playlist': result, 'isQueue': false, 'playlistID': id}).then((value){
+                            onReturn();
+                          });
                         });
                       },
                       child: Text('Show Songs'),
