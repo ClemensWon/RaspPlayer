@@ -14,15 +14,22 @@ class NavigationDrawer extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(0, 1, 49, 1),
-              ),
-              child: Text(
-                'RaspPlayer',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+            Container(
+              height: 250,
+              child: DrawerHeader(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                decoration: BoxDecoration(
+                  color: Colors.blue[100]
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: 20,),
+                    Image(
+                      image: AssetImage('assets/img/logo_withText.png'),
+                      width: 200,
+                      alignment: Alignment.center,
+                    ),
+                  ],
                 ),
               ),
             ),

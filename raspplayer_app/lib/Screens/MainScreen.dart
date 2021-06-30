@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -8,6 +10,7 @@ import 'package:raspplayer_app/Components/SongListItem.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 import 'package:raspplayer_app/Services/UserData.dart';
 import 'package:raspplayer_app/model/Song.dart';
+import 'dart:async';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -22,11 +25,16 @@ class MainScreenState extends State<MainScreen> {
 
   RestService _restService = new RestService();
 
-  final String songTitle = 'Song1';
-  final String artist = 'Artist1';
-  final String album = 'Album1';
-  final String user = 'User1';
+  String _songTitle = '';
+  String _artist = '';
+  String _album = '';
+  String _user = '';
+  String _duration = '';
+  String _genre = '';
+  String _skips = '';
+  String _likes = '';
   List<SongListItem> queue = [];
+  List<Song> songs = [];
 
   displayErrorMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -45,16 +53,17 @@ class MainScreenState extends State<MainScreen> {
   @override
   void initState(){
     super.initState();
-    _restService.getQueue().then((response) {
-      if (response != []) {
-        setState(() {
-          response.forEach((element) {
-           queue.add(SongListItem.fromSong(song: element));
-          });
-        });
+    loadQueue();
+    Timer.periodic(new Duration(seconds: 1), (timer) {
+      var route = ModalRoute.of(context);
+      stderr.writeln(route.settings.name);
+      if (route.settings.name == "Main") {
+        loadQueue();
+      } else {
+        //timer.cancel();
       }
-
     });
+
     //MainScreenProvider mainScreenProvider = Provider.of<MainScreenProvider>(context);
 
   }
@@ -93,17 +102,17 @@ class MainScreenState extends State<MainScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    songTitle,
+                    _songTitle,
                     style: TextStyle(fontSize: 20, color: Colors.white),
                     textAlign: TextAlign.left,
                   ),
                   Text(
-                    'from ' + artist,
+                    'from ' + _artist,
                     style: TextStyle(fontSize: 12, color: Colors.white),
                     textAlign: TextAlign.left,
                   ),
                   Text(
-                    album,
+                    _album,
                     style: TextStyle(fontSize: 12, color: Colors.white),
                     textAlign: TextAlign.left,
                   ),
@@ -117,7 +126,7 @@ class MainScreenState extends State<MainScreen> {
                     alignment: Alignment.bottomRight,
                     child:
                     Text(
-                      album,
+                      _user,
                       style: TextStyle(fontSize: 12, color: Colors.white),
                       textAlign: TextAlign.right,
                     ),
@@ -188,19 +197,19 @@ class MainScreenState extends State<MainScreen> {
                                         children: [
                                           Text("Songname" + ": " + currentSong),
                                           SizedBox(height: 10),
-                                          Text("Interpret" + ": " + artist),
+                                          Text("Interpret" + ": " + _artist),
                                           SizedBox(height: 10),
-                                          Text("Album" + ": " + album),
+                                          Text("Album" + ": " + _album),
                                           SizedBox(height: 10),
-                                          Text("Added by" + ": " + user),
+                                          Text("Added by" + ": " + _user),
                                           SizedBox(height: 10),
-                                          Text("Duration" + ": " + user),
+                                          Text("Duration" + ": " + _duration),
                                           SizedBox(height: 10),
-                                          Text("Genre" + ": " + user),
+                                          Text("Genre" + ": " + _genre),
                                           SizedBox(height: 10),
-                                          Text("Likes" + ": " + user),
+                                          Text("Likes" + ": " + _likes),
                                           SizedBox(height: 10),
-                                          Text("Skips" + ": " + user),
+                                          Text("Skips" + ": " + _skips),
                                         ],
                                       ),
                                     ),
@@ -244,7 +253,7 @@ class MainScreenState extends State<MainScreen> {
                 ),
                 if (UserData.role == 'Owner')IconButton(
                   onPressed: () {
-                    _restService.playCurrentSong().then((success) {
+                    _restService.playQueue().then((success) {
                       if (!success) {
                         displayErrorMessage();
                       }
@@ -278,12 +287,61 @@ class MainScreenState extends State<MainScreen> {
             "Show Playlist"
           ),
           onPressed: () {
-            Navigator.pushNamed(context, 'Playlist');
+            Navigator.pushNamed(context, 'Playlist', arguments: {'playlist': songs, 'isQueue': true});
           },
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
+  }
+
+  void loadQueue() {
+    _restService.getQueue().then((response) {
+      if (response != []) {
+        List<SongListItem> tmp = [];
+        songs = response;
+        setState(() {
+          if (response.first.songTitle != null) {
+            _songTitle = response.first.songTitle;
+            _artist = response.first.artist;
+            _album = response.first.album;
+            _user = response.first.username;
+            _duration = response.first.duration.toString();
+            _genre = response.first.genre;
+            _skips = response.first.skips.toString();
+            _likes = response.first.likes.toString();
+            response.forEach((element) {
+              tmp.add(SongListItem.fromSong(song: element));
+            });
+            queue = tmp;
+          }
+          else {
+            setState(() {
+              _songTitle = "no song playing";
+              _artist = '';
+              _album = '';
+              _user = '';
+              _duration = '';
+              _genre = '';
+              _skips = '';
+              _likes = '';
+            });
+          }
+        });
+      } else {
+        setState(() {
+          _songTitle = "no song playing";
+          _artist = '';
+          _album = '';
+          _user = '';
+          _duration = '';
+          _genre = '';
+          _skips = '';
+          _likes = '';
+        });
+      }
+
+    });
   }
 }
 
