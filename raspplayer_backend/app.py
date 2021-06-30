@@ -46,6 +46,7 @@ def checkForUser(func):
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
         except:
             return jsonify({'message': 'Invalid Token'}), 401
+
         if data.get('admin'):
             print("asdasd")
             return func(*args, **kwargs)
@@ -53,15 +54,21 @@ def checkForUser(func):
             return jsonify({'message': 'DeviceId banned'}), 401
         elif not data.get('sessionPin') == session.sessionPin:
             return jsonify({'message': 'SessionPin not registered'}), 401
-        
+
+        for user in session.muted:
+            if user == int(data.get('deviceId')):
+                return jsonify({'message': 'This Device is muted'}), 401
+            else:
+                continue
+
         for user in session.users:
-            print(user.deviceId)
             if user.deviceId == data.get('deviceId'):
                 return func(*args, **kwargs)
             else:
                 continue
+            
+        return jsonify({'message': 'This Device is not a user in the current Session'}), 401
 
-        return jsonify({'message': 'This Device is nor a user in the current Session'}), 401
     return wrapped
 
 def checkJsonValid(func):
