@@ -10,13 +10,16 @@ class Session:
         self.sessionPin = sessionPin
         self.usersAll = []
         self.users = []
-        self.queue = [1,2]
+        self.queue = []
         self.currentSong = 1
         self.nextInsertPos = 0
         self.currentPlaylist = ''
         self.volume = 100
         self.mopidy = MopidyConnection.MopidyConnection()
         self.db = DB.DB()
+
+    def clearQueue(self):
+        self.mopidy.clearQueue()
 
     def insertUser(self, user):
         self.db.insertUser(user.deviceId, user.username, 0, user.token)
@@ -120,25 +123,27 @@ class Session:
             counter = 0
             for songID in self.queue:
                 if counter >= mopidySongPos:
-                    print(songID)
                     song = self.db.getSong(songID)
-                    print(song)
                     queue.append(song)
                 counter += 1
+        else:
+            for songID in self.queue:
+                song = self.db.getSong(songID)
+                queue.append(song)
         return queue
 
-    def songToQueue(self, songID):
-        songURI = self.db.getSongURI(songID)
-        print(songURI)
-        self.nextInsertPos = self.mopidy.songToQueue(songURI, self.nextInsertPos)
-        self.queue.insert(self.nextInsertPos-1, songID)
-        return self.nextInsertPos-1
+    def songToQueue(self, songIDs):
+        for songID in songIDs:
+            songURI = self.db.getSongURI(songID)
+            self.nextInsertPos = self.mopidy.songToQueue(songURI, self.nextInsertPos)
+            self.queue.insert(self.nextInsertPos-1, songID)
+            print(self.queue)
 
     def playQueue(self):
-        self.mopdidy.play()
+        self.mopidy.play()
 
     def updateQueue(self):
-        status = self.mopdidy.status()
+        status = self.mopidy.status()
         if 'song' in status:
             mopidySongPos = status['song']
             
@@ -151,14 +156,14 @@ class Session:
             self.mopidy.createPlaylist(playlistName)
         return playlistID
 
-    def addSongToPlaylist(self, songID, playlistID):
-        success = self.db.insertSongToPlaylist(songID, playlistID)
-        if success:
-            self.db.incrementNextSongPos(playlistID)
-            playlistName = self.db.getPlaylistName(playlistID)
-            songURI = self.db.getSongURI(songID)
-            self.mopidy.songToPlaylist(playlistName, songURI)
-        return success
+    def addSongToPlaylist(self, songIDs, playlistID):
+        for songID in songIDs:
+            success = self.db.insertSongToPlaylist(songID, playlistID)
+            if success:
+                self.db.incrementNextSongPos(playlistID)
+                playlistName = self.db.getPlaylistName(playlistID)
+                songURI = self.db.getSongURI(songID)
+                self.mopidy.songToPlaylist(playlistName, songURI)
 
     def deleteSongFromPlaylist(self, songID, playlistID):
         self.db.deleteSongFromPlaylist(songID, playlistID)

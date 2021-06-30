@@ -15,6 +15,7 @@ songs = [{"id":0, "name" : "Sockosophie","artist" : "Kaeptn Peng", "genre" : "Ra
 
 
 session = Session.Session('default')
+session.clearQueue()
 admin   = Admin.Admin()
 
 def checkForAdmin(func):
@@ -239,14 +240,6 @@ def returnUsers():
         users
     )
 
-@app.route('/session/queue/delete/<songId>', methods = ['PUT'])
-@checkForUser
-def deleteSongFromQueue():
-    #mopdidy & Session
-    return jsonify(
-        songs
-    )
-
 
 #################### PLAYER CONTROLS ####################
 
@@ -298,20 +291,29 @@ def returnQueue():
         queue
     )
 
-@app.route('/session/queue/addSong', methods = ['POST'])
+@app.route('/session/queue/addSongs', methods = ['POST'])
 #@checkForUser
 def addSongToQueue():
     requestData = request.get_json()
-    songPos = session.songToQueue(requestData['songID'])
+    songPos = session.songToQueue(requestData['songIDs'])
     return jsonify(
-        {'songPos': songPos}
+        {'message': 'done'}
+    )
+
+@app.route('/session/queue/deleteSong', methods = ['DELETE'])
+#@checkForUser
+def deleteSongFromQueue():
+    requestData = request.get_json()
+    session.deleteFromQueue(requestData['songID'])
+    return jsonify(
+        {'message': 'song deleted from queue'}
     )
 
 @app.route('/session/queue/play', methods = ['POST'])
 #@checkForUser
 @checkJsonValid
 def playQueue():
-    
+    session.playQueue()
     return jsonify(
         {'message': 'playing queue'}
     )
@@ -359,20 +361,15 @@ def createPlaylist():
             {'error': 'playlistName already exists'}
         ), 400
 
-@app.route('/session/playlist/addSong', methods = ['PUT'])
+@app.route('/session/playlist/addSongs', methods = ['PUT'])
 #@checkForUser
 @checkJsonValid
 def addSongToPlaylist():
     requestData = request.get_json()
-    success = session.addSongToPlaylist(requestData['songID'], requestData['playlistID'])
-    if success:
-        return jsonify(
-            {'message': 'song added to playlist'}
-        )
-    else:
-        return jsonify(
-            {'error': 'song already in playlist'}
-        ), 400
+    success = session.addSongToPlaylist(requestData['songIDs'], requestData['playlistID'])
+    return jsonify(
+        {'message': 'done'}
+    )
 
 @app.route('/session/playlist/deleteSong', methods = ['DELETE'])
 #@checkForUser

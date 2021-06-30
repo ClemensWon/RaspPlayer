@@ -56,6 +56,11 @@ class MopidyConnection:
         self.client.disconnect()
         return returnValue
 
+    def clearQueue(self):
+        self.client.connect("localhost", 6600)
+        self.client.clear()
+        self.client.disconnect()
+
     
     #################### PLAYLISTS ####################
 
