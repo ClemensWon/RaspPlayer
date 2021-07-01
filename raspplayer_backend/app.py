@@ -320,7 +320,6 @@ def deleteSongFromQueue():
 
 @app.route('/session/queue/play', methods = ['POST'])
 #@checkForUser
-@checkJsonValid
 def playQueue():
     session.playQueue()
     return jsonify(
