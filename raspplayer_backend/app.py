@@ -56,9 +56,6 @@ def checkForUser(func):
         elif not data.get('sessionPin') == session.sessionPin:
             print ('sessionPin not registered')
             return jsonify({'message': 'SessionPin not registered'}), 401
-        elif not data.get('deviceId') == request.headers.get('deviceId'):
-            print ('deviceId in header and token different')
-            return jsonify({'message': 'DeviceId in Header and token are different'}), 401
 
         for user in session.users:
             if user.deviceId == data.get('deviceId'):
