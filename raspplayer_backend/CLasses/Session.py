@@ -134,6 +134,7 @@ class Session:
         elif self.queueStarted:
             self.queue.clear()
             self.queueStarted = False
+            self.mopidy.clearQueue()
         queue = []
         for songID in self.queue:
             song = self.db.getSong(songID)
