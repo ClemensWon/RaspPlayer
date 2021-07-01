@@ -228,5 +228,4 @@ class DB:
                 'filepath': filepath,
                 'interpretName': interpretName
             }
-        del self.cur
         return song
