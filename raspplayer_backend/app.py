@@ -266,13 +266,22 @@ def muteVolume():
 #@checkForUser
 def skipCurrentSong():
 
+    check = 0
     for user in session.muted:
-        if user == int(data.get('deviceId')):
+        if user == data.get('deviceId'):
             return jsonify({'message': 'This Device is muted'}), 401
         else:
             continue
-    
-    session.skipList.append(request.headers.get('deviceId'))
+
+    for user in session.skipList:
+        if user == data.get('deviceId'):
+            check = 1
+        else:
+            continue
+
+    if check == 0:
+        session.skipList.append(request.headers.get('deviceId'))
+
     session.skip()
     return jsonify(
         {'currentSong': session.currentSong}
