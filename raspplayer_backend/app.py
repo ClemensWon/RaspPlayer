@@ -274,7 +274,7 @@ def skipCurrentSong():
             continue
 
     for user in session.skipList:
-        if user == data.get('deviceId'):
+        if user == request.headers.get('deviceId'):
             check = 1
         else:
             continue
