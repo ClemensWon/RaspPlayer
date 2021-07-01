@@ -98,6 +98,7 @@ class Session:
         self.mopidy.replay()
 
     def skip(self):
+        print(float(len(self.skipList))/float(len(self.users)))
         if (float(len(self.skipList))/float(len(self.users))) >= self.skipPercentage:
             self.mopidy.skip()
             self.skipList = []
