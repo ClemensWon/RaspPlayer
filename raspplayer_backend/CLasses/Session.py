@@ -31,14 +31,8 @@ class Session:
         self.users.append(user)
 
     def returnUsers(self):
-        users = self.db.getUsers()
-        self.usersAll = []
-        for user in users:
-            self.usersAll.append({
-                'username': user[1],
-                'banned': user[2]
-            })
-        return self.usersAll
+
+        return self.users
 
     def getSongs(self):
         songs = self.db.getSongs()
