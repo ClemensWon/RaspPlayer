@@ -79,11 +79,11 @@ INSERT INTO User (deviceID, username, banned, token) VALUES ("999", "Alex", 0, "
 /* 
 INSERT INTO Song (deviceID, songName, genre, duration, likes, skips, album, replays, filepath) VALUES ("999", "Found God in a Tomato", "rock", 30, 2, 1, "High Viscera", 1, "aslökdfjsölj");
 INSERT INTO Song (deviceID, songName, genre, duration, likes, skips, album, replays, filepath) VALUES ("999", "Cornflake", "rock", 35, 0, 0, "High Viscera", 0, "asdf");
-*/
+
 
 INSERT INTO Interpret (interpretID, interpretName) VALUES(1, "PPC");
 
 INSERT INTO InterpretToSong(songID, interpretID) VALUES (1, 1);
 INSERT INTO InterpretToSong(songID, interpretID) VALUES (2, 1);
-
+*/
 commit;
