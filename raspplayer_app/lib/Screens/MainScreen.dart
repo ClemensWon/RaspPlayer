@@ -57,7 +57,7 @@ class MainScreenState extends State<MainScreen> {
     Timer.periodic(new Duration(seconds: 1), (timer) {
       var route = ModalRoute.of(context);
       stderr.writeln(route.settings.name);
-      if (route.settings.name == "Main") {
+      if (true || route.settings.name == "Main") {
         loadQueue();
       } else {
         //timer.cancel();
