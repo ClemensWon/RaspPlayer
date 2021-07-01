@@ -263,7 +263,7 @@ def muteVolume():
     )
 
 @app.route('/session/currentSong/skip', methods = ['PUT'])
-#@checkForUser
+@checkForUser
 def skipCurrentSong():
 
     check = 0
