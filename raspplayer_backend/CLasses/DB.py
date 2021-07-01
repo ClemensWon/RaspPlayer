@@ -4,7 +4,8 @@ import sys
 class DB:
     def __init__(self):
         try:
-            self.conn = mariadb.connect(
+            self.conn = mariadb.connect
+            (
                 user="johnlennon",
                 password="woodstock69",
                 host="localhost",
@@ -41,11 +42,6 @@ class DB:
     
     def getUser(self,deviceId):
         self.cur.execute("SELECT * FROM User WHERE deviceID = ?", (deviceId,))
-        return self.cur.fetchall()
-
-    def getSongs(self):
-        self.cur.execute("SELECT * FROM Song")
-
         return self.cur.fetchall()
 
     def getSpecSong(self,id):
