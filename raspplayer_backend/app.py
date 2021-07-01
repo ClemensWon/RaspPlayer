@@ -53,13 +53,7 @@ def checkForUser(func):
         elif session.getBanned(data.get('deviceId')):
             return jsonify({'message': 'DeviceId banned'}), 401
         elif not data.get('sessionPin') == session.sessionPin:
-            return jsonify({'message': 'SessionPin not registered'}), 401
-
-        for user in session.muted:
-            if user == int(data.get('deviceId')):
-                return jsonify({'message': 'This Device is muted'}), 401
-            else:
-                continue
+            return jsonify({'message': 'SessionPin not registered'}), 401f
 
         for user in session.users:
             if user.deviceId == data.get('deviceId'):
@@ -269,6 +263,14 @@ def muteVolume():
 @app.route('/session/currentSong/skip', methods = ['PUT'])
 #@checkForUser
 def skipCurrentSong():
+
+    for user in session.muted:
+    if user == int(data.get('deviceId')):
+        return jsonify({'message': 'This Device is muted'}), 401
+    else:
+        continue
+    
+    session.skipList.append(request.headers.get('deviceId'))
     session.skip()
     return jsonify(
         {'currentSong': session.currentSong}

@@ -9,9 +9,11 @@ class Session:
     def __init__(self,sessionPin):
         self.sessionPin = sessionPin
         self.usersAll = []
-        self.muted = [1]
+        self.muted = []
         self.users = []
         self.queue = []
+        self.skipList = []
+        self.skipPercentage = 0.5
         self.currentSong = 1
         self.nextInsertPos = 0
         self.lastSongPos = 0
@@ -96,8 +98,10 @@ class Session:
         self.mopidy.replay()
 
     def skip(self):
-        self.mopidy.skip()
-        self.currentSong += 1
+        if float(len(self.skipList)/len(self.users)) >= skipPercentage:
+            self.mopidy.skip()
+            self.currentSong += 1
+            self.skipList = []
 
     def pause(self):
         self.mopidy.pause_resume()
