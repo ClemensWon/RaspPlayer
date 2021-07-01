@@ -40,11 +40,18 @@ class ConnectScreenState extends State<ConnectScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                'RaspPlayer',
-                style: TextStyle(fontSize: 28),
-                textAlign: TextAlign.center,
-
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0,0,0,30),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image(
+                      image: AssetImage('assets/img/logo_withText.png'),
+                      width: 200,
+                      alignment: Alignment.center,
+                    ),
+                  ],
+                ),
               ),
               Text(
                 'Type in a Nickname and the password to connect with the RaspPlayer!',
@@ -151,49 +158,47 @@ class ConnectScreenState extends State<ConnectScreen> {
       'sessionPin': _sessionPin.text
     });
     DeviceInfoService deviceInfoService = new DeviceInfoService();
-    deviceInfoService.getDeviceId().then((value) {
-      print(value);
-    });
     RestService restService = new RestService();
-    if (dropdownValue == "User") {
-      restService.login(_nickname.text, _sessionPin.text).then((recievedToken) {
-        if (recievedToken) {
-          Navigator.pushReplacementNamed(context, 'Main');
-        }
-        else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('session pin is wrong'),
-              action: SnackBarAction(
-                label: 'ok',
-                onPressed: () {
-                  // Code to execute.
-                },
+    deviceInfoService.getDeviceId().then((deviceId) {
+      if (dropdownValue == "User") {
+        restService.login(_nickname.text, _sessionPin.text, deviceId).then((recievedToken) {
+          if (recievedToken) {
+            Navigator.pushReplacementNamed(context, 'Main');
+          }
+          else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('session pin is wrong'),
+                action: SnackBarAction(
+                  label: 'ok',
+                  onPressed: () {
+                    // Code to execute.
+                  },
+                ),
               ),
-            ),
-          );
-        }
-      });
-    } else {
-      restService.masterLogin(_nickname.text, _masterPassword.text).then((recievedToken) {
-        if (recievedToken) {
-          Navigator.pushReplacementNamed(context, 'Main');
-        }
-        else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('password is wrong'),
-              action: SnackBarAction(
-                label: 'ok',
-                onPressed: () {
-                  // Code to execute.
-                },
+            );
+          }
+        });
+      } else {
+        restService.masterLogin(_nickname.text, _masterPassword.text, deviceId).then((recievedToken) {
+          if (recievedToken) {
+            Navigator.pushReplacementNamed(context, 'Main');
+          }
+          else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('password is wrong'),
+                action: SnackBarAction(
+                  label: 'ok',
+                  onPressed: () {
+                    // Code to execute.
+                  },
+                ),
               ),
-            ),
-          );
-        }
-      });
-    }
-
+            );
+          }
+        });
+      }
+    });
   }
 }

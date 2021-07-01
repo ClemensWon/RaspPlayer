@@ -1,18 +1,28 @@
 import json
 from CLasses import MopidyConnection, DB, User, Song
+import os
+from werkzeug.utils import secure_filename
+import eyed3
+import threading
 
 class Session:
     def __init__(self,sessionPin):
         self.sessionPin = sessionPin
         self.usersAll = []
+        self.muted = [1]
         self.users = []
-        self.queue = [1,2]
+        self.queue = []
         self.currentSong = 1
         self.nextInsertPos = 0
+        self.lastSongPos = 0
+        self.queueStarted = False
         self.currentPlaylist = ''
-        self.volume = 0
+        self.volume = 100
         self.mopidy = MopidyConnection.MopidyConnection()
         self.db = DB.DB()
+
+    def clearQueue(self):
+        self.mopidy.clearQueue()
 
     def insertUser(self, user):
         self.db.insertUser(user.deviceId, user.username, 0, user.token)
@@ -22,14 +32,18 @@ class Session:
         users = self.db.getUsers()
         self.usersAll = []
         for user in users:
-            self.usersAll.append(((User.User(user[0], user[1], user[2], user[3]).__dict__)))
+            self.usersAll.append({
+                'username': user[1],
+                'banned': user[2]
+            })
         return self.usersAll
 
     def getSongs(self):
         songs = self.db.getSongs()
         songsAll = []
         for song in songs:
-            songsAll.append(Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__)
+            responseDic = self.buildSong(song,)
+            songsAll.append(responseDic)
         return songsAll
 
     def getSpecSong(self,id):
@@ -64,14 +78,33 @@ class Session:
         token = self.db.getToken(deviceId)
         return token.fetchall()[0][0]
 
-    def returnQueue (self): 
-        queue = []
-        for son in self.queue:
-            so = self.db.getSpecSong(son)
-            for song in so:
-                s = Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__ 
-                queue.append(s)           
-        return queue
+    def kickAll(self):
+        self.users = []
+
+    def buildSong(self, song):
+        addedby = self.db.getUser(song[1])
+        interpretToSong = self.db.getInterpretToSong(song[0])
+        interpret = self.db.getInterpret(interpretToSong[0][1])
+        responseDic = Song.Song(song[0], addedby[0][1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
+        responseDic['artist'] = interpret[0][1]
+        return responseDic
+
+
+    #################### PLAYER CONTROLS ####################
+
+    def replay(self):
+        self.mopidy.replay()
+
+    def skip(self):
+        self.mopidy.skip()
+        self.currentSong += 1
+
+    def pause(self):
+        self.mopidy.pause_resume()
+
+    def mute(self):
+        self.volume = 0
+        self.mopidy.mute()
 
     def setvolume(self, volume):
         if volume < 0:
@@ -82,27 +115,94 @@ class Session:
         self.mopidy.volume(volume)
         self.volume = volume
 
-    def mute(self):
-        self.volume = 0
-        self.mopidy.mute()
 
-    def songToQueue(self, songID):
-        #TODO: get songURI from DB
-        self.nextInsertPos = self.mopidy.songToQueue(songURI, self.nextInsertPos)
+    #################### QUEUE ####################
 
-    def replay(self):
-        self.mopidy.replay()
+    def returnQueue (self):
+        status = self.mopidy.status()
+        if 'song' in status:
+            mopidySongPos = int(status['song'])
+            songsToDelete = mopidySongPos - self.lastSongPos
+            print("lastSongPos: " + str(self.lastSongPos))
+            print("mopidySongPos: " + str(mopidySongPos))
+            counter = 0
+            while counter < songsToDelete:
+                self.queue.pop(0)
+                print('song removed from queue')
+                counter += 1
+            self.lastSongPos = mopidySongPos
+        elif self.queueStarted:
+            self.queue.clear()
+            self.queueStarted = False
+        queue = []
+        for songID in self.queue:
+            song = self.db.getSong(songID)
+            queue.append(song)
+        return queue
 
-    def skip(self):
-        self.mopidy.skip()
-        self.currentSong += 1
+    def songToQueue(self, songIDs):
+        for songID in songIDs:
+            songURI = self.db.getSongURI(songID)
+            self.nextInsertPos = self.mopidy.songToQueue(songURI, self.nextInsertPos)
+            self.queue.insert(self.nextInsertPos-1, songID)
+            print(self.queue)
 
-    def play(self):
-        self.mopidy.loadPlaylist("all")
+    def playQueue(self):
         self.mopidy.play()
+        self.queueStarted = True
+            
+    
+    #################### PLAYLIST ####################
 
-    def pause(self):
-        self.mopidy.pause_resume()
+    def createPlaylist(self, playlistName, deviceID):
+        playlistID = self.db.createPlaylist(playlistName, deviceID)
+        if playlistID > 0:
+            self.mopidy.createPlaylist(playlistName)
+        return playlistID
 
-    def kickAll(self):
-        self.users = []
+    def addSongToPlaylist(self, songIDs, playlistID):
+        for songID in songIDs:
+            success = self.db.insertSongToPlaylist(songID, playlistID)
+            if success:
+                self.db.incrementNextSongPos(playlistID)
+                playlistName = self.db.getPlaylistName(playlistID)
+                songURI = self.db.getSongURI(songID)
+                self.mopidy.songToPlaylist(playlistName, songURI)
+
+    def deleteSongFromPlaylist(self, songID, playlistID):
+        self.db.deleteSongFromPlaylist(songID, playlistID)
+
+    def playPlaylist(self, playlistID):
+        playlistName = self.db.getPlaylistName(playlistID)
+        self.mopidy.loadPlaylist(playlistName)
+        self.mopidy.play()
+        self.queue.clear()
+        playlistSongs = self.db.getSongsFromPlaylist(playlistID)
+        for song in playlistSongs:
+            self.queue.append(song['songID'])
+        self.queueStarted = True
+
+    def getPlaylists(self):
+        return self.db.getPlaylists()
+
+    def getSongsFromPlaylist(self, playlistID):
+        return self.db.getSongsFromPlaylist(playlistID)
+
+
+    #################### SONG ####################
+
+    def addSong(self, file, deviceID):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join('/home/john/Music/', filename)
+        songID = self.db.addSong("file://" + filepath, deviceID)
+        if songID > 0:
+            file.save(filepath)
+            audiofile=eyed3.load(filepath)
+            try:
+                self.db.addSongMetaData(songID, audiofile.tag.title, audiofile.tag.artist, audiofile.tag.album, audiofile.tag.genre.name, int(audiofile.info.time_secs))
+            except:
+                self.db.addSongMetaData(songID, "None", "None", "None", "None", 0)
+        return songID
+
+    def getSongs(self):
+        return self.db.getSongs()

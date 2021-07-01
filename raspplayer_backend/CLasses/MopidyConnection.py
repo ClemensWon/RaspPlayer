@@ -6,11 +6,11 @@ class MopidyConnection:
         self.client.timeout = 10
         self.client.idletimeout = None
 
-    def loadPlaylist(self, playlist):
+    def status(self):
         self.client.connect("localhost", 6600)
-        self.client.clear()
-        self.client.load(playlist)
+        status = self.client.status()
         self.client.disconnect()
+        return status
 
     def play(self):
         self.client.connect("localhost", 6600)
@@ -42,9 +42,31 @@ class MopidyConnection:
         self.client.setvol(0)
         self.client.disconnect()
 
+    def songToQueue(self, songURI, SessionNextInsertPos):
+        self.client.connect("localhost", 6600)
+        returnValue = 0
+        id = self.client.addid(songURI)
+        status = self.client.status()
+        if "nextsong" in status:
+            nextInsertPos = int(status["nextsong"])
+            if nextInsertPos < SessionNextInsertPos:
+                nextInsertPos = SessionNextInsertPos
+            self.client.moveid(id, nextInsertPos)
+            returnValue = nextInsertPos+1
+        self.client.disconnect()
+        return returnValue
+
+    def clearQueue(self):
+        self.client.connect("localhost", 6600)
+        self.client.clear()
+        self.client.disconnect()
+
+    
+    #################### PLAYLISTS ####################
+
     def createPlaylist(self, name):
         self.client.connect("localhost", 6600)
-        self.client.playlistadd(name, "file:///home/john/Music/Kalimba.mp3")
+        self.client.playlistadd(name, "file:///home/john/Music/Imagine.mp3")
         self.client.playlistclear(name)
         self.client.disconnect()
 
@@ -53,16 +75,13 @@ class MopidyConnection:
         self.client.playlistadd(name, songURI)
         self.client.disconnect()
 
-    def songToQueue(self, songURI, SessionNextInsertPos):
+    def deleteSongFromPlaylist(self, playlistName, songPos):
         self.client.connect("localhost", 6600)
-        returnValue = 0
-        id = self.client.addid(songURI)
-        status = self.client.status()["nextsong"]
-        if "nextsong" in status:
-            nextInsertPos = status["nextsong"]
-            if nextInsertPos < SessionNextInsertPos:
-                nextInsertPos = SessionNextInsertPos
-            self.client.moveid(id, nextInsertPos)
-            returnValue = nextInsertPos+1
+        self.client.playlistdelete(playlistName, songPos)
         self.client.disconnect()
-        return returnValue
+
+    def loadPlaylist(self, playlist):
+        self.client.connect("localhost", 6600)
+        self.client.clear()
+        self.client.load(playlist)
+        self.client.disconnect()
