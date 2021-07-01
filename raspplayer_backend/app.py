@@ -282,6 +282,9 @@ def skipCurrentSong():
     if check == 0:
         session.skipList.append(request.headers.get('deviceId'))
 
+    for user in session.skipList:
+        print(user)
+
     session.skip()
     return jsonify(
         {'currentSong': session.queue[0]}
