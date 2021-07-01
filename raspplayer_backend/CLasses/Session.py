@@ -31,8 +31,15 @@ class Session:
         self.users.append(user)
 
     def returnUsers(self):
-
-        return self.users
+        
+        users = self.db.getUsers()
+        self.usersAll = []
+        for user in users:
+            self.usersAll.append({
+                'username': user[1],
+                'banned': user[2]
+            })
+        return self.usersAll
 
     def getSongs(self):
         songs = self.db.getSongs()
@@ -92,7 +99,7 @@ class Session:
         self.mopidy.replay()
 
     def skip(self):
-        print(float(len(self.skipList))/float(len(self.users)))
+        print()
         if (float(len(self.skipList))/float(len(self.users))) >= self.skipPercentage:
             self.mopidy.skip()
             self.skipList = []
