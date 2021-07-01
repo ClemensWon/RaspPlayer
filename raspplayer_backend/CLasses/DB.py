@@ -122,6 +122,7 @@ class DB:
         self.cur.execute("SELECT * FROM Playlist INNER JOIN User ON Playlist.deviceID = User.deviceID")
         playlists = []
         for (playlistID, playlistName, nextSongPos, deviceIDPlaylist, deviceID, username, banned, token) in self.cur:
+            print(playlistID)
             playlists.append({
                 'playlistID': playlistID,
                 'playlistName': playlistName,
