@@ -118,6 +118,7 @@ class DB:
         self.conn.commit()
 
     def getPlaylists(self):
+        print("getPlaylists")
         self.cur.execute("SELECT * FROM Playlist INNER JOIN User ON Playlist.deviceID = User.deviceID")
         playlists = []
         for (playlistID, playlistName, nextSongPos, deviceIDPlaylist, deviceID, username, banned, token) in self.cur:
@@ -188,6 +189,7 @@ class DB:
         self.conn.commit()
 
     def getSongs(self):
+        print("getSongs")
         self.cur.execute("SELECT * FROM User INNER JOIN Song ON User.deviceID = Song.deviceID INNER JOIN InterpretToSong ON Song.songID = InterpretToSong.songID INNER JOIN Interpret ON InterpretToSong.interpretID = Interpret.interpretID")
         songs = []
         for (deviceID, username, banned, token, songID, deviceIDSong, songName, genre, duration, likes, skips, album, replays, filepath, songIDInterpretToSong, interpretIDInterpretToSong, interpretID, interpretName) in self.cur:
@@ -207,6 +209,7 @@ class DB:
         return songs
 
     def getSong(self, songID):
+        print("getSong")
         self.cur.execute("SELECT * FROM User INNER JOIN Song ON User.deviceID = Song.deviceID INNER JOIN InterpretToSong ON Song.songID = InterpretToSong.songID INNER JOIN Interpret ON InterpretToSong.interpretID = Interpret.interpretID WHERE Song.songID = ?", (songID,))
         song = {}
         for (deviceID, username, banned, token, songID, deviceIDSong, songName, genre, duration, likes, skips, album, replays, filepath, songIDInterpretToSong, interpretIDInterpretToSong, interpretID, interpretName) in self.cur:
