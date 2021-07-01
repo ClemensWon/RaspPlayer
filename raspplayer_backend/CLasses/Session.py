@@ -100,7 +100,6 @@ class Session:
     def skip(self):
         if float(len(self.skipList)/len(self.users)) >= self.skipPercentage:
             self.mopidy.skip()
-            self.currentSong += 1
             self.skipList = []
 
     def pause(self):

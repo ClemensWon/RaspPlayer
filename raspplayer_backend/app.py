@@ -284,7 +284,7 @@ def skipCurrentSong():
 
     session.skip()
     return jsonify(
-        {'currentSong': session.currentSong}
+        {'currentSong': session.queue[0]}
     )
 
 @app.route('/session/currentSong/pause', methods = ["PUT"])
