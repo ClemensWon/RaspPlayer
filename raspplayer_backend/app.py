@@ -53,7 +53,9 @@ def checkForUser(func):
         elif session.getBanned(data.get('deviceId')):
             return jsonify({'message': 'DeviceId banned'}), 401
         elif not data.get('sessionPin') == session.sessionPin:
-            return jsonify({'message': 'SessionPin not registered'}), 401f
+            return jsonify({'message': 'SessionPin not registered'}), 401
+        elif not data.get('deviceId') == request.headers.get('deviceId'):
+            return jsonify({'message': 'DeviceId in Header and token are different'}), 401
 
         for user in session.users:
             if user.deviceId == data.get('deviceId'):
