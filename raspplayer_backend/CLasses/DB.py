@@ -4,7 +4,7 @@ import sys
 class DB:
     def __init__(self):
         try:
-            self.pool = mariadb.connect(
+            self.pool = mariadb.ConnectionPool(
                 user="johnlennon",
                 password="woodstock69",
                 host="localhost",
