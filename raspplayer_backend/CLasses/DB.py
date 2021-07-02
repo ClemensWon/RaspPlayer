@@ -41,7 +41,7 @@ class DB:
 
 
     def insertUser(self,deviceId, username, banned, token):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute(
@@ -64,7 +64,7 @@ class DB:
 
 
     def getUsers(self):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT * FROM User")
@@ -75,7 +75,7 @@ class DB:
 
     
     def getUser(self,deviceId):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT * FROM User WHERE deviceID = ?", (deviceId,))
@@ -121,7 +121,7 @@ class DB:
         return cur
 
     def getInterpretToSong(self, songID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT * FROM InterpretToSong WHERE songID = ?", (songID,))
@@ -133,7 +133,7 @@ class DB:
             print("Error from getInterpretToSong")
 
     def getInterpret(self, interpretID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT * FROM Interpret WHERE interpretID = ?",(interpretID,))
@@ -148,7 +148,7 @@ class DB:
     #################### PLAYLISTS ####################
 
     def createPlaylist(self, playlistName, deviceID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("INSERT INTO Playlist (playlistName, nextSongPos, deviceID) VALUES (?, ?, ?)", (playlistName, 0, deviceID))
@@ -163,7 +163,7 @@ class DB:
 
 
     def insertSongToPlaylist(self, songID, playlistID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT nextSongPos FROM Playlist WHERE playlistID = ?", (playlistID,))
@@ -181,7 +181,7 @@ class DB:
 
 
     def deleteSongFromPlaylist(self, songID, playlistID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT songPos FROM SongToPlaylist WHERE songID = ? and playlistID = ?", (songID, playlistID))
@@ -201,7 +201,7 @@ class DB:
 
 
     def getPlaylists(self):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT * FROM Playlist INNER JOIN User ON Playlist.deviceID = User.deviceID")
@@ -222,7 +222,7 @@ class DB:
 
 
     def incrementNextSongPos(self, playlistID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("UPDATE Playlist SET nextSongPos = nextSongPos+1 WHERE playlistID = ?", (playlistID,))
@@ -234,7 +234,7 @@ class DB:
 
 
     def getPlaylistName(self, playlistID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT playlistName FROM Playlist WHERE playlistID = ?", (playlistID,))
@@ -247,7 +247,7 @@ class DB:
 
 
     def getSongsFromPlaylist(self, playlistID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT * FROM SongToPlaylist INNER JOIN Song ON SongToPlaylist.songID=Song.songID INNER JOIN InterpretToSong ON Song.songID = InterpretToSong.songID INNER JOIN Interpret ON InterpretToSong.interpretID = Interpret.interpretID INNER JOIN User ON Song.deviceID = User.deviceID WHERE playlistID = ?", (playlistID,))
@@ -278,7 +278,7 @@ class DB:
     #################### SONG ####################
 
     def getSongURI(self, songID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT filepath FROM Song WHERE songID = ?", (songID,))
@@ -291,7 +291,7 @@ class DB:
 
 
     def addSong(self, filepath, deviceID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("INSERT INTO Song (deviceID, songName, genre, duration, likes, skips, album, replays, filepath) VALUES (?, ?, ?, ?, ?, ?, ? ,? ,?)", (deviceID, "", "", 0, 0, 0, "", 0, filepath))
@@ -305,7 +305,7 @@ class DB:
             return -1
 
     def addSongMetaData(self, songID, songName, interpretName, album, genre, duration):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("UPDATE Song SET songName = ?, album = ?, genre = ?, duration = ? WHERE songID = ?", (songName, album, genre, duration, songID))
@@ -326,7 +326,7 @@ class DB:
         pconn.close()
 
     def getSongs(self):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT * FROM User INNER JOIN Song ON User.deviceID = Song.deviceID INNER JOIN InterpretToSong ON Song.songID = InterpretToSong.songID INNER JOIN Interpret ON InterpretToSong.interpretID = Interpret.interpretID")
@@ -354,7 +354,7 @@ class DB:
 
 
     def getSong(self, songID):
-        pconn = get_pool_connection(self)
+        pconn = self.get_pool_connection(self)
         try:
             cur = pconn.cursor()
             cur.execute("SELECT * FROM User INNER JOIN Song ON User.deviceID = Song.deviceID INNER JOIN InterpretToSong ON Song.songID = InterpretToSong.songID INNER JOIN Interpret ON InterpretToSong.interpretID = Interpret.interpretID WHERE Song.songID = ?", (songID,))
