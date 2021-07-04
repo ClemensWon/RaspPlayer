@@ -177,7 +177,7 @@ def changeSessionPin():
 
 @app.route('/sessionPin', methods = ["GET"])
 @checkForAdmin
-def setSessionPin():
+def getSessionPin():
     return jsonify(
         {'sessionPin': session.sessionPin}
     )
