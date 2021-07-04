@@ -172,9 +172,16 @@ def settings():
 @app.route('/settings/sessionPin', methods = ["POST"])
 @checkForAdmin
 @checkJsonValid
-def changeSessionPin():
+def getSessionPin():
     requestData = request.get_json()
     session.sessionPin = requestData['newPin']
+    return jsonify(
+        {'sessionPin': session.sessionPin}
+    )
+
+@app.route('/sessionPin', methods = ["GET"])
+@checkForAdmin
+def changeSessionPin():
     return jsonify(
         {'sessionPin': session.sessionPin}
     )
