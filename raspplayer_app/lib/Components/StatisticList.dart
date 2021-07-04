@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class StatisticList extends StatelessWidget {
+  //name of the statistic property
   final String statisticName;
+  //value of the statistic property
   final String statisticValue;
   final Widget child;
   static const Widget defaultChild = Text('no data');

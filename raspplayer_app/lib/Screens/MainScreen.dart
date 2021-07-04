@@ -21,6 +21,7 @@ class MainScreenState extends State<MainScreen> {
 
 
   final bool admin = true;
+  final bool emptyQueue = true;
   final String currentSong = 'current Song';
 
   RestService _restService = new RestService();

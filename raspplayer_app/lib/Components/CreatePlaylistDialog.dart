@@ -5,6 +5,7 @@ import 'package:raspplayer_app/Services/RestService.dart';
 
 class CreatePlayListDialog extends StatelessWidget{
 
+  //name of the playlist
   String _playlistName = "";
 
   @override
@@ -29,6 +30,7 @@ class CreatePlayListDialog extends StatelessWidget{
                   children: [
                     Text("Playlist Name:"),
                     TextField(
+                      //changes the playlist name on a new key stroke
                       onChanged: (String text) {
                         _playlistName = text;
                       },
@@ -39,12 +41,14 @@ class CreatePlayListDialog extends StatelessWidget{
                       children: <Widget>[
                         TextButton(
                           onPressed: () {
+                            //cancels the dialog
                             Navigator.of(context).pop();
                           },
                           child: Text('Cancel'),
                         ),
                         TextButton(
                           onPressed: () {
+                            //calls the current rest service to create a new playlist
                             RestService restService = new RestService();
                             restService.createPlaylist(_playlistName).then((value) {
                               if (value != -1) {

@@ -18,10 +18,15 @@ class UserListItem extends StatefulWidget {
 }
 
 class UserListItemState extends State<UserListItem> {
+  //name of a user
   String username;
+  //if true shows the buttons available to the admin
   final bool adminView;
+  //shows if muting is allowed
   final bool allowMute;
+  //shows if a user is muted
   bool isMuted;
+  //shows if a user is banned
   bool isBanned = false;
   RestService rs = new RestService();
   DeviceInfoService dis = new DeviceInfoService();
@@ -42,6 +47,7 @@ class UserListItemState extends State<UserListItem> {
           child:  Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              //mutes a user
               IconButton(icon: Icon((isMuted) ? Icons.volume_off : Icons.volume_up), onPressed: () {
                 if(!isMuted) {
                   rs.muteUser(username).then((success) {
@@ -57,6 +63,7 @@ class UserListItemState extends State<UserListItem> {
                 }
 
               }),
+              //bans a user
               IconButton(icon: Icon((isBanned) ? Icons.person_add : Icons.person_remove), onPressed: () {
                 if(!isBanned) {
                   rs.banUser(dis.getDeviceId().toString()).then((success) {
@@ -90,6 +97,7 @@ class UserListItemState extends State<UserListItem> {
           child:  Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              //mutes a user
               IconButton(icon: Icon((isMuted) ? Icons.volume_off : Icons.volume_up), onPressed: () {
                 if(!isMuted) {
                   rs.muteUser(username).then((success) {

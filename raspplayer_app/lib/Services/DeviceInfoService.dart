@@ -10,11 +10,13 @@ class DeviceInfoService {
 
   Future<String> getDeviceId() async {
     try {
+      //gets the device id from android devices
       if (Platform.isAndroid) {
         var build = await deviceInfoPlugin.androidInfo;
         UserData.deviceID = build.androidId;
         return build.androidId;
       }
+      //gets the device id from ios devices
       if (Platform.isIOS) {
         var data = await deviceInfoPlugin.iosInfo;
         UserData.deviceID = data.identifierForVendor;
