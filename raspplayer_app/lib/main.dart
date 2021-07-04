@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         backgroundColor: Color.fromRGBO(218, 218, 218, 1),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MainScreen(),
+      home: ConnectScreen(),
       routes: {
         'About': (context) => AboutScreen(),
         'Connect': (context) => ConnectScreen(),

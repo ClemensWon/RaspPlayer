@@ -45,21 +45,17 @@ def checkForUser(func):
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
         except:
+            print('INVALID TOKEN')
             return jsonify({'message': 'Invalid Token'}), 401
 
         if data.get('admin'):
-            print("asdasd")
             return func(*args, **kwargs)
         elif session.getBanned(data.get('deviceId')):
+            print('device banned')
             return jsonify({'message': 'DeviceId banned'}), 401
         elif not data.get('sessionPin') == session.sessionPin:
+            print ('sessionPin not registered')
             return jsonify({'message': 'SessionPin not registered'}), 401
-
-        for user in session.muted:
-            if user == int(data.get('deviceId')):
-                return jsonify({'message': 'This Device is muted'}), 401
-            else:
-                continue
 
         for user in session.users:
             if user.deviceId == data.get('deviceId'):
@@ -214,6 +210,7 @@ def likeSong():
         {'message': 'song Liked'}
     )
 
+'''
 @app.route('/session/currentSong/get', methods = ["GET"])
 @checkForUser
 def getCurrentSong():
@@ -221,7 +218,7 @@ def getCurrentSong():
     return jsonify(
         song
     )
-
+'''
 @app.route('/session/setCurrentSong/<songId>', methods = ["PUT"])
 @checkForAdmin
 @checkJsonValid
@@ -274,11 +271,31 @@ def muteVolume():
     )
 
 @app.route('/session/currentSong/skip', methods = ['PUT'])
-#@checkForUser
+@checkForUser
 def skipCurrentSong():
+
+    check = 0
+    for user in session.muted:
+        if user == data.get('deviceId'):
+            return jsonify({'message': 'This Device is muted'}), 401
+        else:
+            continue
+
+    for user in session.skipList:
+        if user == request.headers.get('deviceId'):
+            check = 1
+        else:
+            continue
+
+    if check == 0:
+        session.skipList.append(request.headers.get('deviceId'))
+
+    for user in session.skipList:
+        print(user)
+
     session.skip()
     return jsonify(
-        {'currentSong': session.currentSong}
+        {'currentSong': session.queue[0]}
     )
 
 @app.route('/session/currentSong/pause', methods = ["PUT"])
@@ -325,7 +342,6 @@ def deleteSongFromQueue():
 
 @app.route('/session/queue/play', methods = ['POST'])
 #@checkForUser
-@checkJsonValid
 def playQueue():
     session.playQueue()
     return jsonify(
@@ -353,6 +369,7 @@ def uploadSong():
 #@checkForUser
 def getSongs():
     songs = session.getSongs()
+    print(songs)
     return jsonify(
         songs
     )

@@ -9,11 +9,15 @@ class Session:
     def __init__(self,sessionPin):
         self.sessionPin = sessionPin
         self.usersAll = []
-        self.muted = [1]
+        self.muted = []
         self.users = []
         self.queue = []
+        self.skipList = []
+        self.skipPercentage = 0.5
         self.currentSong = 1
         self.nextInsertPos = 0
+        self.lastSongPos = 0
+        self.queueStarted = False
         self.currentPlaylist = ''
         self.volume = 100
         self.mopidy = MopidyConnection.MopidyConnection()
@@ -27,6 +31,7 @@ class Session:
         self.users.append(user)
 
     def returnUsers(self):
+        
         users = self.db.getUsers()
         self.usersAll = []
         for user in users:
@@ -35,30 +40,10 @@ class Session:
                 'banned': user[2]
             })
         return self.usersAll
-
-    def getSongs(self):
-        songs = self.db.getSongs()
-        songsAll = []
-        for song in songs:
-            responseDic = self.buildSong(song,)
-            songsAll.append(responseDic)
-        return songsAll
-
-    def getSpecSong(self,id):
-        so = self.db.getSpecSong(id)
-        for song in so:
-            s = Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
-        return s
-
-    def getCurrentSong(self):
-        so = self.db.getSpecSong(self.currentSong)
-        for song in so:
-            s = Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
-        return s
     
     def getBanned(self, deviceId):
-        banned = self.db.getBanned(deviceId)
-        return banned.fetchall()[0][0]
+        return self.db.getBanned(deviceId)
+        
 
     def banUser(self, deviceId):
         self.db.banUser(deviceId)
@@ -94,8 +79,10 @@ class Session:
         self.mopidy.replay()
 
     def skip(self):
-        self.mopidy.skip()
-        self.currentSong += 1
+        print()
+        if (float(len(self.skipList))/float(len(self.users))) >= self.skipPercentage:
+            self.mopidy.skip()
+            self.skipList = []
 
     def pause(self):
         self.mopidy.pause_resume()
@@ -116,21 +103,30 @@ class Session:
 
     #################### QUEUE ####################
 
-    def returnQueue (self): 
+    def returnQueue (self):
         status = self.mopidy.status()
-        queue = []
+        print(self.queueStarted)
         if 'song' in status:
+            print(status['song'])
             mopidySongPos = int(status['song'])
+            songsToDelete = mopidySongPos - self.lastSongPos
+            print("lastSongPos: " + str(self.lastSongPos))
+            print("mopidySongPos: " + str(mopidySongPos))
             counter = 0
-            for songID in self.queue:
-                if counter >= mopidySongPos:
-                    song = self.db.getSong(songID)
-                    queue.append(song)
+            while counter < songsToDelete:
+                self.queue.pop(0)
+                print('song removed from queue')
                 counter += 1
-        else:
-            for songID in self.queue:
-                song = self.db.getSong(songID)
-                queue.append(song)
+            self.lastSongPos = mopidySongPos
+        elif self.queueStarted:
+            print(">else if from queue")
+            self.queue.clear()
+            self.queueStarted = False
+            self.mopidy.clearQueue()
+        queue = []
+        for songID in self.queue:
+            song = self.db.getSong(songID)
+            queue.append(song)
         return queue
 
     def songToQueue(self, songIDs):
@@ -142,11 +138,7 @@ class Session:
 
     def playQueue(self):
         self.mopidy.play()
-
-    def updateQueue(self):
-        status = self.mopidy.status()
-        if 'song' in status:
-            mopidySongPos = status['song']
+        self.queueStarted = True
             
     
     #################### PLAYLIST ####################
@@ -167,7 +159,9 @@ class Session:
                 self.mopidy.songToPlaylist(playlistName, songURI)
 
     def deleteSongFromPlaylist(self, songID, playlistID):
-        self.db.deleteSongFromPlaylist(songID, playlistID)
+        songPos = self.db.deleteSongFromPlaylist(songID, playlistID)
+        playlistName = self.db.getPlaylistName(playlistID)
+        self.mopidy.deleteSongFromPlaylist(playlistName, songPos)
 
     def playPlaylist(self, playlistID):
         playlistName = self.db.getPlaylistName(playlistID)
@@ -177,6 +171,7 @@ class Session:
         playlistSongs = self.db.getSongsFromPlaylist(playlistID)
         for song in playlistSongs:
             self.queue.append(song['songID'])
+        self.queueStarted = True
 
     def getPlaylists(self):
         return self.db.getPlaylists()

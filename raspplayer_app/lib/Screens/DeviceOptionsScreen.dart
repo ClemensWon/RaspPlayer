@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
+import 'package:raspplayer_app/Services/RestService.dart';
 
 class DeviceOptionsScreen extends StatefulWidget {
 @override
@@ -10,9 +11,11 @@ State<StatefulWidget> createState() => DeviceOptionsScreenState();
 
 class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
 
+  //variables which represents the values on the server
   double _serverVolume;
   String _serverPin;
 
+  //variables which represents the values on the app
   String _pin;
   bool _allowMuting = true;
   bool _allowUpload = false;
@@ -20,6 +23,9 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
   double _skipPercentage = 20;
   double _mutingPercentage = 50;
   double _volumePercentage = 50;
+
+  RestService _restService = new RestService();
+
 
   @override
   void initState() {
@@ -59,10 +65,14 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                   ),
                   SizedBox.fromSize(
                     size: Size(75,30),
+                    //input field for the pin
                     child: TextFormField(
                       initialValue: _pin,
+                      onFieldSubmitted: (newValue) {
+                        _pin = newValue;
+                      },
                       textAlign: TextAlign.center,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.text,
                       decoration: InputDecoration(
                         focusColor: Color.fromRGBO(0, 1, 49, 1),
                         border: OutlineInputBorder(
@@ -88,12 +98,13 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                 ),
                 alignment: Alignment.centerLeft,
               ),
+              //slider to change the volume
               Slider(
                 min: 0,
                 max: 100,
                 divisions: 20,
-                label: _volumePercentage.round().toString() + "%",
-                value: _volumePercentage,
+                label: _volumePercentage.toString() + "%",
+                value: _volumePercentage.toDouble(),
                 onChanged: (double value) {
                   setState(() {
                     _volumePercentage = value;
@@ -114,6 +125,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                     ),
                   ),
                   SizedBox(width: 20,),
+                  //switch for giving users the right to upload songs
                   Switch(value: _allowUpload, onChanged: (bool value) {
                     setState(() {
                       _allowUpload = value;
@@ -135,6 +147,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                     ),
                   ),
                   SizedBox(width: 20,),
+                  //switch for activating the option to limit songs
                   Switch(value: _limitAdding, onChanged: (bool value) {
                     setState(() {
                       _limitAdding = value;
@@ -142,6 +155,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                   }),
                 ],
               ),
+              //is only shown when user can only upload a limited amount of songs
               if (_limitAdding) Row(
                 children: [
                   Text(
@@ -173,12 +187,13 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                 ),
                 alignment: Alignment.centerLeft,
               ),
+              //regulating skip percentage
               Slider(
                 min: 0,
                 max: 100,
                 divisions: 20,
                 label: _skipPercentage.round().toString() + "%",
-                value: _skipPercentage,
+                value: _skipPercentage.toDouble(),
                 onChanged: (double value) {
                   setState(() {
                     _skipPercentage = value;
@@ -222,7 +237,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                 alignment: Alignment.centerLeft,
               ),
               if (_allowMuting) Slider(
-                  value: _mutingPercentage,
+                  value: _mutingPercentage.toDouble(),
                   min:0,
                   max:100,
                   divisions: 20,
@@ -259,23 +274,34 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
         child: Icon(
           Icons.save
         ),
+        //if settings changed, send request to the server
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Saved to Server'),
-              action: SnackBarAction(
-                label: 'Ok',
-                onPressed: () {
-                  if (_pin != _serverPin) {
+          if (_pin != _serverPin) {
+            _restService.setSessionPin(_pin).then((newPin) {
+              if (newPin != "") {
+                _serverPin = newPin;
+              }
+            });
+          }
+          if (_volumePercentage != _serverVolume) {
+            _restService.setVolume(_volumePercentage.floor()).then((newVolume) {
 
-                  }
-                  if (_volumePercentage != _serverVolume) {
+              if (newVolume != -1) {
+                _serverVolume = newVolume.toDouble();
+                /*ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Saved to Server'),
+                    action: SnackBarAction(
+                      label: 'Ok',
+                      onPressed: () {
+                      },
+                    ),
+                  ),
+                );*/
+              }
+            });
+          }
 
-                  }
-                },
-              ),
-            ),
-          );
         },
       ),
     );

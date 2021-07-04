@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:raspplayer_app/Components/CreatePlaylistDialog.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Components/PlayListItem.dart';
+import 'package:raspplayer_app/Services/RestService.dart';
 
 class PlaylistsScreen extends StatefulWidget {
   @override
@@ -9,26 +11,7 @@ class PlaylistsScreen extends StatefulWidget {
 }
 
 class PlaylistsScreenState extends State<PlaylistsScreen> {
-  final List<PlayListItem> playlistList = <PlayListItem>[
-    PlayListItem(
-      id: 1,
-      playlistTitle: 'Awesome Mix',
-      username: 'Michi',
-      totalSongs: 30,
-    ),
-    PlayListItem(
-      id: 2,
-      playlistTitle: 'Ur geile Oldies',
-      username: 'Clemens',
-      totalSongs: 69,
-    ),
-    PlayListItem(
-      id: 3,
-      playlistTitle: 'AustroPop, gemma!',
-      username: 'Martin',
-      totalSongs: 44,
-    ),
-  ];
+  List<PlayListItem> playlistList = <PlayListItem>[];
 
   Widget playListItemTemplate(playlist) {
     return Card(
@@ -45,6 +28,13 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
     );
   }
 
+  //loadPlaylists() gets called once for each state object
+  @override
+  void initState() {
+    super.initState();
+    loadPlaylists();
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -56,10 +46,44 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
       body: Container(
           width: double.infinity,
           margin: EdgeInsets.all(10),
-          child: ListView(
-            children: playlistList,
-          ),
-      )
+          //on refresh, reload playlists
+          child: RefreshIndicator(
+            onRefresh: () async{
+              loadPlaylists();
+            },
+            //Display playlists as List and each playlist as PlayListItem
+            child: ListView(
+              children: playlistList,
+            ),
+          )
+      ),
+      floatingActionButton: IconButton(icon: Icon(Icons.add_circle),
+        //if executed, show popup to create a new playlist, then load playlists
+        onPressed: () {
+          showDialog(context: context, builder: (build) {
+            return CreatePlayListDialog();
+          }).then((value) {
+            loadPlaylists();
+          });
+        },
+        iconSize: 48,
+        color: Colors.blue,
+      ),
     );
+  }
+
+  //get all playlists from database and save them in 'playlistList'
+  void loadPlaylists() {
+    RestService restService = new RestService();
+    final List<PlayListItem> tmp = <PlayListItem>[];
+    restService.getPlaylists().then((result) {
+      setState((){
+        result.forEach((element) {
+          tmp.add(new PlayListItem.fromPlaylist(element, loadPlaylists));
+        });
+        playlistList = tmp;
+      });
+
+    });
   }
 }

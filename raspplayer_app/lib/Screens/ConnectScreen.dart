@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Services/DeviceInfoService.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
+import 'package:raspplayer_app/Services/UserData.dart';
 
 class ConnectScreen extends StatefulWidget {
   @override
@@ -25,6 +26,7 @@ class ConnectScreenState extends State<ConnectScreen> {
       floatingActionButton: Container(
         width: 40,
         child: FloatingActionButton(
+          //if executed, switch to the 'AboutScreen'
           onPressed: () {
             Navigator.pushReplacementNamed(context, 'About');
             },
@@ -40,11 +42,18 @@ class ConnectScreenState extends State<ConnectScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                'RaspPlayer',
-                style: TextStyle(fontSize: 28),
-                textAlign: TextAlign.center,
-
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0,0,0,30),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image(
+                      image: AssetImage('assets/img/logo_withText.png'),
+                      width: 200,
+                      alignment: Alignment.center,
+                    ),
+                  ],
+                ),
               ),
               Text(
                 'Type in a Nickname and the password to connect with the RaspPlayer!',
@@ -54,17 +63,36 @@ class ConnectScreenState extends State<ConnectScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
                 child: Text(
+                  'IP-Address',
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              //input field for nickname
+              TextField(
+                onChanged: (ipaddress) {
+                  UserData.ipaddress = ipaddress;
+                },
+                decoration: InputDecoration(
+                  hintText: 'Enter your Nickname',
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
+                child: Text(
                   'Nickname',
                   style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
               ),
+              //input field for nickname
               TextField(
                 controller: _nickname,
                 decoration: InputDecoration(
                   hintText: 'Enter your Nickname',
                 ),
               ),
+              //create input field for specific user role
               if (dropdownValue == 'User') Padding(
                 padding: const EdgeInsets.fromLTRB(0, 30, 0, 0),
                 child: Text(
@@ -101,6 +129,8 @@ class ConnectScreenState extends State<ConnectScreen> {
                   textAlign: TextAlign.center,
                 ),
               ),
+
+              //dropdown menu for selecting user role
               Container(
                 child: DropdownButton<String>(
                   value: dropdownValue,
@@ -145,11 +175,8 @@ class ConnectScreenState extends State<ConnectScreen> {
     );
   }
 
+  //gets deviceID and sends request to backend
   OnConnect() {
-    stderr.writeln({
-      'username': _nickname.text,
-      'sessionPin': _sessionPin.text
-    });
     DeviceInfoService deviceInfoService = new DeviceInfoService();
     RestService restService = new RestService();
     deviceInfoService.getDeviceId().then((deviceId) {
@@ -173,7 +200,7 @@ class ConnectScreenState extends State<ConnectScreen> {
           }
         });
       } else {
-        restService.masterLogin(_nickname.text, _masterPassword.text).then((recievedToken) {
+        restService.masterLogin(_nickname.text, _masterPassword.text, deviceId).then((recievedToken) {
           if (recievedToken) {
             Navigator.pushReplacementNamed(context, 'Main');
           }
