@@ -9,9 +9,7 @@ class Playlist {
   factory Playlist.fromJson(final json) {
     return Playlist(playlistName: json['playlistName'] as String,
         username: json['creator'] as String,
-        //username: "Alex",
         id: json['playlistID'] as int,
-        //songCount: json['songCount'] as int,
         songCount: json['numberOfSongs'] as int,
     );
   }

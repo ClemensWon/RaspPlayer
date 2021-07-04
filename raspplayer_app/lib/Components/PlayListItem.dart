@@ -2,18 +2,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 import 'package:raspplayer_app/model/Playlist.dart';
-import 'package:raspplayer_app/Components/SongListItem.dart';
-import 'package:raspplayer_app/model/Song.dart';
 
 class PlayListItem extends StatelessWidget {
+  //id of the playlist
   final int id;
+  //title of the playlist
   final String playlistTitle;
+  //username of the user who created the playlist
   final String username;
+  //the count of songs in the playlist
   final int totalSongs;
+
   final onReturn;
 
+  //constructor
   PlayListItem({this.id, this.playlistTitle = 'Playlist', this.username = 'User', this.totalSongs, this.onReturn});
 
+  //creates PlayListItem out of playlist object
   factory PlayListItem.fromPlaylist(Playlist playList, final onReturn) {
     return PlayListItem(id: playList.id, playlistTitle:  playList.playlistName, username: playList.username, totalSongs: playList.songCount, onReturn: onReturn,);
   }
@@ -42,9 +47,11 @@ class PlayListItem extends StatelessWidget {
                 children: <Widget>[
                   TextButton(
                       onPressed: () {
+                        //switches to the playlist screen
                         RestService restService = new RestService();
                         restService.getSongsFromPlaylist(id).then((result) {
                           Navigator.pushNamed(context, 'Playlist', arguments: {'playlist': result, 'isQueue': false, 'playlistID': id}).then((value){
+                            //calls refresh methods
                             onReturn();
                           });
                         });
@@ -53,6 +60,7 @@ class PlayListItem extends StatelessWidget {
                   ),
                   TextButton(
                       onPressed: () {
+                        //switches to the main screen and plays the playlist
                         RestService restService = new RestService();
                         restService.playPlaylist(id).then((success) {
                           if (success) {

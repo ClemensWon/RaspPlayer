@@ -37,7 +37,7 @@ class PlaylistScreenState extends State<PlaylistScreen> {
             onPressed: () {
                 RestService restService = new RestService();
                 if (arguments['isQueue']) {
-                  restService.deleteSongFromQueue(song.id).then((result) {
+                  /*restService.deleteSongFromQueue(song.id).then((result) {
                     setState(() {
                       if (result) {
                         sourceList.removeWhere((element) {
@@ -51,7 +51,7 @@ class PlaylistScreenState extends State<PlaylistScreen> {
                       }
                     });
 
-                  });
+                  });*/
                 } else {
                   restService.deleteSongFromPlaylist(song.id, arguments['playlistID']).then((result) {
                     setState(() {

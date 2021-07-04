@@ -4,10 +4,6 @@ import 'package:raspplayer_app/Services/UserData.dart';
 
 class NavigationDrawer extends StatelessWidget {
 
-  test() {
-
-  }
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -33,6 +29,7 @@ class NavigationDrawer extends StatelessWidget {
                 ),
               ),
             ),
+            //switches to the main screen
             ListTile(
               leading: Icon(Icons.music_note),
               title: Text('Now Playing'),
@@ -40,6 +37,7 @@ class NavigationDrawer extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, 'Main');
               },
             ),
+            //switches to the library screen
             ListTile(
               leading: Icon(Icons.book),
               title: Text('Library'),
@@ -47,6 +45,7 @@ class NavigationDrawer extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, 'Library');
               },
             ),
+            //switches to the playlist screen
             ListTile(
               leading: Icon(Icons.playlist_play),
               title: Text('Playlists'),
@@ -54,6 +53,7 @@ class NavigationDrawer extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, 'Playlists');
               },
             ),
+            //switches to the user list screen
             ListTile(
               leading: Icon(Icons.supervised_user_circle_rounded),
               title: Text('User List'),
@@ -61,6 +61,7 @@ class NavigationDrawer extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, 'UserList');
               },
             ),
+            //switches to the statistic screen
             ListTile(
               leading: Icon(Icons.insert_chart),
               title: Text('Statistics'),
@@ -68,6 +69,7 @@ class NavigationDrawer extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, 'Statistics');
               },
             ),
+            //switches to the device option screen, only for box owner visible
             if (UserData.role == 'Owner')ListTile(
               leading: Icon(Icons.settings),
               title: Text('Device Options'),
@@ -75,15 +77,18 @@ class NavigationDrawer extends StatelessWidget {
                 Navigator.pushReplacementNamed(context, 'DeviceOptions');
               },
             ),
+            //deletes username, role and token then switches to the connect screen
             ListTile(
               leading: Icon(Icons.cancel_presentation),
               title: Text('Disconnect'),
               onTap: () {
                 UserData.role = '';
                 UserData.nickname = '';
+                UserData.token = '';
                 Navigator.pushReplacementNamed(context, 'Connect');
               },
             ),
+            //switches to the help screen
             ListTile(
               leading: Icon(Icons.help),
               title: Text('Help'),
