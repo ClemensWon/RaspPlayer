@@ -175,6 +175,7 @@ class ConnectScreenState extends State<ConnectScreen> {
     );
   }
 
+  //gets deviceID and sends request to backend
   OnConnect() {
     DeviceInfoService deviceInfoService = new DeviceInfoService();
     RestService restService = new RestService();

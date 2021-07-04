@@ -1,4 +1,6 @@
 
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
@@ -90,7 +92,7 @@ class HelpScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                'A user can try to skip a song by pushing the “skip” icon in the main screen. The song will only be skipped if a certain percentage of the users want to skip the song. This percentage can be configured by the owner in the device setting screen.',
+                'You can skip a song by clicking the “skip” icon in the main screen. The song will only be skipped if a certain percentage of users want to skip the song. This percentage can be configured by the session owner in the device setting screen.',
                 textAlign: TextAlign.justify,
               ),
               Text(
@@ -100,7 +102,7 @@ class HelpScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                'The play again feature works similar to the skip function. A user can request an enquor by tapping the play again button. If enough users request the repeat, the same song will be played twice in a row.',
+                'The play again feature works similar to the skip function. You can request an enquor by tapping the play again button. If enough users request the repeat, the same song will be replayed.',
                 textAlign: TextAlign.justify,
               ),
               Text(
@@ -110,7 +112,7 @@ class HelpScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                'If a user hits the pause button the current song gets paused and the button switches to the play icon. If the button is hit again the song starts playing and the button turns back into a pause icon.',
+                'If you hit the pause button the current song gets paused and the button switches to the play icon. If the button is hit again the song starts playing and the button turns back into a pause icon.',
                 textAlign: TextAlign.justify,
               ),
               Text(
@@ -120,7 +122,7 @@ class HelpScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                'By pressing the info button a user can view more information about a song. The following information is displayed: song title, interpret, album, user which added the song, the duration of the song, genres, the amount of likes a song received and the amount of skip votes the song received',
+                'By pressing the info button you can view more information about a song. The following information is displayed: song title, interpret, album, user which added the song, the duration of the song, genres, the amount of likes a song received and the amount of skip votes the song received.',
                 textAlign: TextAlign.justify,
               ),
               Text(
@@ -213,6 +215,11 @@ class HelpScreen extends StatelessWidget {
                 'The Statistic Screen shows different information about users and songs, for example “the most liked song”.',
                 textAlign: TextAlign.justify,
               ),
+              Text(
+                'This feature is currently not fully functional',
+                textAlign: TextAlign.justify,
+                style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic)
+              ),
               Divider(
                 thickness: 2,
                 height: 50,
@@ -284,6 +291,11 @@ class HelpScreen extends StatelessWidget {
                 textAlign: TextAlign.justify,
               ),
               Text(
+                  'This feature is currently not fully functional',
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic)
+              ),
+              Text(
                 'Limit Adding of Songs',
                 style: TextStyle(
                     fontWeight: FontWeight.bold
@@ -292,6 +304,11 @@ class HelpScreen extends StatelessWidget {
               Text(
                 'If activated, a value can be set to limit the songs a user can add to the current playlist. ',
                 textAlign: TextAlign.justify,
+              ),
+              Text(
+                  'This feature is currently not fully functional',
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic)
               ),
               Text(
                 'Skip Percentage',
@@ -304,6 +321,11 @@ class HelpScreen extends StatelessWidget {
                 textAlign: TextAlign.justify,
               ),
               Text(
+                  'This feature is currently not fully functional',
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic)
+              ),
+              Text(
                 'Allow Mute',
                 style: TextStyle(
                     fontWeight: FontWeight.bold
@@ -312,6 +334,11 @@ class HelpScreen extends StatelessWidget {
               Text(
                 'This parameter decides if users are allowed to vote for the muting of other users.',
                 textAlign: TextAlign.justify,
+              ),
+              Text(
+                  'This feature is currently not fully functional',
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic)
               ),
               Text(
                 'Mute Percentage',
@@ -324,6 +351,11 @@ class HelpScreen extends StatelessWidget {
                 textAlign: TextAlign.justify,
               ),
               Text(
+                  'This feature is currently not fully functional',
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic)
+              ),
+              Text(
                 'Mute Duration',
                 style: TextStyle(
                     fontWeight: FontWeight.bold
@@ -332,6 +364,11 @@ class HelpScreen extends StatelessWidget {
               Text(
                 'The mute duration describes the time a user is muted after a mute vote was successful. The timespan is measured in minutes.',
                 textAlign: TextAlign.justify,
+              ),
+              Text(
+                  'This feature is currently not fully functional',
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(color: Colors.red, fontStyle: FontStyle.italic)
               ),
               Divider(
                 thickness: 2,

@@ -125,6 +125,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                     ),
                   ),
                   SizedBox(width: 20,),
+                  //switch for giving users the right to upload songs
                   Switch(value: _allowUpload, onChanged: (bool value) {
                     setState(() {
                       _allowUpload = value;
@@ -146,6 +147,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                     ),
                   ),
                   SizedBox(width: 20,),
+                  //switch for activating the option to limit songs
                   Switch(value: _limitAdding, onChanged: (bool value) {
                     setState(() {
                       _limitAdding = value;
@@ -185,6 +187,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                 ),
                 alignment: Alignment.centerLeft,
               ),
+              //regulating skip percentage
               Slider(
                 min: 0,
                 max: 100,

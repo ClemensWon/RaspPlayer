@@ -36,7 +36,7 @@ class PlaylistScreenState extends State<PlaylistScreen> {
             icon: Icon(Icons.cancel),
             onPressed: () {
                 RestService restService = new RestService();
-                //delete song from queue
+                //delete song from queue (not implemented)
                 if (arguments['isQueue']) {
                   /*restService.deleteSongFromQueue(song.id).then((result) {
                     setState(() {
@@ -53,7 +53,9 @@ class PlaylistScreenState extends State<PlaylistScreen> {
                     });
 
                   });*/
-                } else {
+                }
+                //delete songs from playlist
+                else {
                   restService.deleteSongFromPlaylist(song.id, arguments['playlistID']).then((result) {
                     setState(() {
                       if (result) {
@@ -84,17 +86,6 @@ class PlaylistScreenState extends State<PlaylistScreen> {
           width: double.infinity,
           margin: EdgeInsets.all(10),
           child: ListView(
-            /*
-            onReorder: (int oldIndex, int newIndex) {
-              setState(() {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
-                final SongListItem item = songList.removeAt(oldIndex);
-                songList.insert(newIndex, item);
-              });
-            },
-            */
             children: displayList,
           )),
       floatingActionButton: ElevatedButton(
