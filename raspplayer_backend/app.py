@@ -203,6 +203,7 @@ def likeSong():
         {'message': 'song Liked'}
     )
 
+'''
 @app.route('/session/currentSong/get', methods = ["GET"])
 @checkForUser
 def getCurrentSong():
@@ -210,7 +211,7 @@ def getCurrentSong():
     return jsonify(
         song
     )
-
+'''
 @app.route('/session/setCurrentSong/<songId>', methods = ["PUT"])
 @checkForAdmin
 @checkJsonValid
@@ -361,6 +362,7 @@ def uploadSong():
 #@checkForUser
 def getSongs():
     songs = session.getSongs()
+    print(songs)
     return jsonify(
         songs
     )

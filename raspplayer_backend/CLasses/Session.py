@@ -40,30 +40,10 @@ class Session:
                 'banned': user[2]
             })
         return self.usersAll
-
-    def getSongs(self):
-        songs = self.db.getSongs()
-        songsAll = []
-        for song in songs:
-            responseDic = self.buildSong(song,)
-            songsAll.append(responseDic)
-        return songsAll
-
-    def getSpecSong(self,id):
-        so = self.db.getSpecSong(id)
-        for song in so:
-            s = Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
-        return s
-
-    def getCurrentSong(self):
-        so = self.db.getSpecSong(self.currentSong)
-        for song in so:
-            s = Song.Song(song[0], song[1], song[2], song[3], song[4], song[5], song[6], song[7], song[8]).__dict__
-        return s
     
     def getBanned(self, deviceId):
-        banned = self.db.getBanned(deviceId)
-        return banned.fetchall()[0][0]
+        return self.db.getBanned(deviceId)
+        
 
     def banUser(self, deviceId):
         self.db.banUser(deviceId)
@@ -125,7 +105,9 @@ class Session:
 
     def returnQueue (self):
         status = self.mopidy.status()
+        print(self.queueStarted)
         if 'song' in status:
+            print(status['song'])
             mopidySongPos = int(status['song'])
             songsToDelete = mopidySongPos - self.lastSongPos
             print("lastSongPos: " + str(self.lastSongPos))
@@ -137,6 +119,7 @@ class Session:
                 counter += 1
             self.lastSongPos = mopidySongPos
         elif self.queueStarted:
+            print(">else if from queue")
             self.queue.clear()
             self.queueStarted = False
             self.mopidy.clearQueue()
@@ -176,7 +159,9 @@ class Session:
                 self.mopidy.songToPlaylist(playlistName, songURI)
 
     def deleteSongFromPlaylist(self, songID, playlistID):
-        self.db.deleteSongFromPlaylist(songID, playlistID)
+        songPos = self.db.deleteSongFromPlaylist(songID, playlistID)
+        playlistName = self.db.getPlaylistName(playlistID)
+        self.mopidy.deleteSongFromPlaylist(playlistName, songPos)
 
     def playPlaylist(self, playlistID):
         playlistName = self.db.getPlaylistName(playlistID)
