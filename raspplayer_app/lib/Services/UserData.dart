@@ -3,4 +3,5 @@ class UserData {
   static String token;
   static String deviceID;
   static String role;
+  static String ipaddress;
 }

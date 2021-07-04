@@ -16,6 +16,7 @@ class UserListScreenState extends State<UserListScreen> {
   final bool _allowMute = true;
   List<UserListItem> userListItem = [];
 
+  //loadUser() gets called once for each state object
   @override
   void initState() {
     super.initState();
@@ -33,10 +34,12 @@ class UserListScreenState extends State<UserListScreen> {
       body: Container(
         width: double.infinity,
         margin: EdgeInsets.all(10),
+        //on refresh, reload Users
         child: RefreshIndicator(
           onRefresh: () async{
             loadUser();
           },
+          //display userListItem as ListView
           child: ListView(
             children: userListItem,
           ),
@@ -45,6 +48,7 @@ class UserListScreenState extends State<UserListScreen> {
       floatingActionButton: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            //show "Mute all" button if a User is logged in as 'Owner'
             if (_adminView) ElevatedButton(
               child: SizedBox(
                   width: 70,
@@ -54,6 +58,7 @@ class UserListScreenState extends State<UserListScreen> {
                     maxLines: 1,
                   )
               ),
+              //if executed, sets 'isMuted' for all Users on 'true'
               onPressed: () {
                 RestService rs = new RestService();
                 rs.muteAll().then((success) {
@@ -69,6 +74,7 @@ class UserListScreenState extends State<UserListScreen> {
                 });
               },
             ),
+            //show "Kick all" button if a User is logged in as 'Owner'
             if (_adminView) ElevatedButton(
               child: SizedBox(
                   width: 70,
@@ -78,11 +84,11 @@ class UserListScreenState extends State<UserListScreen> {
                     maxLines: 1,
                   )
               ),
+              //if executed, sets 'isBanned' for all Users on 'true'
               onPressed: () {
                 RestService rs = new RestService();
                 rs.kickAll().then((success) {
                   if(success) {
-                    stderr.writeln('test');
                     setState(() {
                       List<UserListItem> tmp = [];
                       userListItem.forEach((element) {
@@ -100,6 +106,7 @@ class UserListScreenState extends State<UserListScreen> {
     );
   }
 
+  //get all connected Users from Database and save them in userListItem
   void loadUser() {
     userListItem = [];
     RestService rs = new RestService();

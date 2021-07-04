@@ -10,7 +10,12 @@ import 'package:raspplayer_app/model/Song.dart';
 
 
 class RestService {
-  final String hostname = "http://192.168.0.101:5000";
+
+  RestService() {
+    hostname = "http://" + UserData.ipaddress + ":5000";
+  }
+
+  String hostname;
 
   //Test functionality
   void testFetch() async{

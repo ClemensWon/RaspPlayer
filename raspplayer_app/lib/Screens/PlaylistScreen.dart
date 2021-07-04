@@ -36,6 +36,7 @@ class PlaylistScreenState extends State<PlaylistScreen> {
             icon: Icon(Icons.cancel),
             onPressed: () {
                 RestService restService = new RestService();
+                //delete song from queue
                 if (arguments['isQueue']) {
                   restService.deleteSongFromQueue(song.id).then((result) {
                     setState(() {
@@ -52,23 +53,19 @@ class PlaylistScreenState extends State<PlaylistScreen> {
                     });
 
                   });
-                } else {
+                }
+                //delete song from playlist
+                else {
                   restService.deleteSongFromPlaylist(song.id, arguments['playlistID']).then((result) {
                     setState(() {
                       if (result) {
                         sourceList.removeWhere((element) {
-                          stderr.write("SourceList ");
-                          stderr.writeln(element.id == song.id);
                           return element.id == song.id;
                         });
                         songList.removeWhere((element) {
-                          stderr.write(element);
-                          stderr.write(song.id.toString());
-                          stderr.writeln(element.key == Key(song.id.toString()));
                           return element.key == Key(song.id.toString());
                         });
                         displayList = songList;
-                        stderr.write(displayList);
                       }
                     });
 
@@ -109,6 +106,7 @@ class PlaylistScreenState extends State<PlaylistScreen> {
               "Hide",
               textAlign: TextAlign.center,
             )),
+        //close PlaylistScreen
         onPressed: () {
           Navigator.pop(context);
         },

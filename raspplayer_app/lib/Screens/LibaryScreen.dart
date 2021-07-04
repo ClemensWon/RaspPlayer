@@ -17,25 +17,23 @@ class LibraryScreen extends StatefulWidget {
 class LibraryScreenSate extends State<LibraryScreen> {
   final FilePickerService filePickerService = new FilePickerService();
   List<SongListItem> songList = [];
-  final List<StatelessWidget> addToList = [];
+  List<StatelessWidget> addToList = [];
   List<SongListItem> displayList = [];
   final RestService restService = new RestService();
   bool showFab = true;
   Map checked = {};
 
+  //load Songs() and loadBottomSheetOptions() gets called once for each state object
   @override
   void initState() {
     super.initState();
     loadSongs();
     loadBottomSheetOptions();
-
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    MainScreenProvider mainScreenProvider =
-        Provider.of<MainScreenProvider>(context);
     RestService restService = new RestService();
     return Scaffold(
       appBar: AppBar(
@@ -44,13 +42,16 @@ class LibraryScreenSate extends State<LibraryScreen> {
       drawer: NavigationDrawer(),
       body: Container(
         margin: EdgeInsets.all(10),
+          //on refresh, reload songs and bottomSheetOptions
         child: RefreshIndicator(
           onRefresh: () async {
             loadSongs();
             loadBottomSheetOptions();
           },
           child: ReorderableListView(
+            //input field for search function
             header: TextFormField(
+              //check if string matches song title, artist or username
               onChanged: (String searchText) {
                 setState(() {
                   displayList = songList.where((element) {
@@ -76,6 +77,7 @@ class LibraryScreenSate extends State<LibraryScreen> {
                 ),
               ),
             ),
+            //makes it possible to reorder items in the list
             onReorder: (int oldIndex, int newIndex) {
               setState(() {
                 if (oldIndex < newIndex) {
@@ -132,6 +134,7 @@ class LibraryScreenSate extends State<LibraryScreen> {
     );
   }
 
+  //get all songs from Database and save them in displayList
   void loadSongs() {
     songList = [];
     restService.getSongs().then((songs) => {
@@ -159,7 +162,9 @@ class LibraryScreenSate extends State<LibraryScreen> {
     });
   }
 
+  //
   void loadBottomSheetOptions() {
+    addToList = [];
     addToList.add(Card(
         child: ListTile(
           title: Text("Queue"),
@@ -176,6 +181,7 @@ class LibraryScreenSate extends State<LibraryScreen> {
           },
         )
     ));
+    //get playlists from database and add them to list
     restService.getPlaylists().then((playlists) {
       playlists.forEach((element) {
         addToList.add(Card(

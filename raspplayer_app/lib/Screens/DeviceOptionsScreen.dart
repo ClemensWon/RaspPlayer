@@ -11,9 +11,11 @@ State<StatefulWidget> createState() => DeviceOptionsScreenState();
 
 class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
 
+  //variables which represents the values on the server
   double _serverVolume;
   String _serverPin;
 
+  //variables which represents the values on the app
   String _pin;
   bool _allowMuting = true;
   bool _allowUpload = false;
@@ -23,6 +25,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
   double _volumePercentage = 50;
 
   RestService _restService = new RestService();
+
 
   @override
   void initState() {
@@ -62,6 +65,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                   ),
                   SizedBox.fromSize(
                     size: Size(75,30),
+                    //input field for the pin
                     child: TextFormField(
                       initialValue: _pin,
                       onFieldSubmitted: (newValue) {
@@ -94,6 +98,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                 ),
                 alignment: Alignment.centerLeft,
               ),
+              //slider to change the volume
               Slider(
                 min: 0,
                 max: 100,
@@ -148,6 +153,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                   }),
                 ],
               ),
+              //is only shown when user can only upload a limited amount of songs
               if (_limitAdding) Row(
                 children: [
                   Text(
@@ -265,6 +271,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
         child: Icon(
           Icons.save
         ),
+        //if settings changed, send request to the server
         onPressed: () {
           if (_pin != _serverPin) {
             _restService.setSessionPin(_pin).then((newPin) {

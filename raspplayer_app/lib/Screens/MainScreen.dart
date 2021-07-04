@@ -50,10 +50,12 @@ class MainScreenState extends State<MainScreen> {
     );
   }
 
+
   @override
   void initState(){
     super.initState();
     loadQueue();
+    //continuously makes requests to the backend for UI update
     Timer.periodic(new Duration(seconds: 1), (timer) {
       var route = ModalRoute.of(context);
       stderr.writeln(route.settings.name);
@@ -71,6 +73,7 @@ class MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    //responsible for state management
     MainScreenProvider mainScreenProvider = Provider.of<MainScreenProvider>(context);
     return Scaffold(
       appBar: AppBar(

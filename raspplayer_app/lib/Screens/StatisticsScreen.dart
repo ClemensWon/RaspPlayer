@@ -13,13 +13,16 @@ class StatisticsScreenState extends State<StatisticsScreen> {
 
   List<StatisticList> statisticList = [];
 
+  //gets called once for each state object
   @override
   void initState() {
     super.initState();
     RestService rs = new RestService();
+    //get statistic data from database, then initialize the StatisticList with data
     rs.getStatistic().then((result) {
       setState(() {
         statisticList = <StatisticList>[
+          //Displays the user with most likes
           StatisticList(
             statisticName: "Best DJ",
             statisticValue: result["bestDj"]["username"],
@@ -48,6 +51,7 @@ class StatisticsScreenState extends State<StatisticsScreen> {
             ),
           ),
 
+          //Displays the song with most likes
           StatisticList(
             statisticName: 'Best Song',
             statisticValue: result["bestSong"]["songname"],
@@ -76,6 +80,7 @@ class StatisticsScreenState extends State<StatisticsScreen> {
             ),
           ),
 
+          //Displays the artist with most likes
           StatisticList(
             statisticName: 'Favorite Artist',
             statisticValue: result["favArtist"]["artistname"],
@@ -104,6 +109,7 @@ class StatisticsScreenState extends State<StatisticsScreen> {
             ),
           ),
 
+          //Displays the user who added most songs
           StatisticList(
             statisticName: 'Playlist Junkie',
             statisticValue: result["playlistJunkie"]["username"],
@@ -116,6 +122,7 @@ class StatisticsScreenState extends State<StatisticsScreen> {
             ),
           ),
 
+          //Displays the song with the most replay votes
           StatisticList(
             statisticName: 'Most Replays',
             statisticValue: result["mostReplays"]["songname"],
@@ -128,6 +135,7 @@ class StatisticsScreenState extends State<StatisticsScreen> {
             ),
           ),
 
+          //Displays the song with the most skip votes
           StatisticList(
             statisticName: 'Most Skipped',
             statisticValue: result["mostSkipped"]["songname"],
@@ -158,6 +166,7 @@ class StatisticsScreenState extends State<StatisticsScreen> {
       body: Container(
         width: double.infinity,
         margin: EdgeInsets.all(10),
+        //Display the statisticList objects in a ListView
         child: ListView(
           children: statisticList,
         ),

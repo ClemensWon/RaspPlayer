@@ -28,6 +28,7 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
     );
   }
 
+  //loadPlaylists() gets called once for each state object
   @override
   void initState() {
     super.initState();
@@ -45,16 +46,19 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
       body: Container(
           width: double.infinity,
           margin: EdgeInsets.all(10),
+          //on refresh, reload playlists
           child: RefreshIndicator(
             onRefresh: () async{
               loadPlaylists();
             },
+            //Display playlists as List and each playlist as PlayListItem
             child: ListView(
               children: playlistList,
             ),
           )
       ),
       floatingActionButton: IconButton(icon: Icon(Icons.add_circle),
+        //if executed, show popup to create a new playlist, then load playlists
         onPressed: () {
           showDialog(context: context, builder: (build) {
             return CreatePlayListDialog();
@@ -68,6 +72,7 @@ class PlaylistsScreenState extends State<PlaylistsScreen> {
     );
   }
 
+  //get all playlists from database and save them in 'playlistList'
   void loadPlaylists() {
     RestService restService = new RestService();
     final List<PlayListItem> tmp = <PlayListItem>[];
