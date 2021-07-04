@@ -457,4 +457,32 @@ class RestService {
     return null;
   }
 
+  //gets the current volume
+  Future<int> getVolume() async {
+    final response = await http.get(
+        Uri.parse(hostname + '/volume'),
+        headers: {
+          'Accept': 'application/json',
+          'token': UserData.token
+        });
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['Volume'] as int;
+    }
+    return -1;
+  }
+
+  //gets the current volume session pin
+  Future<String> getSessionPin() async{
+    final response = await http.get( Uri.parse(hostname + '/sessionPin'),
+        headers: {
+          'Accept': 'application/json',
+          'token': UserData.token
+        });
+    stderr.writeln(response.body);
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['sessionPin'] as String;
+    }
+    return null;
+  }
+
 }

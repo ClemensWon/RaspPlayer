@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
@@ -11,18 +13,20 @@ State<StatefulWidget> createState() => DeviceOptionsScreenState();
 
 class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
 
+  TextEditingController _pinController;
+
   //variables which represents the values on the server
   double _serverVolume;
   String _serverPin;
 
   //variables which represents the values on the app
-  String _pin;
+  String _pin ="";
   bool _allowMuting = true;
   bool _allowUpload = false;
   bool _limitAdding = false;
   double _skipPercentage = 20;
   double _mutingPercentage = 50;
-  double _volumePercentage = 50;
+  double _volumePercentage = 100;
 
   RestService _restService = new RestService();
 
@@ -31,11 +35,7 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _serverPin = "4000";
-    _serverVolume = 50;
-
-    _pin = _serverPin;
-    _volumePercentage = _serverVolume;
+    loadSetting();
   }
 
   @override
@@ -64,9 +64,11 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
                     ),
                   ),
                   SizedBox.fromSize(
-                    size: Size(75,30),
+                    size: Size(100,30),
                     //input field for the pin
                     child: TextFormField(
+                      key: Key(_pin),
+                      controller: _pinController,
                       initialValue: _pin,
                       onFieldSubmitted: (newValue) {
                         _pin = newValue;
@@ -298,9 +300,29 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
               }
             });
           }
-
         },
       ),
     );
+  }
+
+  void loadSetting() {
+    _restService.getVolume().then((value) {
+      if (value != -1) {
+        setState(() {
+          _serverVolume = value.toDouble();
+          _volumePercentage = _serverVolume;
+        });
+      }
+    });
+    _restService.getSessionPin().then((value) {
+      if (value != null) {
+        setState(() {
+          _serverPin = value;
+          _pin = _serverPin;
+          _pinController.text = _pin;
+          stderr.writeln(_pin);
+        });
+      }
+    });
   }
 }

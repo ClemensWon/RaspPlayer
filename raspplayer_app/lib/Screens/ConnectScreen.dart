@@ -74,7 +74,7 @@ class ConnectScreenState extends State<ConnectScreen> {
                   UserData.ipaddress = ipaddress;
                 },
                 decoration: InputDecoration(
-                  hintText: 'Enter your Nickname',
+                  hintText: 'Enter the IP Address',
                 ),
               ),
               Padding(
