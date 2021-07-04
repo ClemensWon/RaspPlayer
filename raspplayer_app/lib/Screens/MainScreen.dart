@@ -19,7 +19,6 @@ class MainScreen extends StatefulWidget {
 
 class MainScreenState extends State<MainScreen> {
 
-
   final bool admin = true;
   final bool emptyQueue = true;
   final String currentSong = 'current Song';
@@ -50,7 +49,6 @@ class MainScreenState extends State<MainScreen> {
         )
     );
   }
-
 
   @override
   void initState(){
@@ -141,13 +139,14 @@ class MainScreenState extends State<MainScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                //for adding a song, switch to the LibraryScreen
                 IconButton(
                   onPressed: () {
                     Navigator.pushReplacementNamed(context, 'Library');
                   },
                   icon: Image.asset('assets/img/icon_Plus.png', color: Colors.black54),
-
                 ),
+                //increase the likes of the song
                 IconButton(
                   onPressed: () {
                     _restService.likeCurrentSong().then((success) {
@@ -162,6 +161,7 @@ class MainScreenState extends State<MainScreen> {
                   },
                   icon: Image.asset('assets/img/icon_Like.png', color: (mainScreenProvider.getIsLikedSong())? Colors.blue : Colors.black54),
                 ),
+                //replays the current song
                 IconButton(
                   onPressed: () {
                     _restService.replayCurrentSong().then((success) {
@@ -176,6 +176,7 @@ class MainScreenState extends State<MainScreen> {
                   },
                   icon: Image.asset('assets/img/icon_Again.png', color: (mainScreenProvider.getIsReplay())? Colors.blue : Colors.black54),
                 ),
+                //displays information about the current song in a popup
                 IconButton(
                   onPressed: () {
                     showDialog(
@@ -227,6 +228,7 @@ class MainScreenState extends State<MainScreen> {
                   },
                   icon: Image.asset('assets/img/icon_Info.png', color: Colors.black54),
                 ),
+                //skip to the next song in the queue
                 IconButton(
                   onPressed: () {
                     _restService.skipCurrentSong().then((success) {
@@ -241,6 +243,7 @@ class MainScreenState extends State<MainScreen> {
                   },
                   icon: Image.asset('assets/img/icon_PlayNext.png', color: (mainScreenProvider.getIsSkipped())? Colors.blue : Colors.black54),
                 ),
+                //pause the current playlist
                 IconButton(
                   onPressed: () {
                     _restService.pauseResumeCurrentSong().then((success) {
@@ -284,6 +287,7 @@ class MainScreenState extends State<MainScreen> {
           ],
         ),
       ),
+      //button which opens the current playlist
       floatingActionButton: Padding(
         padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
         child: ElevatedButton(
@@ -299,6 +303,7 @@ class MainScreenState extends State<MainScreen> {
     );
   }
 
+  //get the song queue from database
   void loadQueue() {
     _restService.getQueue().then((response) {
       if (response != []) {

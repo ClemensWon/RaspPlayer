@@ -106,7 +106,6 @@ class LibraryScreenSate extends State<LibraryScreen> {
                 setState(() {
                   showFab = false;
                 });
-
                 bottomSheetMethod(context);
               },
             ),
@@ -162,7 +161,7 @@ class LibraryScreenSate extends State<LibraryScreen> {
     });
   }
 
-  //
+  //load queue and playlist as option for adding songs
   void loadBottomSheetOptions() {
     addToList = [];
     addToList.add(Card(
@@ -204,6 +203,7 @@ class LibraryScreenSate extends State<LibraryScreen> {
     });
   }
 
+  //displays the lists
   void bottomSheetMethod(BuildContext context) {
     showBottomSheet(
         context: context,
