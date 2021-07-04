@@ -182,6 +182,14 @@ def getSessionPin():
         {'sessionPin': session.sessionPin}
     )
 
+@app.route('/volume', methods = ["GET"])
+@checkForUser
+def getVolume():
+    return jsonify(
+        {'Volume': session.volume}
+    )
+
+
 #SONGS
 
 @app.route('/songs', methods = ["GET"])
