@@ -95,22 +95,27 @@ class Session:
 
     #################### PLAYER CONTROLS ####################
 
+    #restarts the currently playing song
     def replay(self):
         self.mopidy.replay()
 
+    #skips the currently playing song, if a certain percentage of skipvotes is met
     def skip(self):
         print()
         if (float(len(self.skipList))/float(len(self.users))) >= self.skipPercentage:
             self.mopidy.skip()
             self.skipList = []
 
+    #pauses/resumes the currentlx playing song
     def pause(self):
         self.mopidy.pause_resume()
 
+    #mutes the player
     def mute(self):
         self.volume = 0
         self.mopidy.mute()
 
+    #sets the playervolume (range: 0-100)
     def setvolume(self, volume):
         if volume < 0:
             volume = 0
@@ -123,6 +128,7 @@ class Session:
 
     #################### QUEUE ####################
 
+    #returns all the songs from the queue
     def returnQueue (self):
         status = self.mopidy.status()
         if 'song' in status:
@@ -146,6 +152,7 @@ class Session:
             queue.append(song)
         return queue
 
+    #adds one or more songs to the queue
     def songToQueue(self, songIDs):
         for songID in songIDs:
             songURI = self.db.getSongURI(songID)
@@ -153,6 +160,7 @@ class Session:
             self.queue.insert(self.nextInsertPos-1, songID)
             print(self.queue)
 
+    #starts playing the queue from the beginning
     def playQueue(self):
         self.mopidy.play()
         self.queueStarted = True
@@ -160,12 +168,14 @@ class Session:
     
     #################### PLAYLIST ####################
 
+    #creates an empty playlist in the DB as well as in mopidy
     def createPlaylist(self, playlistName, deviceID):
         playlistID = self.db.createPlaylist(playlistName, deviceID)
         if playlistID > 0:
             self.mopidy.createPlaylist(playlistName)
         return playlistID
 
+    #adds one or more songs to a playlist
     def addSongToPlaylist(self, songIDs, playlistID):
         for songID in songIDs:
             success = self.db.insertSongToPlaylist(songID, playlistID)
@@ -175,9 +185,11 @@ class Session:
                 songURI = self.db.getSongURI(songID)
                 self.mopidy.songToPlaylist(playlistName, songURI)
 
+    #deletes a song from a playlist
     def deleteSongFromPlaylist(self, songID, playlistID):
         self.db.deleteSongFromPlaylist(songID, playlistID)
 
+    #starts playing a playlist from the beginning
     def playPlaylist(self, playlistID):
         playlistName = self.db.getPlaylistName(playlistID)
         self.mopidy.loadPlaylist(playlistName)
@@ -188,18 +200,21 @@ class Session:
             self.queue.append(song['songID'])
         self.queueStarted = True
 
+    #returns all playlists
     def getPlaylists(self):
         return self.db.getPlaylists()
 
+    #returns all the songs from a playlist
     def getSongsFromPlaylist(self, playlistID):
         return self.db.getSongsFromPlaylist(playlistID)
 
 
     #################### SONG ####################
 
+    #saves an uploaded song in the filesystem and DB
     def addSong(self, file, deviceID):
         filename = secure_filename(file.filename)
-        filepath = os.path.join('/home/john/Music/', filename)
+        filepath = os.path.join('$HOME/Music/', filename)
         songID = self.db.addSong("file://" + filepath, deviceID)
         if songID > 0:
             file.save(filepath)
@@ -210,5 +225,6 @@ class Session:
                 self.db.addSongMetaData(songID, "None", "None", "None", "None", 0)
         return songID
 
+    #returns all saved songs
     def getSongs(self):
         return self.db.getSongs()

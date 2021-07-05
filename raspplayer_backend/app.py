@@ -246,6 +246,7 @@ def returnUsers():
 
 #################### PLAYER CONTROLS ####################
 
+#calls a function in Session.py to set the player volume to the specified amount
 @app.route('/session/volume/<amount>', methods = ['PUT'])
 @checkForUser
 def setVolume(amount):
@@ -254,6 +255,7 @@ def setVolume(amount):
         {'volume': amount}
     )
 
+#calls a function in Session.py to mute the player volume
 @app.route('/session/volume/mute', methods = ['PUT'])
 @checkForUser
 def muteVolume():
@@ -262,6 +264,7 @@ def muteVolume():
         {'volume': 'muted'}
     )
 
+#calls a function in Session.py to skip the current song, if the specified skipvote percentage is met
 @app.route('/session/currentSong/skip', methods = ['PUT'])
 @checkForUser
 def skipCurrentSong():
@@ -290,11 +293,13 @@ def skipCurrentSong():
         {'currentSong': session.queue[0]}
     )
 
+#calls a function in Session.py to pause/resume the player
 @app.route('/session/currentSong/pause', methods = ["PUT"])
 def currentSongPause():
     session.pause()
     return 'pause/resume'
 
+#calls a function in Session.py to replay the currently playing song
 @app.route('/session/currentSong/replay', methods = ['GET'])
 @checkForUser
 def replayCurrentSong():
@@ -306,6 +311,7 @@ def replayCurrentSong():
 
 #################### QUEUE ####################
 
+#calls a function in Session.py to return all songs in the queue
 @app.route('/session/queue', methods = ['GET'])
 #@checkForUser
 def returnQueue():
@@ -314,6 +320,7 @@ def returnQueue():
         queue
     )
 
+#calls a function in Session.py to add one or more songs to the queue
 @app.route('/session/queue/addSongs', methods = ['POST'])
 #@checkForUser
 def addSongToQueue():
@@ -323,6 +330,7 @@ def addSongToQueue():
         {'message': 'done'}
     )
 
+#calls a function in Session.py to delete the specified song from the queue
 @app.route('/session/queue/deleteSong', methods = ['DELETE'])
 #@checkForUser
 def deleteSongFromQueue():
@@ -332,6 +340,7 @@ def deleteSongFromQueue():
         {'message': 'song deleted from queue'}
     )
 
+#calls a function in Session.py to start playing the queue
 @app.route('/session/queue/play', methods = ['POST'])
 #@checkForUser
 def playQueue():
@@ -343,6 +352,7 @@ def playQueue():
 
 #################### SONG ####################
 
+#calls a function in Session.py to store the uploaded song in the filesystem and database
 @app.route('/library/upload', methods = ['POST'])
 #@checkForUser
 def uploadSong():
@@ -357,6 +367,7 @@ def uploadSong():
             {'error': 'song already in library'}
         ), 400
 
+#calls a function in Session.py to return all stored songs
 @app.route('/library/songs', methods = ['GET'])
 #@checkForUser
 def getSongs():
@@ -368,6 +379,7 @@ def getSongs():
 
 #################### PLAYLIST ####################
 
+#calls a function in Session.py to create a new playlist
 @app.route('/session/playlist/create', methods = ['PUT'])
 #@checkForUser
 @checkJsonValid
@@ -383,6 +395,7 @@ def createPlaylist():
             {'error': 'playlistName already exists'}
         ), 400
 
+#calls a function in Session.py to add songs to a playlist
 @app.route('/session/playlist/addSongs', methods = ['PUT'])
 #@checkForUser
 @checkJsonValid
@@ -393,6 +406,7 @@ def addSongToPlaylist():
         {'message': 'done'}
     )
 
+#calls a function in Session.py to delete a song from a playlist
 @app.route('/session/playlist/deleteSong', methods = ['DELETE'])
 #@checkForUser
 @checkJsonValid
@@ -403,6 +417,7 @@ def deleteSongFromPlaylist():
         {'message': 'song deleted from playlist'}
     )
 
+#calls a function in Session.py to start playing a playlist from the beginning
 @app.route('/session/playlist/play', methods = ['POST'])
 #@checkForUser
 @checkJsonValid
@@ -413,6 +428,7 @@ def playPlaylist():
         {'message': 'playing playlist'}
     )
 
+#calls a function in Session.py to return all playlists
 @app.route('/session/playlists', methods = ['GET'])
 #@checkForUser
 def getPlaylists():
@@ -421,6 +437,7 @@ def getPlaylists():
         playlists
     )
 
+#calls a function in Session.py to return all songs from a playlist
 @app.route('/session/playlist/songs/<playlistID>', methods = ['GET'])
 #@checkForUser
 def getSongsFromPlaylist(playlistID):
