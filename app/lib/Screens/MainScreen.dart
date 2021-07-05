@@ -1,6 +1,4 @@
 
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -21,11 +19,10 @@ class MainScreenState extends State<MainScreen> {
 
   final bool admin = true;
   final bool emptyQueue = true;
-  final String currentSong = 'current Song';
 
   RestService _restService = new RestService();
 
-  String _songTitle = '';
+  String _songTitle = 'no song playing';
   String _artist = '';
   String _album = '';
   String _user = '';
@@ -43,7 +40,6 @@ class MainScreenState extends State<MainScreen> {
           action: SnackBarAction(
             label: 'Ok',
             onPressed: () {
-              // Code to execute.
             },
           ),
         )
@@ -57,21 +53,16 @@ class MainScreenState extends State<MainScreen> {
     //continuously makes requests to the backend for UI update
     Timer.periodic(new Duration(seconds: 1), (timer) {
       var route = ModalRoute.of(context);
-      stderr.writeln(route.settings.name);
       if (true || route.settings.name == "Main") {
         loadQueue();
       } else {
-        //timer.cancel();
+        timer.cancel();
       }
     });
-
-    //MainScreenProvider mainScreenProvider = Provider.of<MainScreenProvider>(context);
-
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     //responsible for state management
     MainScreenProvider mainScreenProvider = Provider.of<MainScreenProvider>(context);
     return Scaffold(
@@ -200,7 +191,7 @@ class MainScreenState extends State<MainScreen> {
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text("Songname" + ": " + currentSong),
+                                          Text("Songname" + ": " + _songTitle),
                                           SizedBox(height: 10),
                                           Text("Interpret" + ": " + _artist),
                                           SizedBox(height: 10),
