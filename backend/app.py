@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Flask,jsonify, request
 from functools import wraps
-from CLasses import User, Session, Admin, User
+from classes import User, Session, Admin, User
 import json
 import jwt
 import datetime
