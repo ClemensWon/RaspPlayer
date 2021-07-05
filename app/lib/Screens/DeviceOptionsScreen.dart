@@ -40,7 +40,6 @@ class DeviceOptionsScreenState extends State<DeviceOptionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Text('Device Options'),

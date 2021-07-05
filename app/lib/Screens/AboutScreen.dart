@@ -6,7 +6,6 @@ import 'package:flutter/painting.dart';
 class AboutScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       floatingActionButton: Container(
         width: 40,

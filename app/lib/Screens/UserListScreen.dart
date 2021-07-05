@@ -4,7 +4,6 @@ import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Components/UserListItem.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 import 'package:raspplayer_app/Services/UserData.dart';
-import 'dart:io';
 
 class UserListScreen extends StatefulWidget {
   @override
@@ -25,7 +24,6 @@ class UserListScreenState extends State<UserListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Text('User List'),

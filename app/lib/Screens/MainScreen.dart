@@ -43,7 +43,6 @@ class MainScreenState extends State<MainScreen> {
           action: SnackBarAction(
             label: 'Ok',
             onPressed: () {
-              // Code to execute.
             },
           ),
         )
@@ -57,11 +56,10 @@ class MainScreenState extends State<MainScreen> {
     //continuously makes requests to the backend for UI update
     Timer.periodic(new Duration(seconds: 1), (timer) {
       var route = ModalRoute.of(context);
-      stderr.writeln(route.settings.name);
       if (true || route.settings.name == "Main") {
         loadQueue();
       } else {
-        //timer.cancel();
+        timer.cancel();
       }
     });
 
@@ -71,7 +69,6 @@ class MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     //responsible for state management
     MainScreenProvider mainScreenProvider = Provider.of<MainScreenProvider>(context);
     return Scaffold(

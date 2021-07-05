@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:raspplayer_app/Components/NavigationDrawer.dart';
 import 'package:raspplayer_app/Components/SongListItem.dart';
 import 'package:flutter/foundation.dart';
-import 'package:raspplayer_app/Screens/MainScreen.dart';
 import 'package:raspplayer_app/Services/FilePickerService.dart';
 import 'package:raspplayer_app/Services/RestService.dart';
 import 'dart:io';
@@ -33,7 +31,6 @@ class LibraryScreenSate extends State<LibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     RestService restService = new RestService();
     return Scaffold(
       appBar: AppBar(
