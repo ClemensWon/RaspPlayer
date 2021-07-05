@@ -104,10 +104,6 @@ def login():
             {'message': 'SessionPin was not correct'}
         ), 401
 
-@app.route('/')
-def index():
-    return 'Hello World'
-
 @app.route('/login/master', methods = ["POST"])
 @checkJsonValid
 def loginMaster():
@@ -126,54 +122,6 @@ def loginMaster():
         return jsonify(
             {'message': 'Login as Master was not sucessfull'}
         ), 401
-
-@app.route('/statistics', methods = ["GET"])
-@checkForUser
-def getStatistics():
-    return jsonify(
-        {
-            'statistics': 'yes',
-            'bestDj': {
-                'username': 'DJ Ötzi',
-                'likes': 2,
-            },
-            'bestSong': {
-                'songname': 'Song1',
-                'likes': 69,
-            },
-            'favArtist': {
-                'artistname': 'Mozart',
-                'likes': 123,
-            },
-            'playlistJunkie': {
-                'username': 'MoneyBoy',
-                'songsAdded': 123,
-            },
-            'mostReplays': {
-                'songname': 'Song24',
-                'replays': 5,
-            },
-            'mostSkipped': {
-                'songname': 'Song99',
-                'skipped': 19,
-            },
-        }
-    )
-
-@app.route('/settings')
-def settings():
-    #get Settings
-    return 'settings'
-
-@app.route('/settings/sessionPin', methods = ["POST"])
-@checkForAdmin
-@checkJsonValid
-def changeSessionPin():
-    requestData = request.get_json()
-    session.sessionPin = requestData['newPin']
-    return jsonify(
-        {'sessionPin': session.sessionPin}
-    )
 
 @app.route('/sessionPin', methods = ["GET"])
 @checkForAdmin
@@ -218,37 +166,12 @@ def likeSong():
         {'message': 'song Liked'}
     )
 
-'''
-@app.route('/session/currentSong/get', methods = ["GET"])
-@checkForUser
-def getCurrentSong():
-    song = session.getCurrentSong()
-    return jsonify(
-        song
-    )
-'''
-@app.route('/session/setCurrentSong/<songId>', methods = ["PUT"])
-@checkForAdmin
-@checkJsonValid
-def setCurrentSong(songId):
-    session.currentSong = songId
-    return jsonify(
-        {'currentSong': session.currentSong}
-    )
-
 @app.route('/session/start', methods = ['PUT'])
 @checkForUser
 def startSession():
     session = Session.Session("default")
     return jsonify(
         {'session': "Created New"}
-    )
-
-@app.route('/session/mute/<username>', methods = ['PUT'])
-@checkForUser
-def muteUser(username):
-    return jsonify(
-        {'muted': username}
     )
 
 @app.route('/session/users/return', methods = ['GET'])
